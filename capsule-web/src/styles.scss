@@ -1,0 +1,359 @@
+@use '@carbon/styles';
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+/* ---------- Theme + Carbon layering ----------
+   The whole shell is wrapped in ONE <Theme theme={theme}> (.cds--gXX) so the
+   header, side-nav and content all follow the active theme. Resolve the
+   contextual layer tokens to the base layer (-01) so surfaces — data tables,
+   tiles, fields — render on a real layer instead of computing transparent. */
+.cds--g10,
+.cds--g90,
+.cds--g100 {
+  --cds-layer: var(--cds-layer-01);
+  --cds-layer-hover: var(--cds-layer-hover-01);
+  --cds-layer-active: var(--cds-layer-active-01);
+  --cds-layer-selected: var(--cds-layer-selected-01);
+  --cds-layer-selected-hover: var(--cds-layer-selected-hover-01);
+  --cds-layer-accent: var(--cds-layer-accent-01);
+  --cds-layer-accent-hover: var(--cds-layer-accent-hover-01);
+  --cds-field: var(--cds-field-01);
+  --cds-field-hover: var(--cds-field-hover-01);
+  --cds-border-subtle: var(--cds-border-subtle-01);
+  --cds-border-strong: var(--cds-border-strong-01);
+}
+
+body {
+  background: var(--cds-background);
+}
+
+/* Toast region: fixed top-right, above the header. */
+.capsule-toasts {
+  position: fixed;
+  top: 3.5rem;
+  right: 1rem;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* The shell wrapper fills the viewport and paints the page (grey) background. */
+.capsule-shell {
+  min-height: 100vh;
+  background: var(--cds-background);
+  color: var(--cds-text-primary);
+}
+
+/* Shell chrome follows the theme. Carbon's UI-shell header hardcodes
+   light-on-dark colours, so retint its text/icons to the themed tokens. */
+.cds--header {
+  background: var(--cds-background);
+  border-bottom: 1px solid var(--cds-border-subtle);
+}
+.cds--header__name,
+.cds--header__menu-title,
+.cds--header__menu-item,
+.cds--header__action {
+  color: var(--cds-text-primary);
+}
+.cds--header__action > svg,
+.cds--header__name > svg {
+  fill: var(--cds-icon-primary);
+}
+.cds--header__action:hover {
+  background: var(--cds-background-hover);
+}
+.cds--side-nav,
+.cds--side-nav__navigation,
+.cds--side-nav__items {
+  background: var(--cds-background);
+}
+.cds--side-nav {
+  border-right: 1px solid var(--cds-border-subtle);
+}
+
+.capsule-content {
+  padding: 2rem;
+  margin-top: 3rem; /* below the fixed Carbon header */
+  margin-left: 3rem; /* clear the collapsed SideNav rail */
+  min-height: calc(100vh - 3rem);
+  background: var(--cds-background);
+}
+
+/* Surfaces sit on a layer (white in light / #262626 in dark) for depth,
+   with a subtle border so tables/cards read as elevated on the grey page. */
+.cds--data-table-container {
+  background: var(--cds-layer);
+  border: 1px solid var(--cds-border-subtle);
+}
+.cds--data-table tbody td {
+  background-color: var(--cds-layer);
+}
+.cds--data-table thead th {
+  background-color: var(--cds-layer-accent);
+}
+
+.capsule-page {
+  max-width: 80rem;
+}
+.capsule-breadcrumb {
+  margin-bottom: 1rem;
+}
+.capsule-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.capsule-page__title {
+  font-size: 1.75rem;
+  font-weight: 400;
+  margin: 0 0 1.5rem;
+}
+.capsule-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+.capsule-empty h4 {
+  margin: 0 0 0.5rem;
+}
+.capsule-empty p {
+  color: var(--cds-text-secondary);
+  margin: 0 0 1.5rem;
+}
+.capsule-error {
+  color: var(--cds-text-error, #da1e28);
+  margin-top: 0.5rem;
+}
+// Browse layout: narrow tree on the left, wide content on the right.
+.capsule-detail.capsule-detail--browse {
+  grid-template-columns: minmax(14rem, 1fr) 2fr;
+}
+.capsule-detail {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+.capsule-viewer {
+  background: var(--cds-layer);
+  border: 1px solid var(--cds-border-subtle);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-height: 20rem;
+  justify-content: center;
+}
+.capsule-viewer__img {
+  max-width: 100%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.capsule-viewer__nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.capsule-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+@media (max-width: 60rem) {
+  .capsule-detail {
+    grid-template-columns: 1fr;
+  }
+}
+
+.capsule-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.capsule-login-card {
+  width: 100%;
+  max-width: 24rem;
+}
+.capsule-login-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0;
+}
+.capsule-login-subtitle {
+  color: var(--cds-text-secondary);
+  margin: 0.25rem 0 0;
+}
+
+.capsule-preview-img {
+  max-width: 100%;
+  border: 1px solid var(--cds-border-subtle);
+}
+
+/* Dashboard stat tiles */
+.capsule-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem;
+}
+.capsule-stat {
+  min-height: 8rem;
+}
+.capsule-stat__icon {
+  color: var(--cds-icon-secondary);
+  margin-bottom: 0.75rem;
+}
+.capsule-stat__value {
+  font-size: 2.5rem;
+  font-weight: 300;
+  line-height: 1;
+}
+.capsule-stat__label {
+  margin-top: 0.5rem;
+  color: var(--cds-text-secondary);
+}
+.capsule-recent .cds--structured-list-row:hover {
+  background: var(--cds-layer-hover);
+}
+
+/* Detail page action buttons + tabs */
+.capsule-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.capsule-tabs {
+  margin-top: 2rem;
+}
+.capsule-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.capsule-meta-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.capsule-comment__meta {
+  font-size: 0.75rem;
+  color: var(--cds-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+/* Content (OCR / parsed) tabs */
+.capsule-content-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.capsule-hint {
+  color: var(--cds-text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+.capsule-section-title {
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin: 0 0 1rem;
+}
+.capsule-section-subtitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--cds-text-secondary);
+}
+
+/* Workflows */
+.capsule-wf-progress {
+  padding: 1rem 0.5rem;
+  overflow-x: auto;
+}
+.capsule-wf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.capsule-wf-transition {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.capsule-wf-transition > * {
+  min-width: 14rem;
+}
+.capsule-wf-transition > button {
+  min-width: auto;
+}
+
+/* Notification bell badge + dropdown panel */
+.capsule-bell-badge {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.2rem;
+  border-radius: 0.5rem;
+  background: #da1e28;
+  color: #fff;
+  font-size: 0.6rem;
+  line-height: 1rem;
+  text-align: center;
+  pointer-events: none;
+}
+.capsule-bell-panel {
+  position: absolute;
+  top: 3rem;
+  right: 0;
+  width: 22rem;
+  max-height: 26rem;
+  overflow-y: auto;
+  background: var(--cds-layer, #fff);
+  border: 1px solid var(--cds-border-subtle, #e0e0e0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 9000;
+}
+.capsule-bell-panel__header {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--cds-border-subtle, #e0e0e0);
+}
+.capsule-bell-panel__empty {
+  padding: 1rem;
+  color: var(--cds-text-secondary, #525252);
+}
+.capsule-bell-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.capsule-bell-panel__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--cds-border-subtle, #e0e0e0);
+}
+.capsule-bell-panel__item:hover {
+  background: var(--cds-layer-hover, #e8e8e8);
+}
+.capsule-bell-panel__time {
+  font-size: 0.75rem;
+  color: var(--cds-text-secondary, #525252);
+}

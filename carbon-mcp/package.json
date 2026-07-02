@@ -1,0 +1,1 @@
+{"name":"carbon-mcp-data","private":true,"version":"0.0.0","dependencies":{"@carbon/colors":"^11.52.0","@carbon/layout":"^11.53.0","@carbon/themes":"^11.75.0","@carbon/type":"^11.61.0","@carbon/web-components":"^2.57.0"}}

@@ -1,0 +1,13 @@
+services:
+  app:
+    # Force amd64 so the (amd64-only) Mayan image runs on Apple Silicon via Rosetta.
+    # Harmless on native amd64/Linux hosts.
+    platform: linux/amd64
+    # rw so `makemigrations` can write capsule_org migration files back to the host;
+    # all-in-one `app` runs web + workers, so the upload signal handler lives here too.
+    # Path is relative to this compose file's dir (docker/) so it is host-portable.
+    volumes:
+      - ../mayan:/opt/mayan-edms/lib/python3.13/site-packages/mayan:rw
+    environment:
+      # Register the custom tenancy app (full dotted AppConfig path, YAML list).
+      MAYAN_COMMON_EXTRA_APPS: "[mayan.apps.capsule_org.apps.CapsuleOrgApp]"

@@ -1,0 +1,18 @@
+import { chromium } from 'playwright'
+const APP='http://localhost:5180'
+const b=await chromium.launch({headless:false,channel:'chrome',args:['--no-sandbox']})
+const p=await(await b.newContext({viewport:{width:1440,height:900}})).newPage()
+await p.goto(APP+'/login',{waitUntil:'networkidle'});await p.waitForTimeout(800)
+await p.fill('#username','fresh_p2_client');await p.fill('#password','FreshClientPass123!')
+await p.getByRole('button',{name:/sign in/i}).click();await p.waitForTimeout(3000)
+await p.goto(APP+'/workspace/upload',{waitUntil:'networkidle'});await p.waitForTimeout(1500)
+const fi=p.locator('input[type="file"]').first()
+await fi.setInputFiles({name:'p2-err.txt',mimeType:'text/plain',buffer:Buffer.from('x')})
+await p.waitForTimeout(600)
+await p.locator('[data-testid="upload-submit"]').click()
+await p.waitForTimeout(2500)
+const err=await p.locator('.cds--inline-notification__subtitle, .cds--inline-notification__title').allInnerTexts().catch(()=>[])
+const crashed=await p.locator('text=/Something went wrong/i').count()
+console.log(JSON.stringify({errNotifications:err,crashed,stillOnUpload:p.url().includes('upload')}))
+await b.close()
+console.log('ERRDONE')

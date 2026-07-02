@@ -1,0 +1,596 @@
+{
+  "source": "carbondesignsystem.com/llms.txt",
+  "count": 118,
+  "docs": [
+    {
+      "title": "Overview",
+      "url": "https://carbondesignsystem.com/",
+      "desc": "Introduction to Carbon Design System"
+    },
+    {
+      "title": "All Systems",
+      "url": "https://carbondesignsystem.com/all-systems/",
+      "desc": "Overview of all IBM design systems"
+    },
+    {
+      "title": "Designing",
+      "url": "https://carbondesignsystem.com/designing/get-started/",
+      "desc": "Getting started for designers"
+    },
+    {
+      "title": "Developing",
+      "url": "https://carbondesignsystem.com/developing/get-started/",
+      "desc": "Getting started for developers"
+    },
+    {
+      "title": "Color",
+      "url": "https://carbondesignsystem.com/foundations/color/overview/",
+      "desc": "Color usage and tokens"
+    },
+    {
+      "title": "Grid",
+      "url": "https://carbondesignsystem.com/foundations/grid/overview/",
+      "desc": "Layout grid system"
+    },
+    {
+      "title": "Icons",
+      "url": "https://carbondesignsystem.com/foundations/icons/library/",
+      "desc": "Icon library"
+    },
+    {
+      "title": "Motion",
+      "url": "https://carbondesignsystem.com/foundations/motion/overview/",
+      "desc": "Animation and motion guidelines"
+    },
+    {
+      "title": "Pictograms",
+      "url": "https://carbondesignsystem.com/foundations/pictograms/library/",
+      "desc": "Pictogram library"
+    },
+    {
+      "title": "Shape",
+      "url": "https://carbondesignsystem.com/foundations/shape/overview/",
+      "desc": "Shape tokens and usage"
+    },
+    {
+      "title": "Spacing",
+      "url": "https://carbondesignsystem.com/foundations/spacing/overview/",
+      "desc": "Spacing scale and tokens"
+    },
+    {
+      "title": "Themes",
+      "url": "https://carbondesignsystem.com/foundations/themes/overview/",
+      "desc": "Theming and tokens"
+    },
+    {
+      "title": "Typography",
+      "url": "https://carbondesignsystem.com/foundations/typography/overview/",
+      "desc": "Type scale and usage"
+    },
+    {
+      "title": "2x Grid",
+      "url": "https://carbondesignsystem.com/foundations/2x-grid/overview/",
+      "desc": "2x Grid system"
+    },
+    {
+      "title": "Overview",
+      "url": "https://carbondesignsystem.com/components/overview/components/",
+      "desc": "All components overview"
+    },
+    {
+      "title": "Accordion",
+      "url": "https://carbondesignsystem.com/components/accordion/usage/",
+      "desc": "Expandable/collapsible sections"
+    },
+    {
+      "title": "AI Label",
+      "url": "https://carbondesignsystem.com/components/ai-label/usage/",
+      "desc": "AI-generated content label"
+    },
+    {
+      "title": "AI Skeleton",
+      "url": "https://carbondesignsystem.com/components/ai-skeleton/usage/",
+      "desc": "Skeleton loader for AI content"
+    },
+    {
+      "title": "Breadcrumb",
+      "url": "https://carbondesignsystem.com/components/breadcrumb/usage/",
+      "desc": "Navigation breadcrumb trail"
+    },
+    {
+      "title": "Button",
+      "url": "https://carbondesignsystem.com/components/button/usage/",
+      "desc": "Button variants and usage"
+    },
+    {
+      "title": "Checkbox",
+      "url": "https://carbondesignsystem.com/components/checkbox/usage/",
+      "desc": "Checkbox input"
+    },
+    {
+      "title": "Code Snippet",
+      "url": "https://carbondesignsystem.com/components/code-snippet/usage/",
+      "desc": "Inline and block code display"
+    },
+    {
+      "title": "Combobox",
+      "url": "https://carbondesignsystem.com/components/combobox/usage/",
+      "desc": "Searchable dropdown"
+    },
+    {
+      "title": "Content Switcher",
+      "url": "https://carbondesignsystem.com/components/content-switcher/usage/",
+      "desc": "Toggle between content views"
+    },
+    {
+      "title": "Context Menu",
+      "url": "https://carbondesignsystem.com/components/context-menu/usage/",
+      "desc": "Right-click context menu"
+    },
+    {
+      "title": "Data Table",
+      "url": "https://carbondesignsystem.com/components/data-table/usage/",
+      "desc": "Tabular data display"
+    },
+    {
+      "title": "Date Picker",
+      "url": "https://carbondesignsystem.com/components/date-picker/usage/",
+      "desc": "Date selection input"
+    },
+    {
+      "title": "Dropdown",
+      "url": "https://carbondesignsystem.com/components/dropdown/usage/",
+      "desc": "Select from a list"
+    },
+    {
+      "title": "File Uploader",
+      "url": "https://carbondesignsystem.com/components/file-uploader/usage/",
+      "desc": "File upload component"
+    },
+    {
+      "title": "Form",
+      "url": "https://carbondesignsystem.com/components/form/usage/",
+      "desc": "Form layout and structure"
+    },
+    {
+      "title": "Inline Loading",
+      "url": "https://carbondesignsystem.com/components/inline-loading/usage/",
+      "desc": "Inline loading state"
+    },
+    {
+      "title": "Link",
+      "url": "https://carbondesignsystem.com/components/link/usage/",
+      "desc": "Hyperlink component"
+    },
+    {
+      "title": "List",
+      "url": "https://carbondesignsystem.com/components/list/usage/",
+      "desc": "Ordered and unordered lists"
+    },
+    {
+      "title": "Loading",
+      "url": "https://carbondesignsystem.com/components/loading/usage/",
+      "desc": "Loading spinner"
+    },
+    {
+      "title": "Menu",
+      "url": "https://carbondesignsystem.com/components/menu/usage/",
+      "desc": "Menu and menu items"
+    },
+    {
+      "title": "Modal",
+      "url": "https://carbondesignsystem.com/components/modal/usage/",
+      "desc": "Dialog overlay"
+    },
+    {
+      "title": "Multiselect",
+      "url": "https://carbondesignsystem.com/components/multi-select/usage/",
+      "desc": "Select multiple items"
+    },
+    {
+      "title": "Notification",
+      "url": "https://carbondesignsystem.com/components/notification/usage/",
+      "desc": "Alert and notification banners"
+    },
+    {
+      "title": "Number Input",
+      "url": "https://carbondesignsystem.com/components/number-input/usage/",
+      "desc": "Numeric input field"
+    },
+    {
+      "title": "Overflow Menu",
+      "url": "https://carbondesignsystem.com/components/overflow-menu/usage/",
+      "desc": "Additional options menu"
+    },
+    {
+      "title": "Pagination",
+      "url": "https://carbondesignsystem.com/components/pagination/usage/",
+      "desc": "Page navigation"
+    },
+    {
+      "title": "Popover",
+      "url": "https://carbondesignsystem.com/components/popover/usage/",
+      "desc": "Floating content panel"
+    },
+    {
+      "title": "Progress Bar",
+      "url": "https://carbondesignsystem.com/components/progress-bar/usage/",
+      "desc": "Task progress indicator"
+    },
+    {
+      "title": "Progress Indicator",
+      "url": "https://carbondesignsystem.com/components/progress-indicator/usage/",
+      "desc": "Multi-step progress"
+    },
+    {
+      "title": "Radio Button",
+      "url": "https://carbondesignsystem.com/components/radio-button/usage/",
+      "desc": "Single-select radio input"
+    },
+    {
+      "title": "Search",
+      "url": "https://carbondesignsystem.com/components/search/usage/",
+      "desc": "Search input field"
+    },
+    {
+      "title": "Select",
+      "url": "https://carbondesignsystem.com/components/select/usage/",
+      "desc": "Native select dropdown"
+    },
+    {
+      "title": "Side Panel",
+      "url": "https://carbondesignsystem.com/components/side-panel/usage/",
+      "desc": "Sliding side panel"
+    },
+    {
+      "title": "Skeleton",
+      "url": "https://carbondesignsystem.com/components/skeleton/usage/",
+      "desc": "Loading skeleton placeholder"
+    },
+    {
+      "title": "Slider",
+      "url": "https://carbondesignsystem.com/components/slider/usage/",
+      "desc": "Range slider input"
+    },
+    {
+      "title": "Stack",
+      "url": "https://carbondesignsystem.com/components/stack/usage/",
+      "desc": "Layout stack utility"
+    },
+    {
+      "title": "Structured List",
+      "url": "https://carbondesignsystem.com/components/structured-list/usage/",
+      "desc": "Structured data list"
+    },
+    {
+      "title": "Tabs",
+      "url": "https://carbondesignsystem.com/components/tabs/usage/",
+      "desc": "Tabbed content navigation"
+    },
+    {
+      "title": "Tag",
+      "url": "https://carbondesignsystem.com/components/tag/usage/",
+      "desc": "Label and category tags"
+    },
+    {
+      "title": "Text Area",
+      "url": "https://carbondesignsystem.com/components/text-area/usage/",
+      "desc": "Multi-line text input"
+    },
+    {
+      "title": "Text Input",
+      "url": "https://carbondesignsystem.com/components/text-input/usage/",
+      "desc": "Single-line text input"
+    },
+    {
+      "title": "Tile",
+      "url": "https://carbondesignsystem.com/components/tile/usage/",
+      "desc": "Clickable tile component"
+    },
+    {
+      "title": "Time Picker",
+      "url": "https://carbondesignsystem.com/components/time-picker/usage/",
+      "desc": "Time selection input"
+    },
+    {
+      "title": "Toggle",
+      "url": "https://carbondesignsystem.com/components/toggle/usage/",
+      "desc": "On/off toggle switch"
+    },
+    {
+      "title": "Toggletip",
+      "url": "https://carbondesignsystem.com/components/toggletip/usage/",
+      "desc": "Interactive tooltip"
+    },
+    {
+      "title": "Toolbar",
+      "url": "https://carbondesignsystem.com/components/toolbar/usage/",
+      "desc": "Action toolbar"
+    },
+    {
+      "title": "Tooltip",
+      "url": "https://carbondesignsystem.com/components/tooltip/usage/",
+      "desc": "Hover tooltip"
+    },
+    {
+      "title": "Tree View",
+      "url": "https://carbondesignsystem.com/components/tree-view/usage/",
+      "desc": "Hierarchical tree navigation"
+    },
+    {
+      "title": "UI Shell",
+      "url": "https://carbondesignsystem.com/components/UI-shell-header/usage/",
+      "desc": "App shell header, side nav, and footer"
+    },
+    {
+      "title": "Common Actions",
+      "url": "https://carbondesignsystem.com/patterns/common-actions/",
+      "desc": "Standard UI actions"
+    },
+    {
+      "title": "Dialogs",
+      "url": "https://carbondesignsystem.com/patterns/dialog-patterns/",
+      "desc": "Dialog and modal patterns"
+    },
+    {
+      "title": "Disclosures",
+      "url": "https://carbondesignsystem.com/patterns/disclosures/",
+      "desc": "Disclosure patterns"
+    },
+    {
+      "title": "Empty States",
+      "url": "https://carbondesignsystem.com/patterns/empty-states-pattern/",
+      "desc": "No content state handling"
+    },
+    {
+      "title": "Filtering",
+      "url": "https://carbondesignsystem.com/patterns/filtering/",
+      "desc": "Data filtering patterns"
+    },
+    {
+      "title": "Forms",
+      "url": "https://carbondesignsystem.com/patterns/forms-pattern/",
+      "desc": "Form design patterns"
+    },
+    {
+      "title": "Global Header",
+      "url": "https://carbondesignsystem.com/patterns/global-header/",
+      "desc": "Site-wide header pattern"
+    },
+    {
+      "title": "Loading",
+      "url": "https://carbondesignsystem.com/patterns/loading-pattern/",
+      "desc": "Loading state patterns"
+    },
+    {
+      "title": "Login",
+      "url": "https://carbondesignsystem.com/patterns/login-pattern/",
+      "desc": "Authentication patterns"
+    },
+    {
+      "title": "Notifications",
+      "url": "https://carbondesignsystem.com/patterns/notification-pattern/",
+      "desc": "Notification patterns"
+    },
+    {
+      "title": "Overflow Content",
+      "url": "https://carbondesignsystem.com/patterns/overflow-content/",
+      "desc": "Handling overflow"
+    },
+    {
+      "title": "Pagination",
+      "url": "https://carbondesignsystem.com/patterns/pagination-pattern/",
+      "desc": "Pagination patterns"
+    },
+    {
+      "title": "Placeholder Loading",
+      "url": "https://carbondesignsystem.com/patterns/placeholder-loading-pattern/",
+      "desc": "Skeleton loading"
+    },
+    {
+      "title": "Search",
+      "url": "https://carbondesignsystem.com/patterns/search-pattern/",
+      "desc": "Search UX patterns"
+    },
+    {
+      "title": "Status Indicators",
+      "url": "https://carbondesignsystem.com/patterns/status-indicator-pattern/",
+      "desc": "Status display patterns"
+    },
+    {
+      "title": "Overview",
+      "url": "https://carbondesignsystem.com/data-visualization/getting-started/",
+      "desc": "Data viz overview"
+    },
+    {
+      "title": "Chart Types",
+      "url": "https://carbondesignsystem.com/data-visualization/chart-types/",
+      "desc": "Available chart types"
+    },
+    {
+      "title": "Color Palettes",
+      "url": "https://carbondesignsystem.com/data-visualization/color-palettes/",
+      "desc": "Viz color system"
+    },
+    {
+      "title": "Axes & Labels",
+      "url": "https://carbondesignsystem.com/data-visualization/axes-and-labels/",
+      "desc": "Chart axes guidance"
+    },
+    {
+      "title": "Overview",
+      "url": "https://charts.carbondesignsystem.com/",
+      "desc": "Carbon Charts component library (React, Vue, Angular, Svelte, Vanilla)"
+    },
+    {
+      "title": "React (@carbon/react)",
+      "url": "https://carbondesignsystem.com/developing/frameworks/react/",
+      "desc": "React implementation"
+    },
+    {
+      "title": "Web Components (@carbon/web-components)",
+      "url": "https://carbondesignsystem.com/developing/frameworks/web-components/",
+      "desc": "Web Components implementation"
+    },
+    {
+      "title": "Angular",
+      "url": "https://angular.carbondesignsystem.com/documentation/",
+      "desc": "Angular implementation"
+    },
+    {
+      "title": "Vue",
+      "url": "https://carbondesignsystem.com/developing/frameworks/vue/",
+      "desc": "Community Vue implementation"
+    },
+    {
+      "title": "Repository",
+      "url": "https://github.com/carbon-design-system/carbon",
+      "desc": "Main monorepo"
+    },
+    {
+      "title": "React (@carbon/react)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/react",
+      "desc": "React component source code"
+    },
+    {
+      "title": "Web Components (@carbon/web-components)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/web-components",
+      "desc": "Web Components source code"
+    },
+    {
+      "title": "Icons (@carbon/icons)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/icons",
+      "desc": "Icon SVG source files"
+    },
+    {
+      "title": "Icons React (@carbon/icons-react)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/icons-react",
+      "desc": "React icon components"
+    },
+    {
+      "title": "Icons Web Components (@carbon/icons-element)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/icons-element",
+      "desc": "Web Component icon elements"
+    },
+    {
+      "title": "Pictograms (@carbon/pictograms)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/pictograms",
+      "desc": "Pictogram SVG source files"
+    },
+    {
+      "title": "Pictograms React (@carbon/pictograms-react)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/pictograms-react",
+      "desc": "React pictogram components"
+    },
+    {
+      "title": "Styles (@carbon/styles)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/styles",
+      "desc": "CSS and Sass styles"
+    },
+    {
+      "title": "Tokens (@carbon/tokens)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/tokens",
+      "desc": "Design tokens"
+    },
+    {
+      "title": "Motion (@carbon/motion)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/motion",
+      "desc": "Motion tokens"
+    },
+    {
+      "title": "Type (@carbon/type)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/type",
+      "desc": "Typography tokens and utilities"
+    },
+    {
+      "title": "Layout (@carbon/layout)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/layout",
+      "desc": "Spacing and grid tokens"
+    },
+    {
+      "title": "Themes (@carbon/themes)",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/packages/themes",
+      "desc": "Theme definitions (White, G10, G90, G100)"
+    },
+    {
+      "title": "Examples",
+      "url": "https://github.com/carbon-design-system/carbon/tree/main/examples",
+      "desc": "Framework usage examples"
+    },
+    {
+      "title": "Repository",
+      "url": "https://github.com/carbon-design-system/ibm-products",
+      "desc": "IBM Products monorepo"
+    },
+    {
+      "title": "IBM Products React (@carbon/ibm-products)",
+      "url": "https://github.com/carbon-design-system/ibm-products/tree/main/packages/ibm-products",
+      "desc": "React components for IBM Products"
+    },
+    {
+      "title": "IBM Products Web Components (@carbon/ibm-products-web-components)",
+      "url": "https://github.com/carbon-design-system/ibm-products/tree/main/packages/ibm-products-web-components",
+      "desc": "Web Components for IBM Products"
+    },
+    {
+      "title": "Storybook",
+      "url": "https://ibm-products.carbondesignsystem.com",
+      "desc": "Interactive component demos"
+    },
+    {
+      "title": "Repository",
+      "url": "https://github.com/carbon-design-system/carbon-ai-chat",
+      "desc": "Carbon AI Chat monorepo"
+    },
+    {
+      "title": "Packages",
+      "url": "https://github.com/carbon-design-system/carbon-ai-chat/tree/main/packages",
+      "desc": "React and Web Component chat packages"
+    },
+    {
+      "title": "Examples",
+      "url": "https://github.com/carbon-design-system/carbon-ai-chat/tree/main/examples",
+      "desc": "Usage examples for React and Web Components"
+    },
+    {
+      "title": "Demo",
+      "url": "https://github.com/carbon-design-system/carbon-ai-chat/tree/main/demo",
+      "desc": "Live demo source"
+    },
+    {
+      "title": "Docs",
+      "url": "https://github.com/carbon-design-system/carbon-ai-chat/tree/main/docs",
+      "desc": "Documentation source"
+    },
+    {
+      "title": "Storybook",
+      "url": "https://chat.carbondesignsystem.com/tag/latest/docs/documents/Overview.html",
+      "desc": "Interactive AI chat component docs"
+    },
+    {
+      "title": "GitHub",
+      "url": "https://github.com/carbon-design-system/carbon",
+      "desc": "Source code"
+    },
+    {
+      "title": "Storybook (React)",
+      "url": "https://react.carbondesignsystem.com/",
+      "desc": "Interactive component demos"
+    },
+    {
+      "title": "FAQ",
+      "url": "https://carbondesignsystem.com/help/faq/",
+      "desc": "Frequently asked questions"
+    },
+    {
+      "title": "Changelog",
+      "url": "https://github.com/carbon-design-system/carbon/releases",
+      "desc": "Release notes"
+    },
+    {
+      "title": "Community Assets",
+      "url": "https://carbondesignsystem.com/community/component-index/",
+      "desc": "Community components"
+    }
+  ]
+}
