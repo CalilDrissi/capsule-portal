@@ -24,6 +24,37 @@ DEFAULT_CATEGORIES = [
     'Tax', 'Other'
 ]
 
+# Mayan renders a MetadataType.lookup value as a Django *template* (with a
+# context that exposes ALL platform users/groups) before comma-splitting it
+# into choices. A firm-supplied category that contains template control
+# sequences would therefore be evaluated server-side, leaking every firm's
+# usernames and `firm:<slug>:client:<username>` group names (e.g. a category
+# of `{{ users }}` or `{{ groups }}`). Any value containing one of these
+# sequences is rejected/stripped so only inert literals ever reach `lookup`.
+UNSAFE_LOOKUP_SEQUENCES = ('{{', '}}', '{%', '%}', '{', '}')
+
+
+def category_is_safe(value):
+    """
+    True if `value` is a plain literal that cannot be interpreted as a Django
+    template when written into a MetadataType.lookup field.
+    """
+    text = value or ''
+    return not any(token in text for token in UNSAFE_LOOKUP_SEQUENCES)
+
+
+def sanitize_categories(categories):
+    """
+    Drop empty and template-unsafe category values. Defense in depth for the
+    serializer-level rejection (`FirmSettingsSerializer`); guarantees that
+    nothing template-like ever reaches MetadataType.lookup even if a value
+    arrives through another code path.
+    """
+    return [
+        value for value in (categories or [])
+        if value and category_is_safe(value)
+    ]
+
 
 def _firm_metadata_name(firm, suffix):
     # MetadataType.name is globally unique and disallows spaces. Fold the
@@ -59,6 +90,8 @@ def build_firm_metadata_types(firm, categories=None):
         categories = list(
             getattr(settings, 'categories', None) or DEFAULT_CATEGORIES
         )
+    # Defense in depth: never write template-unsafe values into `lookup`.
+    categories = sanitize_categories(categories)
     if not categories:
         categories = list(DEFAULT_CATEGORIES)
 
@@ -106,7 +139,9 @@ def update_firm_category_choices(firm, categories):
     if metadata_type is None:
         return None
 
-    categories = [c for c in (categories or []) if c]
+    # Defense in depth: strip empty and template-unsafe values before they
+    # reach the `lookup` field (see UNSAFE_LOOKUP_SEQUENCES).
+    categories = sanitize_categories(categories)
     metadata_type.lookup = ','.join(categories)
     metadata_type._event_ignore = True
     metadata_type.save(update_fields=['lookup'])

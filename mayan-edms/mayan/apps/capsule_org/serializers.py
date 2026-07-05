@@ -1,7 +1,35 @@
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 from rest_framework import serializers
 
 from .models import CapsuleNotification, Client, DocumentRequest, Firm
 from .models.firm_models import PERIOD_BASIS_CHOICES, PERIOD_DEPTH_CHOICES
+from .services.metadata_builder import category_is_safe
+
+# Minimum length for any Capsule-set password (accountant creation, client
+# invite completion, and password change). Enforced alongside Django's
+# configured password validators.
+MINIMUM_PASSWORD_LENGTH = 10
+
+
+def validate_capsule_password(value):
+    """
+    Server-side password policy shared by every Capsule password entry point:
+    a minimum length plus Django's configured `AUTH_PASSWORD_VALIDATORS`.
+    Raises `serializers.ValidationError` (→ HTTP 400) on failure.
+    """
+    if not value or len(value) < MINIMUM_PASSWORD_LENGTH:
+        raise serializers.ValidationError(
+            'Password must be at least {} characters long.'.format(
+                MINIMUM_PASSWORD_LENGTH
+            )
+        )
+    try:
+        validate_password(password=value)
+    except DjangoValidationError as exception:
+        raise serializers.ValidationError(list(exception.messages))
+    return value
 
 
 class FirmSerializer(serializers.ModelSerializer):
@@ -28,6 +56,9 @@ class AccountantCreateSerializer(serializers.Serializer):
     full_name = serializers.CharField(
         allow_blank=True, max_length=150, required=False
     )
+
+    def validate_password(self, value):
+        return validate_capsule_password(value)
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -62,6 +93,25 @@ class FirmSettingsSerializer(serializers.Serializer):
     categories = serializers.ListField(
         child=serializers.CharField(max_length=255), required=False
     )
+
+    def validate_categories(self, value):
+        # Reject any category that could be interpreted as a Django template
+        # once written into the firm's Category MetadataType `lookup` field
+        # (Mayan renders that field as a template with a context exposing all
+        # platform users/groups — a `{{ users }}` category would leak every
+        # firm's usernames and client group names). See
+        # metadata_builder.UNSAFE_LOOKUP_SEQUENCES.
+        unsafe = [item for item in (value or []) if not category_is_safe(item)]
+        if unsafe:
+            # NOTE: build the message without str.format()/f-strings — it
+            # necessarily names the very brace sequences it forbids, and
+            # str.format() would parse those as fields and raise KeyError.
+            raise serializers.ValidationError(
+                'Categories may not contain template characters '
+                '(curly braces or percent-braces). Rejected: '
+                + ', '.join(unsafe)
+            )
+        return value
 
 
 class DocumentRequestSerializer(serializers.ModelSerializer):
@@ -108,3 +158,6 @@ class PasswordChangeSerializer(serializers.Serializer):
     new_password = serializers.CharField(
         max_length=255, style={'input_type': 'password'}
     )
+
+    def validate_new_password(self, value):
+        return validate_capsule_password(value)

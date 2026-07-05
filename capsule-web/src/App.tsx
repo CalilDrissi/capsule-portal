@@ -72,8 +72,10 @@ function RequireRole({
   children: React.ReactNode
 }) {
   const role = useAppStore((s) => s.role)
-  // Platform keeps full access to every route (today's behavior).
-  if (role === 'platform' || role == null) return <>{children}</>
+  // Only an explicit platform role gets full access. A null/unknown role must
+  // NOT fail open to admin — bounce to login for a clean re-auth.
+  if (role == null) return <Navigate to="/login" replace />
+  if (role === 'platform') return <>{children}</>
   if (allow.includes(role)) return <>{children}</>
   return <Navigate to={landingFor(role)} replace />
 }

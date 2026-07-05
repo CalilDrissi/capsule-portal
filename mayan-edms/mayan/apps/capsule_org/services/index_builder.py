@@ -11,7 +11,12 @@ The expression "basis" comes from `FirmSettings.period_basis`:
   * upload_date   -> document.datetime_created    (proxy; file timestamp
                      is not cleanly template-addressable, created date is
                      the closest stable equivalent)
-  * document_date -> document.metadata_value_of.capsule_document_date
+  * document_date -> the `capsule_document_date` metadata value (stored as
+                     TEXT). Mayan's `|date` filter cannot parse a plain ISO
+                     string, so the year/month are sliced out of the ISO
+                     "YYYY-MM-DD" value directly, falling back to the creation
+                     date when the metadata is absent — matching
+                     export.py `_effective_period_key`.
 
 The "depth" comes from `FirmSettings.period_depth`:
   * Y    -> year
@@ -29,26 +34,66 @@ from ..models.firm_models import (
 DOCUMENT_DATE_METADATA_NAME = 'capsule_document_date'
 
 
-def _basis_token(firm):
+def _quarter_body(month_number_expression):
     """
-    Return the Django-template variable path used as the date source for
-    the index expressions, derived from the firm's settings.
+    Wrap a template expression that yields the 1-12 month number into a
+    "Q1".."Q4" label. Django templates lack arithmetic, so the quarter is
+    derived from an inline comparison chain (the index renderer supports
+    `{% with %}`/`{% if %}`, as the pre-existing expression relied on).
+    """
+    return (
+        'Q{% with m=' + month_number_expression + ' %}'
+        '{% if m <= 3 %}1{% elif m <= 6 %}2'
+        '{% elif m <= 9 %}3{% else %}4{% endif %}{% endwith %}'
+    )
+
+
+def _period_expressions(firm):
+    """
+    Return (year, quarter, month) Django-template expressions for the firm's
+    period basis.
+
+    created_date / upload_date resolve to `document.datetime_created`, a real
+    datetime the `date` filter formats directly.
+
+    document_date resolves to the `capsule_document_date` metadata value, which
+    Mayan stores as TEXT. The `date` filter cannot parse a plain ISO string —
+    which previously filed every document into empty buckets — so the year and
+    month are sliced straight out of the ISO "YYYY-MM-DD" value, falling back
+    to the document creation date when the metadata is absent. This mirrors
+    export.py `_effective_period_key` (both assume the SPA's zero-padded ISO
+    dates, which Mayan's DateValidator accepts) so the index and the export
+    agree on a document's period.
     """
     settings = getattr(firm, 'settings', None)
     basis = getattr(settings, 'period_basis', None)
 
-    if basis == PERIOD_BASIS_DOCUMENT:
-        # Render the document-date metadata value (a "YYYY-MM-DD" string)
-        # through Django's `date` filter via a parse first. Mayan stores
-        # metadata as text, so we reference it directly; the `date` filter
-        # accepts ISO date strings.
-        return 'document.metadata_value_of.{}'.format(
-            DOCUMENT_DATE_METADATA_NAME
-        )
+    created = 'document.datetime_created'
 
-    # created_date and upload_date both resolve to the document creation
-    # timestamp, which is a real datetime and works cleanly with `date`.
-    return 'document.datetime_created'
+    if basis == PERIOD_BASIS_DOCUMENT:
+        meta = 'document.metadata_value_of.' + DOCUMENT_DATE_METADATA_NAME
+        # ISO date slices: [:4] -> "YYYY", [5:7] -> "MM".
+        year = (
+            '{% if ' + meta + ' %}{{ ' + meta + '|slice:":4" }}'
+            '{% else %}{{ ' + created + '|date:"Y" }}{% endif %}'
+        )
+        month = (
+            '{% if ' + meta + ' %}{{ ' + meta + '|slice:"5:7" }}'
+            '{% else %}{{ ' + created + '|date:"m" }}{% endif %}'
+        )
+        quarter = (
+            '{% if ' + meta + ' %}'
+            + _quarter_body(meta + '|slice:"5:7"|add:"0"')
+            + '{% else %}'
+            + _quarter_body(created + '|date:"n"|add:"0"')
+            + '{% endif %}'
+        )
+        return year, quarter, month
+
+    year = '{{ ' + created + '|date:"Y" }}'
+    month = '{{ ' + created + '|date:"m" }}'
+    quarter = _quarter_body(created + '|date:"n"|add:"0"')
+    return year, quarter, month
 
 
 def _build_nodes(index, firm):
@@ -59,12 +104,14 @@ def _build_nodes(index, firm):
     """
     settings = getattr(firm, 'settings', None)
     depth = getattr(settings, 'period_depth', PERIOD_DEPTH_YEAR_MONTH)
-    token = _basis_token(firm=firm)
+    year_expression, quarter_expression, month_expression = (
+        _period_expressions(firm=firm)
+    )
 
     root = index.index_template_root_node
 
     year = root.get_children().create(
-        expression='{{{{ {0}|date:"Y" }}}}'.format(token),
+        expression=year_expression,
         index=index, link_documents=False, parent=root
     )
 
@@ -75,18 +122,8 @@ def _build_nodes(index, firm):
         return
 
     if depth == PERIOD_DEPTH_YEAR_QUARTER_MONTH:
-        # Quarter expression: "Q" + ceil(month/3). Django templates lack
-        # arithmetic, so derive the quarter from a small inline mapping by
-        # rendering the month number and using `divisibleby`-free math via
-        # the `add` filter is awkward; instead use the month's "n" (1-12)
-        # mapped through a verbose but template-only expression.
         quarter = year.get_children().create(
-            expression=(
-                'Q{{% with m={0}|date:"n"|add:"0" %}}'
-                '{{% if m <= 3 %}}1{{% elif m <= 6 %}}2'
-                '{{% elif m <= 9 %}}3{{% else %}}4{{% endif %}}'
-                '{{% endwith %}}'
-            ).format(token),
+            expression=quarter_expression,
             index=index, link_documents=False, parent=year
         )
         parent = quarter
@@ -94,7 +131,7 @@ def _build_nodes(index, firm):
         parent = year
 
     parent.get_children().create(
-        expression='{{{{ {0}|date:"m" }}}}'.format(token),
+        expression=month_expression,
         index=index, link_documents=True, parent=parent
     )
 

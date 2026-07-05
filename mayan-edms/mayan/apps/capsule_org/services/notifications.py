@@ -49,6 +49,42 @@ def notify_accountants_of_upload(client, document):
     return created
 
 
+def notify_accountants_of_orphan_upload(firm, document):
+    """
+    Notify every accountant of `firm` that a document was uploaded but its
+    uploading client could not be resolved (e.g. page counting failed and the
+    upload actor was lost). Makes the otherwise-silent orphan state visible so
+    an accountant can locate and re-file the document instead of it vanishing.
+    """
+    FirmMembership = apps.get_model(
+        app_label='capsule_org', model_name='FirmMembership'
+    )
+    CapsuleNotification = _model()
+
+    message = (
+        'A document ("{}") was uploaded but could not be linked to a client. '
+        'Please review it.'
+    ).format(getattr(document, 'label', document))
+
+    memberships = FirmMembership.objects.filter(
+        firm=firm, kind='accountant'
+    ).select_related('user')
+
+    created = 0
+    for membership in memberships:
+        CapsuleNotification.objects.create(
+            firm=firm, user=membership.user, kind=NOTIFICATION_KIND_UPLOAD,
+            message=message, document_id=getattr(document, 'pk', None)
+        )
+        created += 1
+
+    logger.error(
+        'capsule_org: emitted %d orphan-upload notifications for firm %s '
+        '(document %s).', created, firm, document
+    )
+    return created
+
+
 def notify_client_of_request(document_request):
     """
     Notify the client that their accountant requested a document.

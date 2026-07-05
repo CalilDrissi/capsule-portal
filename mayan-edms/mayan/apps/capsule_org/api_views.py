@@ -19,8 +19,9 @@ from .serializers import (
     ClientCreateSerializer, ClientSerializer, DocumentRequestCreateSerializer,
     DocumentRequestSerializer, DocumentRequestUpdateSerializer,
     FirmCreateSerializer, FirmSerializer, FirmSettingsSerializer,
-    PasswordChangeSerializer
+    PasswordChangeSerializer, validate_capsule_password
 )
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from .services import (
     export, index_builder, metadata_builder, notifications, provisioning
 )
@@ -285,10 +286,14 @@ class APIInviteView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         password = (request.data or {}).get('password')
-        if not password or len(password) < 8:
+        # Enforce the shared Capsule password policy (min length + Django's
+        # configured validators) on invite completion, same as accountant
+        # creation and password change.
+        try:
+            validate_capsule_password(password)
+        except DRFValidationError as exception:
             return Response(
-                data={'detail': 'A password of at least 8 characters '
-                      'is required.'},
+                data={'detail': exception.detail},
                 status=status.HTTP_400_BAD_REQUEST
             )
 

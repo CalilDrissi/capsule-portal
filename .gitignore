@@ -34,3 +34,6 @@ Thumbs.db
 
 # NOTE: dev-only .env files (docker/.env, capsule-web/.env) are intentionally
 # committed so the stack runs out-of-the-box. They contain no production secrets.
+
+# --- Production secrets (real values) — template stays tracked ---
+deploy/.env.prod

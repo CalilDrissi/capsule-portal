@@ -1,7 +1,27 @@
 import { useAppStore } from '../store/useAppStore'
+import { notify } from '../store/useNotifications'
 
-export const API_BASE =
-  import.meta.env.VITE_API_BASE ?? 'http://localhost:8800/api/v4'
+// Same-origin relative base by default: in production the app calls its own
+// origin behind a reverse proxy (no baked host, no CORS). The Vite dev server
+// proxies `/api` to :8800, so the relative base works in dev too.
+export const API_BASE = import.meta.env.VITE_API_BASE ?? '/api/v4'
+
+/**
+ * Central 401 handler: a dead/expired token must not strand the user in a
+ * broken app. Clear auth and bounce to /login. Only fires when a session
+ * exists (so it never loops on public pages) and skips the redirect when
+ * we're already on /login. The login token-obtain call uses its own fetch and
+ * never routes through here, so a failed login shows its normal error instead.
+ */
+function handleUnauthorized(): void {
+  const store = useAppStore.getState()
+  if (!store.token) return
+  store.logout()
+  notify.error('Your session expired', 'Please sign in again.')
+  if (window.location.pathname !== '/login') {
+    window.location.assign('/login')
+  }
+}
 
 export class ApiError extends Error {
   status: number
@@ -25,6 +45,7 @@ export async function apiGet<T>(path: string): Promise<T> {
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`
   const res = await fetch(url, { headers: authHeaders() })
   if (!res.ok) {
+    if (res.status === 401) handleUnauthorized()
     const body = await safeBody(res)
     throw new ApiError(res.status, `GET ${path} failed (${res.status})`, body)
   }
@@ -60,6 +81,7 @@ async function apiSend<T>(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
   if (!res.ok) {
+    if (res.status === 401) handleUnauthorized()
     const errBody = await safeBody(res)
     throw new ApiError(
       res.status,

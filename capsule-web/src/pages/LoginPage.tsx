@@ -17,7 +17,7 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const setAuth = useAppStore((s) => s.setAuth)
   const setWhoami = useAppStore((s) => s.setWhoami)
-  const [username, setUsername] = useState('admin')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -31,7 +31,7 @@ export default function LoginPage() {
       setAuth(token, username)
 
       // Fetch tenancy context and populate the store before routing.
-      let role: Whoami['role'] = 'platform'
+      let role: Whoami['role']
       let mustChange = false
       try {
         const who = await apiGet<Whoami>('/capsule/whoami/')
@@ -49,13 +49,11 @@ export default function LoginPage() {
           categories: who.categories ?? [],
         })
       } catch {
-        // whoami unavailable → treat as platform (existing behavior).
-        setWhoami({
-          firm: null,
-          role: 'platform',
-          clientId: null,
-          mustChangePassword: false,
-        })
+        // whoami failed: never fail OPEN to platform/admin. Clear the
+        // half-established session and ask the user to retry.
+        useAppStore.getState().logout()
+        setError("Couldn't load your account, please try again.")
+        return
       }
 
       if (mustChange) {

@@ -1,0 +1,17 @@
+# Derived Mayan image with the capsule_org tenancy app BAKED IN (no bind-mount).
+#
+# Build context MUST be the repo root (set in deploy/docker-compose.prod.yml as
+# context: ../..  — relative to the base compose file's dir, mayan-edms/docker/).
+#
+# The SITE_PACKAGES path below matches the s4.11 base image (Python 3.13). It is
+# the exact path the dev override bind-mounts to:
+#   /opt/mayan-edms/lib/python3.13/site-packages/mayan
+# If a future base image bumps Python, override with:
+#   --build-arg SITE_PACKAGES=/opt/mayan-edms/lib/pythonX.Y/site-packages
+FROM mayanedms/mayanedms:s4.11
+
+ARG SITE_PACKAGES=/opt/mayan-edms/lib/python3.13/site-packages
+
+# Copy just the tenancy app into Mayan's app tree so it is importable as
+# mayan.apps.capsule_org (registered via MAYAN_COMMON_EXTRA_APPS at runtime).
+COPY mayan-edms/mayan/apps/capsule_org ${SITE_PACKAGES}/mayan/apps/capsule_org
