@@ -75,7 +75,7 @@ export default function WorkspaceDocumentPage() {
         <TabPanels>
           <TabPanel>
             <div data-testid="workspace-doc-status">
-              <WorkflowsTab docId={doc.id} />
+              <WorkflowsTab docId={doc.id} canTransition={role !== 'client'} />
             </div>
           </TabPanel>
           <TabPanel>

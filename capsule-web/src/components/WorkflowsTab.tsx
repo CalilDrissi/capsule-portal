@@ -69,9 +69,11 @@ function WorkflowHistory({
 function WorkflowInstanceCard({
   docId,
   instance,
+  canTransition,
 }: {
   docId: number
   instance: WorkflowInstance
+  canTransition: boolean
 }) {
   const templateId = instance.workflow_template?.id ?? null
   const { data: transitionsData } = useWorkflowTransitions(templateId)
@@ -103,7 +105,17 @@ function WorkflowInstanceCard({
           </Tag>
         </div>
 
-        {available.length > 0 ? (
+        {!canTransition ? (
+          // Clients see the workflow state read-only — they cannot drive
+          // transitions (the server ACL also rejects the attempt).
+          <InlineNotification
+            kind="info"
+            lowContrast
+            hideCloseButton
+            title="Read-only"
+            subtitle="Your accountant manages this document's status."
+          />
+        ) : available.length > 0 ? (
           <div className="capsule-wf-transition">
             <Dropdown
               id={`wf-transition-${instance.id}`}
@@ -177,7 +189,13 @@ function WorkflowInstanceCard({
  * GET  /documents/{id}/workflow_instances/
  * POST /documents/{id}/workflow_instances/{wid}/log_entries/ {transition_id}
  */
-export default function WorkflowsTab({ docId }: { docId: number }) {
+export default function WorkflowsTab({
+  docId,
+  canTransition = true,
+}: {
+  docId: number
+  canTransition?: boolean
+}) {
   const { data, isLoading } = useDocumentWorkflows(docId)
   if (isLoading) return <InlineLoading description="Loading workflows…" />
 
@@ -193,7 +211,12 @@ export default function WorkflowsTab({ docId }: { docId: number }) {
   return (
     <Stack gap={6} data-testid="workflows-tab">
       {instances.map((inst) => (
-        <WorkflowInstanceCard key={inst.id} docId={docId} instance={inst} />
+        <WorkflowInstanceCard
+          key={inst.id}
+          docId={docId}
+          instance={inst}
+          canTransition={canTransition}
+        />
       ))}
     </Stack>
   )

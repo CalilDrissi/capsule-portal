@@ -1,11 +1,21 @@
 import { chromium } from 'playwright'
-import fs from 'fs'
+import {
+  APP,
+  provisionFirm,
+  provisionClient,
+  activateClient,
+  uploadViaUi,
+  writeSamplePdf,
+} from './capsule_test_helpers.mjs'
 
-const APP = 'http://localhost:5180'
-const ACCT = { u: fs.readFileSync('/tmp/p3_acct_user.txt', 'utf8').trim(), p: 'AcctPass123!' }
-const creds = fs.readFileSync('/tmp/p3_client_creds.txt', 'utf8').trim().split('\n')
-const CLIENT = { u: creds[0].trim(), p: creds[1].trim() }
+// ---- Self-provision a fresh firm + accountant + an activated client -------
+const { firm, acct, token } = await provisionFirm('Grouping P3')
+const provisioned = await provisionClient(token, firm.id, 'Grouping P3 Client')
 const NEWPW = 'P3ClientPass123!'
+const CLIENT = { u: provisioned.temp_username }
+// A single sample PDF reused for all uploads (Mayan can page-count PDFs; .txt
+// would crash the page-count step).
+const PDF = writeSamplePdf('/tmp/capsule_p3_sample.pdf')
 
 const out = []
 const errs = []
@@ -30,7 +40,7 @@ async function logout() {
 
 // ============ ACCOUNTANT: Grouping settings ============
 await step('accountant login -> /clients', async () => {
-  await login(ACCT.u, ACCT.p)
+  await login(acct.u, acct.p)
   return { url: page.url(), ok: page.url().includes('/clients') }
 })
 
@@ -40,7 +50,7 @@ await step('open Grouping settings via SideNav', async () => {
   const onSettings = page.url().includes('/settings')
   const hasBasis = await page.locator('#settings-basis').count() > 0
   const hasDepth = await page.locator('#settings-depth').count() > 0
-  return { url: page.url(), onSettings, hasBasis, hasDepth }
+  return { url: page.url(), onSettings, hasBasis, hasDepth, ok: onSettings && hasBasis && hasDepth }
 })
 
 await step('change basis + depth, add a category, save (toast)', async () => {
@@ -59,71 +69,47 @@ await page.screenshot({ path: '/tmp/p3-settings.png' })
 
 await logout()
 
-// ============ CLIENT: login (handles first-login change-pw OR already set) ============
-await step('client login', async () => {
-  // Try the temp password first; if that fails (password already changed on a
-  // prior run), fall back to the new password.
-  await login(CLIENT.u, CLIENT.p)
-  if (page.url().includes('/login')) {
-    await login(CLIENT.u, NEWPW)
-  }
-  const onChangePw = page.url().includes('/change-password')
-  if (onChangePw) {
-    await page.fill('#new-password', NEWPW)
-    await page.fill('#confirm-password', NEWPW)
-    await page.getByRole('button', { name: /set password/i }).click()
-    await page.waitForTimeout(3500)
-  }
-  return { url: page.url(), onWorkspace: page.url().includes('/workspace') }
+// ============ CLIENT: activate via invite, then upload ============
+await step('client activation via invite -> workspace', async () => {
+  const url = await activateClient(page, provisioned.invite_path, NEWPW)
+  return { url, onWorkspace: url.includes('/workspace'), ok: url.includes('/workspace') }
 })
 
-// Upload 3 docs with different dates + categories
+// Upload 3 PDFs with distinct document dates + categories. Two distinct years
+// (2025 + 2026) prove the document_date metadata drives the grouping.
 const uploads = [
-  { name: 'p3-jan.txt', date: '2026-01-15', cat: 0 },
-  { name: 'p3-mar.txt', date: '2026-03-20', cat: 1 },
-  { name: 'p3-prev.txt', date: '2025-11-05', cat: 2 },
+  { label: 'p3-jan', date: '2026-01-15', cat: 0 },
+  { label: 'p3-mar', date: '2026-03-20', cat: 1 },
+  { label: 'p3-prev', date: '2025-11-05', cat: 2 },
 ]
 let uploaded = 0
 for (const u of uploads) {
-  await step('upload ' + u.name, async () => {
+  await step('upload ' + u.label, async () => {
+    // Resolve the category option value by index (firm categories vary).
     await page.goto(APP + '/workspace/upload', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(1500)
-    // create a temp file
-    const path = '/tmp/' + u.name
-    fs.writeFileSync(path, 'content of ' + u.name + '\n')
-    await page.locator('input[type="file"]').setInputFiles(path)
-    await page.waitForTimeout(500)
-    // select category by index if available
+    await page.waitForTimeout(1200)
     const opts = await page.locator('#upload-category option').count()
+    let category
     if (opts > u.cat) {
-      const val = await page.locator('#upload-category option').nth(u.cat).getAttribute('value')
-      await page.selectOption('#upload-category', val)
+      category = await page.locator('#upload-category option').nth(u.cat).getAttribute('value')
     }
-    // set document date (flatpickr parses typed input on blur/enter)
-    await page.fill('#upload-document-date', u.date)
-    await page.locator('#upload-document-date').press('Enter')
-    await page.waitForTimeout(400)
-    await page.locator('#upload-label').click().catch(() => {})
-    await page.locator('[data-testid="upload-submit"]').click()
-    await page.waitForTimeout(3500)
+    await uploadViaUi(page, { file: PDF, category, date: u.date, label: u.label + '-' + (Date.now() % 100000) })
     uploaded++
-    return { url: page.url(), submitted: true }
+    return { url: page.url(), ok: page.url().endsWith('/workspace') }
   })
 }
 
 // ============ CLIENT: By period + Timeline ============
 await step('client By period tab groups docs', async () => {
   await page.goto(APP + '/workspace', { waitUntil: 'networkidle' })
-  await page.waitForTimeout(2000)
-  await page.getByRole('tab', { name: /By period/i }).click()
   await page.waitForTimeout(2500)
+  await page.getByRole('tab', { name: /By period/i }).click()
+  await page.waitForTimeout(3000)
   const accordion = await page.locator('[data-testid="by-period-accordion"]').count()
   const items = await page.locator('.cds--accordion__item').count()
-  // Two distinct years (2025 + 2026) means the document_date metadata drove
-  // the grouping rather than the upload (today) date.
   const has2025 = await page.getByText(/2025/).count() > 0
   const has2026 = await page.getByText(/2026/).count() > 0
-  return { accordion, yearSections: items, has2025, has2026, ok: accordion > 0 && items >= 2 }
+  return { accordion, yearSections: items, has2025, has2026, ok: accordion > 0 && items >= 2 && has2025 && has2026 }
 })
 await page.screenshot({ path: '/tmp/p3-by-period.png' })
 
@@ -138,10 +124,11 @@ await page.screenshot({ path: '/tmp/p3-timeline.png' })
 
 await browser.close()
 console.log('\n===== PHASE 3 GROUPING HEADED TEST =====')
-console.log('client:', CLIENT.u, ' uploaded:', uploaded)
+console.log('firm:', firm.name, ' client:', CLIENT.u, ' uploaded:', uploaded)
 let pass = 0, fail = 0
 for (const o of out) { if (o.ok) pass++; else fail++; console.log(`  [${o.ok ? 'PASS' : 'FAIL'}] ${o.name} ${JSON.stringify(Object.fromEntries(Object.entries(o).filter(([k]) => !['name', 'ok'].includes(k))))}`) }
 console.log(`\n  ${pass} passed, ${fail} failed`)
 console.log('\nCONSOLE ERRORS (' + [...new Set(errs)].length + '):')
 ;[...new Set(errs)].slice(0, 10).forEach(e => console.log('   -', e))
 console.log('\nP3GROUPINGDONE')
+process.exit(fail === 0 ? 0 : 1)

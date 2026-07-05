@@ -1,5 +1,6 @@
 import io
 import logging
+import shutil
 import zipfile
 
 from django.apps import apps
@@ -7,6 +8,10 @@ from django.apps import apps
 from .index_builder import DOCUMENT_DATE_METADATA_NAME
 
 logger = logging.getLogger(name=__name__)
+
+# Read/compress each document file this many bytes at a time so a single
+# large file never becomes fully resident in memory during export.
+COPY_CHUNK_SIZE = 1024 * 1024  # 1 MiB
 
 
 def _effective_period_key(document):
@@ -53,13 +58,15 @@ def _period_matches(document, period_key):
 
 def build_period_zip(client, period_key, user):
     """
-    Build an in-memory zip of the latest file of every document in the
-    client's cabinet whose effective period matches `period_key`, restricted
-    to documents the requesting `user` may view (ACL-checked).
+    Build a zip of the latest file of every document in the client's cabinet
+    whose effective period matches `period_key`, restricted to documents the
+    requesting `user` may view (ACL-checked).
 
-    Returns (bytes, count). Synchronous, in-memory — adequate for v1 firm
-    document volumes; swap for a Celery `document_exports`-style task if
-    periods grow large.
+    Returns (bytes, count). Synchronous — adequate for v1 firm document
+    volumes; swap for a Celery `document_exports`-style task if periods grow
+    large. Memory-bounded: each document file is streamed into the zip in
+    fixed-size chunks (see COPY_CHUNK_SIZE) rather than being fully read into
+    RAM, so a single large file never becomes wholly resident.
     """
     AccessControlList = apps.get_model(
         app_label='acls', model_name='AccessControlList'
@@ -73,6 +80,11 @@ def build_period_zip(client, period_key, user):
         return b'', 0
 
     queryset = Document.valid.filter(cabinets=cabinet).distinct()
+
+    # Kill the per-document N+1: `_effective_period_key` walks
+    # `document.metadata.all()` and reads `metadata_type` on each row, so
+    # prefetch both in a single pair of queries for the whole period scan.
+    queryset = queryset.prefetch_related('metadata__metadata_type')
 
     # ACL-restrict to what the requester may view. Accountants/clients of the
     # firm hold per-document view ACLs (granted on upload); a foreign user
@@ -107,8 +119,14 @@ def build_period_zip(client, period_key, user):
             used_names.add(arc_name)
 
             try:
+                # Stream the file into the zip entry in fixed-size chunks so
+                # the whole document is never resident in RAM. The archive's
+                # ZIP_DEFLATED compression is applied by the entry writer.
                 with document_file.open() as file_object:
-                    archive.writestr(arc_name, file_object.read())
+                    with archive.open(arc_name, mode='w') as archive_entry:
+                        shutil.copyfileobj(
+                            file_object, archive_entry, COPY_CHUNK_SIZE
+                        )
                 count += 1
             except Exception as exception:
                 logger.error(

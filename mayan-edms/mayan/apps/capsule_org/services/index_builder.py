@@ -23,13 +23,18 @@ The "depth" comes from `FirmSettings.period_depth`:
   * YM   -> year / month        (default)
   * YQM  -> year / quarter / month
 """
+import logging
+
 from django.apps import apps
+from django.db import transaction
 from django.utils.text import slugify
 
 from ..models.firm_models import (
     PERIOD_BASIS_DOCUMENT, PERIOD_DEPTH_YEAR, PERIOD_DEPTH_YEAR_MONTH,
     PERIOD_DEPTH_YEAR_QUARTER_MONTH
 )
+
+logger = logging.getLogger(name=__name__)
 
 DOCUMENT_DATE_METADATA_NAME = 'capsule_document_date'
 
@@ -154,27 +159,37 @@ def rebuild_period_index(firm, user=None):
 
     index = firm.index_template
 
-    if index is None:
-        slug = 'capsule-firm-{}-period'.format(firm.slug)
-        label = 'Capsule: {} — periods'.format(firm.name)
-        index = IndexTemplate(label=label, slug=slug)
-        index._event_ignore = True
-        index.save()
-        if firm.document_type:
-            index.document_types.add(firm.document_type)
-        firm.index_template = index
-        firm.save(update_fields=['index_template'])
-    else:
-        # Drop every non-root template node so the tree is rebuilt cleanly
-        # from current settings.
-        IndexTemplateNode.objects.filter(
-            index=index
-        ).exclude(parent=None).delete()
+    # Wrap the whole (create-or-)rebuild in a single transaction. The rebuild
+    # deletes the existing template nodes, recreates them, then deletes and
+    # recreates every instance node (index.rebuild()). A mid-way failure would
+    # otherwise leave template nodes rebuilt while instance nodes are gone or
+    # half-filed. Atomicity guarantees that on any failure the database rolls
+    # back to the prior template + instance tree; the exception is re-raised
+    # for the caller to surface. On the first-call creation path the same
+    # rollback also unwinds the IndexTemplate row and the firm.index_template
+    # link, so a failed first build leaves no orphan index.
+    with transaction.atomic():
+        if index is None:
+            slug = 'capsule-firm-{}-period'.format(firm.slug)
+            label = 'Capsule: {} — periods'.format(firm.name)
+            index = IndexTemplate(label=label, slug=slug)
+            index._event_ignore = True
+            index.save()
+            if firm.document_type:
+                index.document_types.add(firm.document_type)
+            firm.index_template = index
+            firm.save(update_fields=['index_template'])
+        else:
+            # Drop every non-root template node so the tree is rebuilt cleanly
+            # from current settings.
+            IndexTemplateNode.objects.filter(
+                index=index
+            ).exclude(parent=None).delete()
 
-    _build_nodes(index=index, firm=firm)
+        _build_nodes(index=index, firm=firm)
 
-    # Rebuild instance nodes from the new template so existing documents of
-    # the firm document type are filed into the fresh tree.
-    index.rebuild()
+        # Rebuild instance nodes from the new template so existing documents of
+        # the firm document type are filed into the fresh tree.
+        index.rebuild()
 
     return index

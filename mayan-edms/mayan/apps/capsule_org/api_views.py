@@ -1,6 +1,8 @@
+import logging
 import secrets
 
 from django.apps import apps
+from django.db import transaction
 from django.http import HttpResponse
 from django.utils import timezone
 
@@ -25,6 +27,8 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 from .services import (
     export, index_builder, metadata_builder, notifications, provisioning
 )
+
+logger = logging.getLogger(name=__name__)
 
 
 class APIWhoAmIView(APIView):
@@ -369,19 +373,47 @@ class APIFirmSettingsView(APIView):
             firm_settings.categories = list(data['categories'])
             categories_changed = True
 
-        firm_settings.save()
+        # Persist the settings and apply their side effects (index rebuild,
+        # category rewrite) as one unit. If the index rebuild fails partway it
+        # leaves template/instance nodes inconsistent, so we roll the whole
+        # thing back — the saved settings included — rather than half-apply and
+        # report success. The caller gets a clear 500 instead of a traceback.
+        try:
+            with transaction.atomic():
+                firm_settings.save()
 
-        # Refresh the cached related object so the index/category builders
-        # read the freshly-saved settings.
-        firm = Firm.objects.get(pk=firm.pk)
+                # Refresh the cached related object so the index/category
+                # builders read the freshly-saved settings.
+                firm = Firm.objects.get(pk=firm.pk)
 
-        if index_changed and firm.index_template_id:
-            index_builder.rebuild_period_index(firm=firm, user=request.user)
-        if categories_changed:
-            metadata_builder.update_firm_category_choices(
-                firm=firm, categories=firm_settings.categories
+                if index_changed and firm.index_template_id:
+                    index_builder.rebuild_period_index(
+                        firm=firm, user=request.user
+                    )
+                if categories_changed:
+                    metadata_builder.update_firm_category_choices(
+                        firm=firm, categories=firm_settings.categories
+                    )
+        except Exception as exception:
+            logger.error(
+                'capsule_org: firm settings update failed for firm %s; the '
+                'index rebuild or category rewrite raised, so no changes were '
+                'saved. %s', firm.pk, exception, exc_info=True
+            )
+            return Response(
+                data={
+                    'detail': (
+                        'Failed to apply settings: the period index rebuild '
+                        'did not complete. No changes were saved; the firm '
+                        'retains its previous settings and index.'
+                    )
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+        # Re-read outside the transaction so the response reflects committed
+        # state.
+        firm = Firm.objects.get(pk=firm.pk)
         return Response(data=self._serialize(firm=firm))
 
     @staticmethod

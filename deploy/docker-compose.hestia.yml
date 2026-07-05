@@ -1,0 +1,33 @@
+# Production override for a SHARED server that already runs a reverse proxy
+# (e.g. HestiaCP nginx terminating TLS). Layer ON TOP of the base compose:
+#
+#   docker compose -p capsule \
+#     -f mayan-edms/docker/docker-compose.yml \
+#     -f deploy/docker-compose.hestia.yml \
+#     --env-file mayan-edms/docker/.env \
+#     --env-file deploy/.env.prod \
+#     up -d --build
+#
+# vs the base dev override:
+#   - builds a derived image with capsule_org BAKED IN (no source bind-mount)
+#   - no `platform:` line (native amd64 host)
+#   - publishes the app ONLY on 127.0.0.1:8092 (loopback) — the host's nginx
+#     proxies the public domain to it and terminates TLS. Nothing binds 80/443
+#     here, and the datastores stay internal to the project network.
+#
+# The SPA is served as static files by the host nginx from the domain docroot,
+# so there is no web/proxy container in this stack — just Mayan + datastores.
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deploy/Dockerfile.capsule
+    image: capsule-mayan:prod
+    env_file:
+      - ../../deploy/.env.prod
+    environment:
+      MAYAN_COMMON_EXTRA_APPS: "[mayan.apps.capsule_org.apps.CapsuleOrgApp]"
+    # Replace (not merge) the base ports list; expose only on loopback:8092.
+    ports: !override
+      - "127.0.0.1:8092:8000"

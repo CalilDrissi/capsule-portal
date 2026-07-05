@@ -1,17 +1,21 @@
 import { chromium } from 'playwright'
-import fs from 'fs'
+import {
+  APP,
+  provisionFirm,
+  provisionClient,
+  activateClient,
+  uploadViaUi,
+  writeSamplePdf,
+} from './capsule_test_helpers.mjs'
 
-const APP = 'http://localhost:5180'
-const ACCT = {
-  u: fs.readFileSync('/tmp/p4_acct_user.txt', 'utf8').trim(),
-  p: 'AcctPass123!',
-}
-const clientLogin = fs
-  .readFileSync('/tmp/p4_client_login.txt', 'utf8')
-  .trim()
-  .split('\n')
-const CLIENT = { u: clientLogin[0].trim(), p: clientLogin[1].trim() }
-const CLIENT_ID = fs.readFileSync('/tmp/p4_client_id.txt', 'utf8').trim()
+// ---- Self-provision a fresh firm + accountant + an activated client -------
+const { firm, acct, token } = await provisionFirm('Flow P4')
+const provisioned = await provisionClient(token, firm.id, 'Flow P4 Client')
+const CLIENT = { u: provisioned.temp_username, p: 'P4ClientPass123!' }
+const CLIENT_ID = String(provisioned.client.id)
+// Document dated 2026-06 so the accountant "export period 2026-06" has content.
+const DOC_DATE = '2026-06-15'
+const PDF = writeSamplePdf('/tmp/capsule_p4_sample.pdf')
 
 const out = []
 const errs = []
@@ -48,17 +52,30 @@ async function logout() {
   await page.waitForTimeout(1500)
 }
 
+// =================== SETUP: activate client + upload a document ===========
+await step('setup: activate client + upload document', async () => {
+  await activateClient(page, provisioned.invite_path, CLIENT.p)
+  const category = await page
+    .locator('#upload-category option')
+    .first()
+    .getAttribute('value')
+    .catch(() => null)
+  await uploadViaUi(page, { file: PDF, category, date: DOC_DATE, label: 'p4-statement' })
+  await logout()
+  return { url: page.url(), ok: true }
+})
+
 // =================== ACCOUNTANT ===================
 await step('accountant login -> clients grid', async () => {
-  await login(ACCT.u, ACCT.p)
-  return { url: page.url() }
+  await login(acct.u, acct.p)
+  return { url: page.url(), ok: page.url().includes('/clients') }
 })
 
 await step('open client workspace', async () => {
   await page.goto(APP + '/clients/' + CLIENT_ID, { waitUntil: 'networkidle' })
   await page.waitForTimeout(2500)
   const title = await page.locator('.capsule-page__title').first().textContent()
-  return { title }
+  return { title, ok: !!title }
 })
 
 await step('documents tab shows status badge column', async () => {
@@ -86,7 +103,7 @@ await step('open a document -> status tab + transition', async () => {
     .first()
     .textContent()
     .catch(() => null)
-  return { hadTransition: hasTransition > 0, stateTag }
+  return { hadTransition: hasTransition > 0, stateTag, ok: hasTransition > 0 }
 })
 
 await step('accountant posts a comment', async () => {
@@ -126,7 +143,10 @@ await step('accountant exports a period -> zip download', async () => {
   await page.waitForTimeout(2000)
   await page.getByRole('tab', { name: /By period/i }).click()
   await page.waitForTimeout(2000)
-  await page.fill('[data-testid="export-period-input"]', '2026-06')
+  // Export by the current month: the backend period export matches on the
+  // document's date, and a just-uploaded doc's date is "now".
+  const exportPeriod = new Date().toISOString().slice(0, 7)
+  await page.fill('[data-testid="export-period-input"]', exportPeriod)
   const dl = page.waitForEvent('download', { timeout: 15000 }).catch(() => null)
   await page.locator('[data-testid="export-period-button"]').click()
   const download = await dl
@@ -135,7 +155,7 @@ await step('accountant exports a period -> zip download', async () => {
     saved = '/tmp/p4-export-headed.zip'
     await download.saveAs(saved)
   }
-  return { download: !!download, saved }
+  return { download: !!download, saved, ok: !!download }
 })
 
 await logout()
@@ -145,7 +165,7 @@ await step('client login -> workspace', async () => {
   await login(CLIENT.u, CLIENT.p)
   await page.goto(APP + '/workspace', { waitUntil: 'networkidle' })
   await page.waitForTimeout(2500)
-  return { url: page.url() }
+  return { url: page.url(), ok: page.url().includes('/workspace') }
 })
 
 await step('client sees open-requests checklist', async () => {
@@ -162,7 +182,7 @@ await step('client notification bell shows unread', async () => {
   await page.screenshot({ path: '/tmp/p4-notifications.png' })
   const panel = await page.locator('[data-testid="notification-panel"]').count()
   const txt = await page.locator('body').textContent()
-  return { hadCount: count > 0, panelOpen: panel > 0, hasRequestMsg: /requested/i.test(txt) }
+  return { hadCount: count > 0, panelOpen: panel > 0, hasRequestMsg: /requested/i.test(txt), ok: panel > 0 && count > 0 }
 })
 
 await step('client opens a document -> status read-only (no transition control)', async () => {
@@ -180,7 +200,7 @@ await step('client opens a document -> status read-only (no transition control)'
   const transitionControls = await page
     .locator('[data-testid^="wf-do-transition-"]')
     .count()
-  return { stateTag, transitionControls, readOnly: transitionControls === 0 }
+  return { stateTag, transitionControls, readOnly: transitionControls === 0, ok: transitionControls === 0 }
 })
 
 await step('client posts a comment (round-trip)', async () => {
@@ -199,6 +219,7 @@ await logout()
 
 // =================== REPORT ===================
 console.log('\n========== P4 FLOW RESULTS ==========')
+console.log('firm:', firm.name, ' acct:', acct.u, ' client:', CLIENT.u, ' id:', CLIENT_ID)
 for (const r of out) {
   console.log(
     `${r.ok ? 'PASS' : 'FAIL'}  ${r.name}` +
@@ -212,7 +233,7 @@ const passed = out.filter((r) => r.ok).length
 console.log(`\n${passed}/${out.length} passed`)
 if (errs.length) {
   console.log('\nConsole errors (first 10):')
-  for (const e of errs.slice(0, 10)) console.log('  ' + e)
+  for (const e of [...new Set(errs)].slice(0, 10)) console.log('  ' + e)
 }
 await browser.close()
 process.exit(passed === out.length ? 0 : 1)
