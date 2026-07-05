@@ -128,6 +128,53 @@ provisioning services / API directly).
 
 ---
 
+## Before you open *public* signup (pilot → GA hardening)
+
+The stack above is safe for a **monitored pilot** (you provision the firms, you watch
+the logs). Add these before exposing an open, unattended signup to the internet:
+
+### a. Login brute-force protection
+Baseline is already present: the API throttles anonymous requests. For real
+account-lockout, the simplest host-level control (no app changes) is **fail2ban**
+watching Caddy's access log for repeated failed token requests:
+
+```bash
+sudo apt-get install -y fail2ban
+```
+
+Add a filter matching `POST /api/v4/auth/token/obtain/` responses with status `400`
+in the Caddy JSON access log, and a jail that bans the source IP after ~10 failures
+in 10 minutes. (Caddy must log access to a file the jail reads — add a `log` block to
+the Caddyfile pointing at `/var/log/caddy/access.log` and mount it to the host.)
+
+For **per-account lockout** (not just per-IP), integrate
+[`django-axes`](https://django-axes.readthedocs.io): `pip install django-axes` in
+`deploy/Dockerfile.capsule`, then add `axes` to `INSTALLED_APPS`, its middleware, and
+`AxesStandaloneBackend` as the first `AUTHENTICATION_BACKENDS` entry. This requires a
+small Mayan settings patch (these aren't all exposed as `MAYAN_*` env vars), so it's a
+code change, not config — do it deliberately and run its migrations.
+
+### b. Multi-factor auth for accountants
+Accountants hold access to every client's financial documents. Add TOTP MFA
+(e.g. `django-otp`) for accountant/admin logins before GA.
+
+### c. Automate backups (don't rely on manual snapshots)
+Cron a nightly `pg_dump` **off-box** plus a snapshot of the `mayan_app` volume
+(documents + the generated secret key live there):
+
+```bash
+DC="docker compose -f mayan-edms/docker/docker-compose.yml -f deploy/docker-compose.prod.yml --env-file deploy/.env.prod"
+$DC exec -T app pg_dump ... > backup-$(date +%F).sql   # ship this off the server
+```
+
+### d. Scale-out for large firms
+Period **export** streams files into the zip and is memory-bounded, and the settings
+**index rebuild** is failure-guarded — both fine for pilot-scale data. For firms with
+thousands of documents, move these two operations to Celery tasks (the workers already
+run in the all-in-one container) so they don't hold an HTTP request open.
+
+---
+
 ## Operations
 
 ```bash
