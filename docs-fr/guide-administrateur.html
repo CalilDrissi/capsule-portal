@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Capsule — Guide de l'administrateur</title>
+<link rel="stylesheet" href="guide.css" />
+</head>
+<body>
+<header class="shell">
+  <div class="brand">Cap<span>sule</span></div>
+  <div class="divider"></div>
+  <div class="ctx">Guide de l'administrateur</div>
+</header>
+
+<main>
+  <div class="eyebrow">Guide pas à pas</div>
+  <h1>Administrer Capsule en tant que <b>administrateur</b></h1>
+  <p class="lead">
+    Le compte <b>administrateur</b> gère la plateforme : il crée les cabinets comptables et
+    leurs comptables. Chaque cabinet est ensuite autonome pour gérer ses propres clients.
+    Ce guide vous accompagne, étape par étape.
+  </p>
+  <div class="chips">
+    <span class="chip"><b>Administrateur</b> — vous, propriétaire de la plateforme</span>
+    <span class="chip"><b>Cabinet</b> — une structure comptable</span>
+    <span class="chip"><b>Comptable</b> — utilise le cabinet au quotidien</span>
+  </div>
+
+  <div class="steps">
+
+    <article class="step">
+      <div class="step-head"><span class="num">01</span><h2>Se connecter</h2></div>
+      <ol class="actions">
+        <li>Ouvrez <a href="https://capsule.kiloctet.com">capsule.kiloctet.com</a>.</li>
+        <li>Connectez-vous avec le compte <b>administrateur</b>.</li>
+        <li>Cliquez sur <b>Se connecter</b>.</li>
+      </ol>
+      <figure><img src="img/01-connexion.png" alt="Page de connexion" /><figcaption>La page de connexion.</figcaption></figure>
+      <p class="note warn"><b>Important :</b> changez le mot de passe administrateur après la première connexion et conservez-le en lieu sûr — c'est le compte maître de la plateforme.</p>
+    </article>
+
+    <article class="step">
+      <div class="step-head"><span class="num">02</span><h2>Créer un cabinet</h2></div>
+      <ol class="actions">
+        <li>Dans le menu de gauche, cliquez sur <b>Cabinets</b>.</li>
+        <li>Cliquez sur <b>Nouveau cabinet</b> (en haut à droite).</li>
+        <li>Renseignez le <b>Nom du cabinet</b> et le <b>Nom complet</b> du premier comptable. Le nom d'utilisateur est généré automatiquement (laissez-le vide) et un mot de passe est pré-rempli.</li>
+        <li>Cliquez sur <b>Créer le cabinet</b>.</li>
+        <li><b>Copiez l'identifiant et le mot de passe du comptable</b> affichés — c'est l'accès quotidien du cabinet. Ils ne s'affichent qu'une seule fois.</li>
+      </ol>
+      <figure><img src="img/10-cabinets.png" alt="Grille des cabinets" /><figcaption>La grille des cabinets, avec la recherche et les logos.</figcaption></figure>
+      <figure><img src="img/11-nouveau-cabinet.png" alt="Fenêtre Nouveau cabinet" /><figcaption>Créer un cabinet et son premier comptable.</figcaption></figure>
+      <figure><img src="img/12-cabinet-cree.png" alt="Identifiants du comptable" /><figcaption>Les identifiants de connexion du comptable, à transmettre au cabinet.</figcaption></figure>
+    </article>
+
+    <article class="step">
+      <div class="step-head"><span class="num">03</span><h2>Gérer un cabinet</h2></div>
+      <ol class="actions">
+        <li>Dans la grille <b>Cabinets</b>, cliquez sur un cabinet pour ouvrir sa fiche.</li>
+        <li><b>Détails du cabinet</b> — modifiez le nom, l'e-mail de contact et le <b>logo</b>, puis <b>Enregistrer</b>.</li>
+        <li><b>Comptables</b> — ajoutez un comptable, réinitialisez un mot de passe, désactivez ou retirez un compte.</li>
+        <li><b>Zone de danger</b> — désactivez le cabinet (bloque tous ses accès, comptables et clients inclus) ou supprimez-le définitivement.</li>
+      </ol>
+      <figure><img src="img/13-cabinet-detail.png" alt="Fiche d'un cabinet" /><figcaption>La fiche d'un cabinet : détails, liste des comptables et zone de danger.</figcaption></figure>
+      <p class="note">La désactivation est réversible et conserve tous les documents. La suppression est définitive.</p>
+    </article>
+
+  </div>
+</main>
+<footer>Capsule — portail sécurisé de gestion documentaire pour cabinets comptables. Guide de l'administrateur.</footer>
+</body>
+</html>

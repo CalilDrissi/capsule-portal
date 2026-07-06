@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Capsule — Guide du comptable</title>
+<link rel="stylesheet" href="guide.css" />
+</head>
+<body>
+<header class="shell">
+  <div class="brand">Cap<span>sule</span></div>
+  <div class="divider"></div>
+  <div class="ctx">Guide du comptable</div>
+</header>
+
+<main>
+  <div class="eyebrow">Guide pas à pas</div>
+  <h1>Utiliser Capsule en tant que <b>comptable</b></h1>
+  <p class="lead">
+    Capsule est votre portail sécurisé pour recevoir et organiser les documents de vos
+    clients. Ce guide vous accompagne, étape par étape : créer un client, l'inviter,
+    importer et suivre ses documents, gérer son dossier, et configurer le classement.
+  </p>
+  <div class="chips">
+    <span class="chip"><b>Comptable</b> — vous</span>
+    <span class="chip"><b>Client</b> — votre client qui dépose ses documents</span>
+    <span class="chip">Adresse — <span class="mono">capsule.kiloctet.com</span></span>
+  </div>
+
+  <div class="steps">
+
+    <!-- 1 -->
+    <article class="step">
+      <div class="step-head"><span class="num">01</span><h2>Se connecter</h2></div>
+      <ol class="actions">
+        <li>Ouvrez <a href="https://capsule.kiloctet.com">capsule.kiloctet.com</a> dans votre navigateur.</li>
+        <li>Saisissez votre <b>nom d'utilisateur</b> et votre <b>mot de passe</b> (fournis par l'administrateur du cabinet).</li>
+        <li>Cliquez sur <b>Se connecter</b>. Vous arrivez sur la page <b>Clients</b>.</li>
+      </ol>
+      <figure><img src="img/01-connexion.png" alt="Page de connexion" /><figcaption>La page de connexion.</figcaption></figure>
+      <p class="note">À votre première connexion, changez votre mot de passe si le système vous le demande, puis conservez-le en lieu sûr.</p>
+    </article>
+
+    <!-- 2 -->
+    <article class="step">
+      <div class="step-head"><span class="num">02</span><h2>Créer un client et envoyer l'invitation</h2></div>
+      <ol class="actions">
+        <li>Sur la page <b>Clients</b>, cliquez sur <b>Nouveau client</b> (en haut à droite).</li>
+        <li>Saisissez le <b>Nom d'affichage</b> du client (par exemple « Boulangerie Lefèvre »).</li>
+        <li>Cliquez sur <b>Créer</b>.</li>
+        <li>Capsule affiche un <b>lien d'invitation</b> à usage unique. Copiez-le et envoyez-le à votre client (par e-mail, message…).</li>
+      </ol>
+      <figure><img src="img/20-clients.png" alt="Grille des clients" /><figcaption>La grille de vos clients, avec la recherche et le logo de chaque client.</figcaption></figure>
+      <figure><img src="img/21-nouveau-client.png" alt="Fenêtre Nouveau client" /><figcaption>Créer un nouveau client.</figcaption></figure>
+      <figure><img src="img/22-client-invitation.png" alt="Lien d'invitation du client" /><figcaption>Le lien d'invitation à envoyer au client. Il n'est utilisable qu'une seule fois.</figcaption></figure>
+      <p class="note">Votre client ouvre le lien, choisit son mot de passe et accède directement à son espace pour déposer ses documents. Vous n'avez rien à installer de leur côté.</p>
+    </article>
+
+    <!-- 3 -->
+    <article class="step">
+      <div class="step-head"><span class="num">03</span><h2>Importer un document pour un client</h2></div>
+      <p class="lead" style="font-size:15px">Vous pouvez déposer un document à la place d'un client (par exemple un document que vous avez reçu par un autre canal).</p>
+      <ol class="actions">
+        <li>Ouvrez le client depuis la grille <b>Clients</b>.</li>
+        <li>Dans l'onglet <b>Documents</b>, cliquez sur <b>Importer un document</b>.</li>
+        <li>Choisissez le <b>fichier</b> (PDF, image ou document Office), une <b>catégorie</b> et la <b>date du document</b>.</li>
+        <li>Cliquez sur <b>Importer</b>. Le document apparaît dans la liste, avec la colonne <b>Importé par</b> indiquant votre nom.</li>
+      </ol>
+      <figure><img src="img/23-espace-client-documents.png" alt="Espace du client, onglet Documents" /><figcaption>L'espace d'un client : onglets Documents, Par période, Chronologie, Demandes et Client.</figcaption></figure>
+      <figure><img src="img/24-importer-document.png" alt="Fenêtre d'import de document" /><figcaption>Importer un document pour ce client.</figcaption></figure>
+      <p class="note">Seuls les formats <b>PDF, images et documents Office</b> sont acceptés.</p>
+    </article>
+
+    <!-- 4 -->
+    <article class="step">
+      <div class="step-head"><span class="num">04</span><h2>Consulter, classer et suivre les documents</h2></div>
+      <ol class="actions">
+        <li><b>Documents</b> — la liste de tous les documents du client, avec leur statut et leur auteur.</li>
+        <li><b>Par période</b> — les documents regroupés par année / mois selon la configuration du cabinet.</li>
+        <li><b>Chronologie</b> — l'historique des dépôts, du plus récent au plus ancien.</li>
+        <li><b>Demandes</b> — demandez au client les documents manquants ; il les voit dans sa liste de tâches.</li>
+        <li>Cliquez sur un document pour l'ouvrir : l'onglet <b>Document</b> affiche l'aperçu et permet de le <b>Télécharger</b> ; les onglets <b>Statut</b> et <b>Commentaires</b> permettent le suivi et les échanges.</li>
+      </ol>
+      <figure><img src="img/25-document-apercu.png" alt="Aperçu d'un document" /><figcaption>L'aperçu d'un document, avec le bouton Télécharger et les onglets Statut et Commentaires.</figcaption></figure>
+    </article>
+
+    <!-- 5 -->
+    <article class="step">
+      <div class="step-head"><span class="num">05</span><h2>Gérer le dossier du client</h2></div>
+      <ol class="actions">
+        <li>Dans l'espace du client, ouvrez l'onglet <b>Client</b>.</li>
+        <li><b>Détails</b> — renseignez la raison sociale, le contact, l'e-mail, le téléphone, l'adresse, le numéro fiscal, et importez un <b>logo</b>. Cliquez sur <b>Enregistrer</b>.</li>
+        <li><b>Comptes</b> — ajoutez un <b>compte employé</b> (chaque employé reçoit son propre lien d'invitation et partage les documents du client), réinitialisez un mot de passe, ou désactivez / retirez un compte.</li>
+        <li><b>Zone de danger</b> — désactivez le client (bloque ses accès sans supprimer les documents) ou supprimez-le définitivement.</li>
+      </ol>
+      <figure><img src="img/26-espace-client-gestion.png" alt="Onglet de gestion du client" /><figcaption>L'onglet Client : détails, comptes de connexion et zone de danger.</figcaption></figure>
+      <p class="note"><b>Plusieurs comptes par client :</b> une entreprise cliente peut avoir plusieurs employés qui déposent des documents ; chaque dépôt indique qui l'a importé.</p>
+    </article>
+
+    <!-- 6 -->
+    <article class="step">
+      <div class="step-head"><span class="num">06</span><h2>Configurer le regroupement</h2></div>
+      <ol class="actions">
+        <li>Dans le menu de gauche, cliquez sur <b>Regroupement</b>.</li>
+        <li>Choisissez la <b>base de période</b> (date de création, d'import, ou date du document) et la <b>profondeur</b> (Année, Année / Mois, ou Année / Trimestre / Mois).</li>
+        <li>Gérez la liste des <b>catégories</b> proposées lors de l'import.</li>
+        <li>Cliquez sur <b>Enregistrer</b>.</li>
+      </ol>
+      <figure><img src="img/27-regroupement.png" alt="Paramètres de regroupement" /><figcaption>Les paramètres de regroupement et les catégories du cabinet.</figcaption></figure>
+    </article>
+
+  </div>
+</main>
+<footer>Capsule — portail sécurisé de gestion documentaire pour cabinets comptables. Guide du comptable.</footer>
+</body>
+</html>

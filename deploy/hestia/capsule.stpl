@@ -24,6 +24,12 @@ server {
     }
 
     # SPA: serve built static assets, fall back to index.html for client routes.
+    location /aide {
+        root %home%/%user%/web/%domain%;
+        index index.html;
+        try_files $uri $uri/ =404;
+    }
+
     location / { try_files $uri /index.html; }
 
     location /error/ { alias %home%/%user%/web/%domain%/document_errors/; }
