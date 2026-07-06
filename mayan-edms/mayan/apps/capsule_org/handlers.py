@@ -207,9 +207,11 @@ def handler_auto_grant_document_acl(sender, instance, **kwargs):
 
     client = None
     if user is not None:
+        # Resolve through ClientUser so ANY of a client's employee logins maps
+        # to the client (not just the primary O2O user).
         client = Client.objects.select_related(
             'client_role', 'firm', 'firm__accountant_role', 'cabinet'
-        ).filter(user=user).first()
+        ).filter(client_users__user=user).first()
 
     if client is None:
         if user is not None:
@@ -269,6 +271,22 @@ def handler_auto_grant_document_acl(sender, instance, **kwargs):
                     'capsule_org: failed to emit failure notification for '
                     'document %s.', document, exc_info=True
                 )
+    else:
+        # Record who uploaded (attribution). Best-effort: never let this fail
+        # the upload. Upsert keyed by document so a re-delivery is idempotent.
+        try:
+            CapsuleDocumentUpload = apps.get_model(
+                app_label='capsule_org', model_name='CapsuleDocumentUpload'
+            )
+            CapsuleDocumentUpload.objects.update_or_create(
+                document_id=document.pk,
+                defaults={'client': client, 'user': user}
+            )
+        except Exception:
+            logger.error(
+                'capsule_org: failed to record uploader for document %s.',
+                document, exc_info=True
+            )
 
 
 def handler_enforce_firm_user_not_privileged(sender, instance, **kwargs):

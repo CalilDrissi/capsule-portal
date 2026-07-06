@@ -79,6 +79,14 @@ class Firm(models.Model):
         related_name='capsule_firm', to='document_states.Workflow',
         verbose_name=_(message='Status workflow')
     )
+    contact_email = models.EmailField(
+        blank=True, verbose_name=_(message='Contact email')
+    )
+    # Deactivating a firm disables its logins (users set is_active=False) while
+    # keeping all documents/history intact. Reversible.
+    is_active = models.BooleanField(
+        db_index=True, default=True, verbose_name=_(message='Active')
+    )
 
     class Meta:
         ordering = ('name',)

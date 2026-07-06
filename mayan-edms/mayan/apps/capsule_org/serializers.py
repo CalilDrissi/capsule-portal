@@ -38,7 +38,7 @@ class FirmSerializer(serializers.ModelSerializer):
             'id', 'name', 'slug', 'accountant_group_id',
             'accountant_role_id', 'document_type_id',
             'document_date_metadata_type_id', 'category_metadata_type_id',
-            'index_template_id', 'workflow_id'
+            'index_template_id', 'workflow_id', 'contact_email', 'is_active'
         )
         model = Firm
         read_only_fields = fields
@@ -46,6 +46,28 @@ class FirmSerializer(serializers.ModelSerializer):
 
 class FirmCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
+
+
+class FirmUpdateSerializer(serializers.Serializer):
+    """
+    PATCH a firm's editable details. Both fields optional/partial. `name`
+    uniqueness is validated excluding the firm being edited.
+    """
+    name = serializers.CharField(max_length=255, required=False)
+    contact_email = serializers.EmailField(
+        allow_blank=True, required=False
+    )
+
+    def validate_name(self, value):
+        queryset = Firm.objects.filter(name=value)
+        instance = getattr(self, 'instance', None)
+        if instance is not None:
+            queryset = queryset.exclude(pk=instance.pk)
+        if queryset.exists():
+            raise serializers.ValidationError(
+                'A firm with this name already exists.'
+            )
+        return value
 
 
 class AccountantCreateSerializer(serializers.Serializer):
@@ -65,7 +87,9 @@ class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
             'id', 'firm_id', 'user_id', 'display_name', 'cabinet_id',
-            'client_role_id', 'client_group_id', 'must_change_password'
+            'client_role_id', 'client_group_id', 'must_change_password',
+            'company_name', 'contact_name', 'contact_email', 'contact_phone',
+            'address', 'tax_id', 'notes', 'is_active'
         )
         model = Client
         read_only_fields = fields
@@ -77,6 +101,96 @@ class ClientCreateSerializer(serializers.Serializer):
     username = serializers.CharField(
         allow_blank=True, max_length=150, required=False
     )
+
+
+class ClientUpdateSerializer(serializers.Serializer):
+    """
+    PATCH a client's editable business details. All fields optional/partial.
+    """
+    display_name = serializers.CharField(max_length=255, required=False)
+    company_name = serializers.CharField(
+        allow_blank=True, max_length=255, required=False
+    )
+    contact_name = serializers.CharField(
+        allow_blank=True, max_length=255, required=False
+    )
+    contact_email = serializers.EmailField(allow_blank=True, required=False)
+    contact_phone = serializers.CharField(
+        allow_blank=True, max_length=64, required=False
+    )
+    address = serializers.CharField(allow_blank=True, required=False)
+    tax_id = serializers.CharField(
+        allow_blank=True, max_length=128, required=False
+    )
+    notes = serializers.CharField(allow_blank=True, required=False)
+
+
+class ClientUserSerializer(serializers.Serializer):
+    """A login belonging to a client company (read-only projection)."""
+    id = serializers.IntegerField()
+    user_id = serializers.IntegerField()
+    username = serializers.SerializerMethodField()
+    first_name = serializers.SerializerMethodField()
+    is_active = serializers.SerializerMethodField()
+    is_primary = serializers.BooleanField()
+    has_invite = serializers.SerializerMethodField()
+
+    def get_username(self, instance):
+        return instance.user.get_username()
+
+    def get_first_name(self, instance):
+        return instance.user.first_name
+
+    def get_is_active(self, instance):
+        return instance.user.is_active
+
+    def get_has_invite(self, instance):
+        return bool(instance.invite_token)
+
+
+class AddClientUserSerializer(serializers.Serializer):
+    full_name = serializers.CharField(
+        allow_blank=True, max_length=150, required=False
+    )
+    username = serializers.CharField(
+        allow_blank=True, max_length=150, required=False
+    )
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    """
+    Reset a login's password either by setting one directly (`mode=password`)
+    or by minting a fresh one-time invite link (`mode=link`).
+    """
+    mode = serializers.ChoiceField(choices=('password', 'link'))
+    password = serializers.CharField(
+        max_length=255, required=False, style={'input_type': 'password'}
+    )
+
+    def validate(self, attrs):
+        if attrs['mode'] == 'password':
+            validate_capsule_password(attrs.get('password'))
+        return attrs
+
+
+class AccountantSerializer(serializers.Serializer):
+    """An accountant login of a firm (read-only projection)."""
+    user_id = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+    first_name = serializers.SerializerMethodField()
+    is_active = serializers.SerializerMethodField()
+
+    def get_user_id(self, instance):
+        return instance.user_id
+
+    def get_username(self, instance):
+        return instance.user.get_username()
+
+    def get_first_name(self, instance):
+        return instance.user.first_name
+
+    def get_is_active(self, instance):
+        return instance.user.is_active
 
 
 class FirmSettingsSerializer(serializers.Serializer):

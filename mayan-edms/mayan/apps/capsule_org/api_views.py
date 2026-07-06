@@ -12,16 +12,21 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django.contrib.auth import get_user_model
+
 from .models import (
-    CapsuleNotification, Client, DocumentRequest, Firm, FirmMembership
+    CapsuleNotification, Client, ClientUser, DocumentRequest, Firm,
+    FirmMembership
 )
 from .models.firm_models import MEMBERSHIP_KIND_ACCOUNTANT
 from .serializers import (
-    AccountantCreateSerializer, CapsuleNotificationSerializer,
-    ClientCreateSerializer, ClientSerializer, DocumentRequestCreateSerializer,
+    AccountantCreateSerializer, AccountantSerializer, AddClientUserSerializer,
+    CapsuleNotificationSerializer, ClientCreateSerializer, ClientSerializer,
+    ClientUpdateSerializer, ClientUserSerializer, DocumentRequestCreateSerializer,
     DocumentRequestSerializer, DocumentRequestUpdateSerializer,
     FirmCreateSerializer, FirmSerializer, FirmSettingsSerializer,
-    PasswordChangeSerializer, validate_capsule_password
+    FirmUpdateSerializer, PasswordChangeSerializer, ResetPasswordSerializer,
+    validate_capsule_password
 )
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from .services import (
@@ -29,6 +34,8 @@ from .services import (
 )
 
 logger = logging.getLogger(name=__name__)
+
+User = get_user_model()
 
 
 class APIWhoAmIView(APIView):
@@ -76,10 +83,19 @@ class APIWhoAmIView(APIView):
             if firm_settings is not None:
                 data['categories'] = list(firm_settings.categories or [])
 
-        client = Client.objects.filter(user=user).first()
+        # Resolve the client through ClientUser so employee logins also carry a
+        # client context. `must_change_password` only applies to the primary
+        # owner login (the temp-credential path); employees onboard via their
+        # own invite and never need a forced change.
+        client = Client.objects.filter(client_users__user=user).first()
         if client:
             data['client_id'] = client.pk
-            data['must_change_password'] = client.must_change_password
+            is_primary = client.client_users.filter(
+                user=user, is_primary=True
+            ).exists()
+            data['must_change_password'] = (
+                client.must_change_password if is_primary else False
+            )
 
         return Response(data=data)
 
@@ -265,29 +281,47 @@ class APIInviteView(APIView):
     permission_classes = (AllowAny,)
     authentication_classes = ()
 
-    def _get_client(self, token):
+    def _resolve(self, token):
+        """
+        Resolve an invite token to (client, client_user, user). A Client token
+        (primary owner) resolves client_user=None and operates on Client.user;
+        a ClientUser token (employee login) resolves the client from the
+        ClientUser and operates on ClientUser.user. Returns None on no match.
+        """
         if not token:
             return None
-        return Client.objects.select_related('firm', 'user').filter(
+        client = Client.objects.select_related('firm', 'user').filter(
             invite_token=token
         ).first()
+        if client is not None:
+            return client, None, client.user
+
+        client_user = ClientUser.objects.select_related(
+            'client', 'client__firm', 'user'
+        ).filter(invite_token=token).first()
+        if client_user is not None:
+            return client_user.client, client_user, client_user.user
+
+        return None
 
     def get(self, request, token, *args, **kwargs):
-        client = self._get_client(token=token)
-        if client is None:
+        resolved = self._resolve(token=token)
+        if resolved is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        client, client_user, user = resolved
         return Response(
             data={
                 'firm_name': client.firm.name,
                 'display_name': client.display_name,
-                'username': client.user.get_username()
+                'username': user.get_username()
             }
         )
 
     def post(self, request, token, *args, **kwargs):
-        client = self._get_client(token=token)
-        if client is None:
+        resolved = self._resolve(token=token)
+        if resolved is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        client, client_user, user = resolved
 
         password = (request.data or {}).get('password')
         # Enforce the shared Capsule password policy (min length + Django's
@@ -301,19 +335,27 @@ class APIInviteView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        user = client.user
         user.set_password(raw_password=password)
         user._event_ignore = True
         user.save(update_fields=('password',))
 
-        client.must_change_password = False
-        client.invite_token = None
-        client.invite_created = None
-        client.save(
-            update_fields=(
-                'must_change_password', 'invite_token', 'invite_created'
+        # Clear the one-time token on whichever record it belonged to. For a
+        # Client (primary) token also drop the forced password-change flag.
+        if client_user is None:
+            client.must_change_password = False
+            client.invite_token = None
+            client.invite_created = None
+            client.save(
+                update_fields=(
+                    'must_change_password', 'invite_token', 'invite_created'
+                )
             )
-        )
+        else:
+            client_user.invite_token = None
+            client_user.invite_created = None
+            client_user.save(
+                update_fields=('invite_token', 'invite_created')
+            )
 
         return Response(data={'username': user.get_username()})
 
@@ -641,6 +683,451 @@ class APIPeriodExportView(APIView):
         return response
 
 
+class APIClientDetailView(APIView):
+    """
+    get: Return a client's full detail (accountant of the firm, the client, or
+    platform).
+    patch: Update the client's business details (accountant of the firm or
+    platform).
+    delete: Permanently tear the client down (accountant of the firm or
+    platform).
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def _get_client(self, client_id):
+        return get_object_or_404(
+            queryset=Client.objects.select_related('firm'), pk=client_id
+        )
+
+    def get(self, request, client_id, *args, **kwargs):
+        client = self._get_client(client_id=client_id)
+        if not _can_access_client(user=request.user, client=client):
+            return Response(
+                data={'detail': 'Not permitted for this client.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return Response(data=ClientSerializer(instance=client).data)
+
+    def patch(self, request, client_id, *args, **kwargs):
+        client = self._get_client(client_id=client_id)
+        if not _can_manage_firm(user=request.user, firm=client.firm):
+            return Response(
+                data={'detail': 'Must be an accountant of this firm.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = ClientUpdateSerializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        for field, value in data.items():
+            setattr(client, field, value)
+        if data:
+            client.save(update_fields=tuple(data.keys()))
+
+        return Response(data=ClientSerializer(instance=client).data)
+
+    def delete(self, request, client_id, *args, **kwargs):
+        client = self._get_client(client_id=client_id)
+        if not _can_manage_firm(user=request.user, firm=client.firm):
+            return Response(
+                data={'detail': 'Must be an accountant of this firm.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        provisioning.delete_client(client=client)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class APIClientActiveView(APIView):
+    """
+    post: Enable/disable all of a client's logins. Body {active: bool}.
+    Accountant of the firm or platform.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, client_id, *args, **kwargs):
+        client = get_object_or_404(
+            queryset=Client.objects.select_related('firm'), pk=client_id
+        )
+        if not _can_manage_firm(user=request.user, firm=client.firm):
+            return Response(
+                data={'detail': 'Must be an accountant of this firm.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        active = bool((request.data or {}).get('active'))
+        provisioning.set_client_active(client=client, active=active)
+        return Response(data={'is_active': active})
+
+
+class APIClientUserListCreateView(APIView):
+    """
+    get: List a client's logins (accountant of the firm, the client, or
+    platform).
+    post: Add an employee login to the client (accountant of the firm or
+    platform). Body {full_name?, username?}.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, client_id, *args, **kwargs):
+        client = get_object_or_404(
+            queryset=Client.objects.select_related('firm'), pk=client_id
+        )
+        if not _can_access_client(user=request.user, client=client):
+            return Response(
+                data={'detail': 'Not permitted for this client.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        serializer = ClientUserSerializer(
+            instance=client.client_users.select_related('user'), many=True
+        )
+        return Response(data=serializer.data)
+
+    def post(self, request, client_id, *args, **kwargs):
+        client = get_object_or_404(
+            queryset=Client.objects.select_related('firm'), pk=client_id
+        )
+        if not _can_manage_firm(user=request.user, firm=client.firm):
+            return Response(
+                data={'detail': 'Must be an accountant of this firm.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = AddClientUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        _client_user, username, invite_token = provisioning.add_client_user(
+            client=client,
+            full_name=serializer.validated_data.get('full_name', '') or '',
+            username=serializer.validated_data.get('username') or None
+        )
+
+        return Response(
+            data={
+                'username': username,
+                'invite_token': invite_token,
+                'invite_path': '/invite/{}'.format(invite_token)
+            }, status=status.HTTP_201_CREATED
+        )
+
+
+class APIClientUserDetailView(APIView):
+    """
+    patch: Edit an employee login's first_name/email, or toggle its active
+    state via {active: bool}. Accountant of the firm or platform.
+    delete: Remove the login (deletes the User, cascading ClientUser +
+    FirmMembership). Refuses to delete the primary login.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def _get(self, client_id, user_id):
+        client = get_object_or_404(
+            queryset=Client.objects.select_related('firm'), pk=client_id
+        )
+        client_user = get_object_or_404(
+            queryset=client.client_users.select_related('user'),
+            user_id=user_id
+        )
+        return client, client_user
+
+    def patch(self, request, client_id, user_id, *args, **kwargs):
+        client, client_user = self._get(client_id=client_id, user_id=user_id)
+        if not _can_manage_firm(user=request.user, firm=client.firm):
+            return Response(
+                data={'detail': 'Must be an accountant of this firm.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        data = request.data or {}
+        user = client_user.user
+        update_fields = []
+        if 'active' in data:
+            user.is_active = bool(data['active'])
+            update_fields.append('is_active')
+        if 'first_name' in data:
+            user.first_name = (data.get('first_name') or '')[:150]
+            update_fields.append('first_name')
+        if 'email' in data:
+            user.email = data.get('email') or ''
+            update_fields.append('email')
+        if update_fields:
+            user._event_ignore = True
+            user.save(update_fields=update_fields)
+
+        return Response(
+            data=ClientUserSerializer(instance=client_user).data
+        )
+
+    def delete(self, request, client_id, user_id, *args, **kwargs):
+        client, client_user = self._get(client_id=client_id, user_id=user_id)
+        if not _can_manage_firm(user=request.user, firm=client.firm):
+            return Response(
+                data={'detail': 'Must be an accountant of this firm.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        if client_user.is_primary:
+            return Response(
+                data={'detail': 'Delete the client instead.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        client_user.user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class APIClientUserResetPasswordView(APIView):
+    """
+    post: Reset an employee login's password. Body {mode: 'password'|'link',
+    password?}. mode=password sets the password directly; mode=link mints a
+    fresh one-time invite link. Accountant of the firm or platform.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, client_id, user_id, *args, **kwargs):
+        client = get_object_or_404(
+            queryset=Client.objects.select_related('firm'), pk=client_id
+        )
+        if not _can_manage_firm(user=request.user, firm=client.firm):
+            return Response(
+                data={'detail': 'Must be an accountant of this firm.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        client_user = get_object_or_404(
+            queryset=client.client_users.select_related('user'),
+            user_id=user_id
+        )
+
+        serializer = ResetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        mode = serializer.validated_data['mode']
+
+        if mode == 'password':
+            provisioning.set_user_password(
+                user=client_user.user,
+                password=serializer.validated_data['password']
+            )
+            return Response(data={'ok': True})
+
+        # mode == 'link'. The primary login sets its password through the
+        # Client's own invite token; employees through their ClientUser token.
+        if client_user.is_primary:
+            client.invite_token = secrets.token_urlsafe(nbytes=32)
+            client.invite_created = timezone.now()
+            client.save(update_fields=('invite_token', 'invite_created'))
+            token = client.invite_token
+        else:
+            token = provisioning.regenerate_client_user_invite(
+                client_user=client_user
+            )
+        return Response(data={'invite_path': '/invite/{}'.format(token)})
+
+
+class APIClientDocumentUploadersView(APIView):
+    """
+    get: Return a {document_id: {username, display}} map of who uploaded each
+    of the client's documents. Accountant of the firm, the client, or platform.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, client_id, *args, **kwargs):
+        client = get_object_or_404(
+            queryset=Client.objects.select_related('firm'), pk=client_id
+        )
+        if not _can_access_client(user=request.user, client=client):
+            return Response(
+                data={'detail': 'Not permitted for this client.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        data = {}
+        for upload in client.document_uploads.select_related('user'):
+            user = upload.user
+            if user is None:
+                username = None
+                display = None
+            else:
+                username = user.get_username()
+                display = user.first_name or username
+            data[str(upload.document_id)] = {
+                'username': username, 'display': display
+            }
+        return Response(data=data)
+
+
+class APIFirmDetailView(APIView):
+    """
+    get: Return a firm's detail (platform only).
+    patch: Update the firm's name/contact_email (platform only).
+    delete: Permanently tear the firm down (platform only).
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, firm_id, *args, **kwargs):
+        if not request.user.is_superuser:
+            return Response(
+                data={'detail': 'Superuser required.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
+        return Response(data=FirmSerializer(instance=firm).data)
+
+    def patch(self, request, firm_id, *args, **kwargs):
+        if not request.user.is_superuser:
+            return Response(
+                data={'detail': 'Superuser required.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
+
+        serializer = FirmUpdateSerializer(
+            instance=firm, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        for field, value in data.items():
+            setattr(firm, field, value)
+        if data:
+            firm.save(update_fields=tuple(data.keys()))
+
+        return Response(data=FirmSerializer(instance=firm).data)
+
+    def delete(self, request, firm_id, *args, **kwargs):
+        if not request.user.is_superuser:
+            return Response(
+                data={'detail': 'Superuser required.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
+        provisioning.delete_firm(firm=firm)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class APIFirmActiveView(APIView):
+    """
+    post: Enable/disable every login belonging to a firm. Body {active: bool}.
+    Platform only.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, firm_id, *args, **kwargs):
+        if not request.user.is_superuser:
+            return Response(
+                data={'detail': 'Superuser required.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
+        active = bool((request.data or {}).get('active'))
+        provisioning.set_firm_active(firm=firm, active=active)
+        return Response(data={'is_active': active})
+
+
+class APIFirmAccountantListView(APIView):
+    """
+    get: List a firm's accountant logins (platform only).
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, firm_id, *args, **kwargs):
+        if not request.user.is_superuser:
+            return Response(
+                data={'detail': 'Superuser required.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
+        memberships = FirmMembership.objects.filter(
+            firm=firm, kind=MEMBERSHIP_KIND_ACCOUNTANT
+        ).select_related('user')
+        serializer = AccountantSerializer(instance=memberships, many=True)
+        return Response(data=serializer.data)
+
+
+class APIAccountantDetailView(APIView):
+    """
+    patch: Edit an accountant login's first_name/email, or toggle active via
+    {active: bool} (platform only).
+    delete: Remove the accountant login (platform only).
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def _get(self, firm_id, user_id):
+        firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
+        membership = get_object_or_404(
+            queryset=FirmMembership.objects.select_related('user').filter(
+                firm=firm, kind=MEMBERSHIP_KIND_ACCOUNTANT
+            ), user_id=user_id
+        )
+        return firm, membership
+
+    def patch(self, request, firm_id, user_id, *args, **kwargs):
+        if not request.user.is_superuser:
+            return Response(
+                data={'detail': 'Superuser required.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        firm, membership = self._get(firm_id=firm_id, user_id=user_id)
+
+        data = request.data or {}
+        user = membership.user
+        update_fields = []
+        if 'active' in data:
+            user.is_active = bool(data['active'])
+            update_fields.append('is_active')
+        if 'first_name' in data:
+            user.first_name = (data.get('first_name') or '')[:150]
+            update_fields.append('first_name')
+        if 'email' in data:
+            user.email = data.get('email') or ''
+            update_fields.append('email')
+        if update_fields:
+            user._event_ignore = True
+            user.save(update_fields=update_fields)
+
+        return Response(data=AccountantSerializer(instance=membership).data)
+
+    def delete(self, request, firm_id, user_id, *args, **kwargs):
+        if not request.user.is_superuser:
+            return Response(
+                data={'detail': 'Superuser required.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        firm, membership = self._get(firm_id=firm_id, user_id=user_id)
+        membership.user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class APIAccountantResetPasswordView(APIView):
+    """
+    post: Set an accountant login's password directly. Body {password}.
+    Accountants have no invite link; the password is set in place. Platform
+    only.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, firm_id, user_id, *args, **kwargs):
+        if not request.user.is_superuser:
+            return Response(
+                data={'detail': 'Superuser required.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
+        membership = get_object_or_404(
+            queryset=FirmMembership.objects.select_related('user').filter(
+                firm=firm, kind=MEMBERSHIP_KIND_ACCOUNTANT
+            ), user_id=user_id
+        )
+
+        password = (request.data or {}).get('password')
+        try:
+            validate_capsule_password(password)
+        except DRFValidationError as exception:
+            return Response(
+                data={'detail': exception.detail},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        provisioning.set_user_password(user=membership.user, password=password)
+        return Response(data={'ok': True})
+
+
 def _can_manage_firm(user, firm):
     if user.is_superuser:
         return True
@@ -657,6 +1144,8 @@ def _can_access_client(user, client):
     """
     if user.is_superuser:
         return True
-    if client.user_id == user.pk:
+    # Any of the client's logins (primary owner or employees) count as the
+    # client themselves.
+    if client.client_users.filter(user=user).exists():
         return True
     return _can_manage_firm(user=user, firm=client.firm)

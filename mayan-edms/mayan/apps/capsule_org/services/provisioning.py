@@ -14,7 +14,7 @@ from mayan.apps.documents.permissions import permission_document_create
 from mayan.apps.permissions.models import Role
 from mayan.apps.sources.models import Source
 
-from ..models import Client, Firm, FirmMembership, FirmSettings
+from ..models import Client, ClientUser, Firm, FirmMembership, FirmSettings
 from ..models.firm_models import (
     MEMBERSHIP_KIND_ACCOUNTANT, MEMBERSHIP_KIND_CLIENT
 )
@@ -215,4 +215,127 @@ def provision_client(firm, display_name, username=None, actor=None):
         firm=firm, user=user, kind=MEMBERSHIP_KIND_CLIENT
     )
 
+    # The primary login. Additional employee logins are added later via
+    # add_client_user(); all client logins are resolved through ClientUser.
+    ClientUser.objects.create(client=client, user=user, is_primary=True)
+
     return client, username, temp_password
+
+
+@transaction.atomic
+def add_client_user(client, full_name='', username=None, actor=None):
+    """
+    Add another employee login to an existing client company. The new user
+    joins the client's group (inheriting the client role -> the shared cabinet
+    and every per-document ACL granted to that role), gets a client
+    FirmMembership, and a one-time invite token to set their own password.
+
+    Returns: (client_user, username, invite_token)
+    """
+    firm = client.firm
+    username = _unique_username(
+        base=username or '{}_user'.format(client.display_name)
+    )
+
+    user = User(username=username, is_staff=False, is_superuser=False)
+    user.first_name = full_name[:150]
+    # Placeholder password — unusable in practice until the invite sets a real
+    # one (the token is unguessable and the temp password is never shared).
+    user.set_password(raw_password=secrets.token_urlsafe(nbytes=12))
+    user.save()
+
+    if client.client_group:
+        user.groups.add(client.client_group)
+
+    FirmMembership.objects.create(
+        firm=firm, user=user, kind=MEMBERSHIP_KIND_CLIENT
+    )
+
+    token = secrets.token_urlsafe(nbytes=32)
+    client_user = ClientUser.objects.create(
+        client=client, user=user, is_primary=False, invite_token=token,
+        invite_created=timezone.now()
+    )
+    return client_user, username, token
+
+
+def set_user_password(user, password):
+    """Set a login's password directly (reactivates the account)."""
+    user.set_password(raw_password=password)
+    user.is_active = True
+    user.save(update_fields=('password', 'is_active'))
+
+
+def regenerate_client_user_invite(client_user):
+    """Mint a fresh one-time invite token for an employee login."""
+    client_user.invite_token = secrets.token_urlsafe(nbytes=32)
+    client_user.invite_created = timezone.now()
+    client_user.save(update_fields=('invite_token', 'invite_created'))
+    return client_user.invite_token
+
+
+def set_client_active(client, active):
+    """Enable/disable all of a client's logins (documents are untouched)."""
+    client.is_active = active
+    client.save(update_fields=('is_active',))
+    User.objects.filter(capsule_client_user__client=client).update(
+        is_active=active
+    )
+
+
+def set_firm_active(firm, active):
+    """Enable/disable every login belonging to a firm (accountants + clients)."""
+    firm.is_active = active
+    firm.save(update_fields=('is_active',))
+    User.objects.filter(capsule_membership__firm=firm).update(is_active=active)
+
+
+@transaction.atomic
+def delete_client(client):
+    """
+    Permanently remove a client: its logins, group, role and cabinet. Documents
+    that were uploaded remain in Mayan storage but lose their ACL grants (the
+    client role is deleted), so they become inaccessible — this matches the
+    "keep the data, remove access" expectation for a hard delete.
+    """
+    group = client.client_group
+    role = client.client_role
+    cabinet = client.cabinet
+    user_ids = list(
+        User.objects.filter(capsule_client_user__client=client).values_list(
+            'id', flat=True
+        )
+    )
+    # Deleting the users cascades ClientUser + FirmMembership, and the primary
+    # user's O2O cascades the Client row itself.
+    User.objects.filter(id__in=user_ids).delete()
+    Client.objects.filter(pk=client.pk).delete()
+    if role:
+        role.delete()
+    if group:
+        group.delete()
+    if cabinet:
+        cabinet._event_ignore = True
+        cabinet.delete()
+
+
+@transaction.atomic
+def delete_firm(firm):
+    """
+    Permanently remove a firm and everything provisioned for it: all client
+    logins + clients, all accountant logins, the firm's group/role, and the
+    firm row (cascading settings + memberships). The firm's DocumentType and its
+    documents are left in place (retention); their ACLs are gone with the roles.
+    """
+    for client in list(firm.clients.all()):
+        delete_client(client)
+    # Remaining firm users are the accountants.
+    User.objects.filter(capsule_membership__firm=firm).delete()
+    group = firm.accountant_group
+    role = firm.accountant_role
+    firm_pk = firm.pk
+    Firm.objects.filter(pk=firm_pk).delete()
+    if role:
+        role.delete()
+    if group:
+        group.delete()
