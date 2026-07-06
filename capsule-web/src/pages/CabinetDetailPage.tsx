@@ -13,12 +13,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TextInput,
   Tile,
   TreeNode,
   TreeView,
 } from '@carbon/react'
 import { Add, Folder, FolderAdd, TrashCan } from '@carbon/icons-react'
 import PageBreadcrumb from '../components/PageBreadcrumb'
+import { requiredLabel } from '../lib/forms'
 import {
   useAddDocumentToCabinet,
   useCabinet,
@@ -69,6 +71,7 @@ export default function CabinetDetailPage() {
   const [selectedDocId, setSelectedDocId] = useState<number | null>(null)
   const [childOpen, setChildOpen] = useState(false)
   const [childLabel, setChildLabel] = useState('')
+  const [childAttempted, setChildAttempted] = useState(false)
 
   // The detail endpoint returns the subtree rooted here; for the breadcrumb /
   // full hierarchy we render the tree starting from this cabinet's node.
@@ -105,8 +108,15 @@ export default function CabinetDetailPage() {
     )
   }
 
+  function openChild() {
+    setChildLabel('')
+    setChildAttempted(false)
+    setChildOpen(true)
+  }
+
   function submitChild() {
     if (cabinetId == null) return
+    setChildAttempted(true)
     const label = childLabel.trim()
     if (!label) return
     createCabinet.mutate(
@@ -120,6 +130,9 @@ export default function CabinetDetailPage() {
     )
   }
 
+  // Field-level validity (only surfaced after a save attempt).
+  const childLabelInvalid = childAttempted && !childLabel.trim()
+
   return (
     <div className="capsule-page">
       <PageBreadcrumb items={[{ label: 'Cabinets', to: '/cabinets' }, { label: cabinet.full_path }]} />
@@ -130,7 +143,7 @@ export default function CabinetDetailPage() {
           <Button
             kind="tertiary"
             renderIcon={FolderAdd}
-            onClick={() => setChildOpen(true)}
+            onClick={openChild}
             data-testid="new-subcabinet"
           >
             New sub-cabinet
@@ -248,18 +261,20 @@ export default function CabinetDetailPage() {
         modalHeading="New sub-cabinet"
         primaryButtonText="Create"
         secondaryButtonText="Cancel"
-        primaryButtonDisabled={!childLabel.trim() || createCabinet.isPending}
+        primaryButtonDisabled={createCabinet.isPending}
         onRequestClose={() => setChildOpen(false)}
         onRequestSubmit={submitChild}
       >
         <p style={{ marginBottom: '0.5rem' }}>
           Parent: <strong>{cabinet.full_path}</strong>
         </p>
-        <input
-          className="cds--text-input"
-          aria-label="Sub-cabinet label"
+        <TextInput
+          id="new-subcabinet-label"
+          labelText={requiredLabel('Sub-cabinet label')}
           value={childLabel}
           onChange={(e) => setChildLabel(e.target.value)}
+          invalid={childLabelInvalid}
+          invalidText="Sub-cabinet label is required."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitChild()
           }}

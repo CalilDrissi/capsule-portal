@@ -24,6 +24,7 @@ import {
   useGroups,
   useUpdateGroup,
 } from '../api/queries'
+import { requiredLabel } from '../lib/forms'
 import type { Group } from '../api/types'
 
 const headers = [
@@ -39,13 +40,25 @@ export default function GroupsPage() {
   const deleteGroup = useDeleteGroup()
 
   const [createOpen, setCreateOpen] = useState(false)
+  const [createAttempted, setCreateAttempted] = useState(false)
   const [newName, setNewName] = useState('')
   const [editGroup, setEditGroup] = useState<Group | null>(null)
+  const [editAttempted, setEditAttempted] = useState(false)
   const [editName, setEditName] = useState('')
 
   const groups = data?.results ?? []
 
+  const newNameInvalid = createAttempted && !newName.trim()
+  const editNameInvalid = editAttempted && !editName.trim()
+
+  function openCreate() {
+    setNewName('')
+    setCreateAttempted(false)
+    setCreateOpen(true)
+  }
+
   function submitCreate() {
+    setCreateAttempted(true)
     const name = newName.trim()
     if (!name) return
     createGroup.mutate(
@@ -61,6 +74,7 @@ export default function GroupsPage() {
 
   function submitEdit() {
     if (!editGroup) return
+    setEditAttempted(true)
     const name = editName.trim()
     if (!name) return
     updateGroup.mutate(
@@ -75,7 +89,7 @@ export default function GroupsPage() {
     <div className="capsule-page">
       <div className="capsule-page__header">
         <h2 className="capsule-page__title">Groups</h2>
-        <Button renderIcon={Add} onClick={() => setCreateOpen(true)} data-testid="new-group">
+        <Button renderIcon={Add} onClick={openCreate} data-testid="new-group">
           New group
         </Button>
       </div>
@@ -88,7 +102,7 @@ export default function GroupsPage() {
         <Tile className="capsule-empty">
           <h4>No groups yet</h4>
           <p>Create a group to organize users.</p>
-          <Button renderIcon={Add} onClick={() => setCreateOpen(true)}>
+          <Button renderIcon={Add} onClick={openCreate}>
             New group
           </Button>
         </Tile>
@@ -132,6 +146,7 @@ export default function GroupsPage() {
                                     if (grp) {
                                       setEditGroup(grp)
                                       setEditName(grp.name)
+                                      setEditAttempted(false)
                                     }
                                   }}
                                 />
@@ -168,16 +183,18 @@ export default function GroupsPage() {
         modalHeading="New group"
         primaryButtonText="Create"
         secondaryButtonText="Cancel"
-        primaryButtonDisabled={!newName.trim() || createGroup.isPending}
+        primaryButtonDisabled={createGroup.isPending}
         onRequestClose={() => setCreateOpen(false)}
         onRequestSubmit={submitCreate}
       >
         <TextInput
           id="new-group-name"
           data-testid="group-name-input"
-          labelText="Name"
+          labelText={requiredLabel('Name')}
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
+          invalid={newNameInvalid}
+          invalidText="Name is required."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitCreate()
           }}
@@ -192,15 +209,17 @@ export default function GroupsPage() {
         modalHeading="Rename group"
         primaryButtonText="Save"
         secondaryButtonText="Cancel"
-        primaryButtonDisabled={!editName.trim() || updateGroup.isPending}
+        primaryButtonDisabled={updateGroup.isPending}
         onRequestClose={() => setEditGroup(null)}
         onRequestSubmit={submitEdit}
       >
         <TextInput
           id="edit-group-name"
-          labelText="Name"
+          labelText={requiredLabel('Name')}
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
+          invalid={editNameInvalid}
+          invalidText="Name is required."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitEdit()
           }}

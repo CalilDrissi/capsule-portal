@@ -14,6 +14,7 @@ import {
 import { Add, User } from '@carbon/icons-react'
 import { useClients, useProvisionClient } from '../api/queries'
 import { useAppStore } from '../store/useAppStore'
+import { requiredLabel } from '../lib/forms'
 import type { ProvisionClientResult } from '../api/types'
 
 export default function ClientsGridPage() {
@@ -25,14 +26,26 @@ export default function ClientsGridPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [displayName, setDisplayName] = useState('')
   const [created, setCreated] = useState<ProvisionClientResult | null>(null)
+  const [attempted, setAttempted] = useState(false)
+
+  const displayNameInvalid = attempted && !displayName.trim()
+
+  function openModal() {
+    setDisplayName('')
+    setCreated(null)
+    setAttempted(false)
+    setModalOpen(true)
+  }
 
   function resetModal() {
     setModalOpen(false)
     setDisplayName('')
     setCreated(null)
+    setAttempted(false)
   }
 
   function handleCreate() {
+    setAttempted(true)
     if (!firm || !displayName.trim()) return
     provision.mutate(
       { firm_id: firm.id, display_name: displayName.trim() },
@@ -52,7 +65,7 @@ export default function ClientsGridPage() {
         <h2 className="capsule-page__title">Clients</h2>
         <Button
           renderIcon={Add}
-          onClick={() => setModalOpen(true)}
+          onClick={openModal}
           data-testid="new-client"
         >
           New client
@@ -105,9 +118,7 @@ export default function ClientsGridPage() {
         modalHeading={created ? 'Client created' : 'New client'}
         primaryButtonText={created ? 'Done' : 'Create'}
         secondaryButtonText={created ? undefined : 'Cancel'}
-        primaryButtonDisabled={
-          !created && (!displayName.trim() || provision.isPending)
-        }
+        primaryButtonDisabled={!created && provision.isPending}
         onRequestClose={resetModal}
         onRequestSubmit={created ? resetModal : handleCreate}
         onSecondarySubmit={resetModal}
@@ -152,10 +163,12 @@ export default function ClientsGridPage() {
           <Stack gap={5}>
             <TextInput
               id="client-display-name"
-              labelText="Display name"
+              labelText={requiredLabel('Display name')}
               placeholder="e.g. Acme Corp"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
+              invalid={displayNameInvalid}
+              invalidText="Display name is required."
             />
           </Stack>
         )}

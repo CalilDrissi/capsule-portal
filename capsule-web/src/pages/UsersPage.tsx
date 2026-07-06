@@ -27,6 +27,7 @@ import {
   useUpdateUser,
   useUsers,
 } from '../api/queries'
+import { requiredLabel } from '../lib/forms'
 import type { User } from '../api/types'
 
 const headers = [
@@ -45,6 +46,7 @@ export default function UsersPage() {
   const deleteUser = useDeleteUser()
 
   const [createOpen, setCreateOpen] = useState(false)
+  const [attempted, setAttempted] = useState(false)
   const [form, setForm] = useState({
     username: '',
     first_name: '',
@@ -61,12 +63,22 @@ export default function UsersPage() {
 
   const users = data?.results ?? []
 
+  const usernameInvalid = attempted && !form.username.trim()
+  const passwordInvalid = attempted && !form.password.trim()
+
   function resetForm() {
     setForm({ username: '', first_name: '', last_name: '', email: '', password: '' })
   }
 
+  function openCreate() {
+    resetForm()
+    setAttempted(false)
+    setCreateOpen(true)
+  }
+
   function submitCreate() {
-    if (!form.username.trim()) return
+    setAttempted(true)
+    if (!form.username.trim() || !form.password.trim()) return
     createUser.mutate(
       {
         username: form.username.trim(),
@@ -115,7 +127,7 @@ export default function UsersPage() {
         <h2 className="capsule-page__title">Users</h2>
         <Button
           renderIcon={Add}
-          onClick={() => setCreateOpen(true)}
+          onClick={openCreate}
           data-testid="new-user"
         >
           New user
@@ -130,7 +142,7 @@ export default function UsersPage() {
         <Tile className="capsule-empty">
           <h4>No users yet</h4>
           <p>Superusers are managed separately and not listed here.</p>
-          <Button renderIcon={Add} onClick={() => setCreateOpen(true)}>
+          <Button renderIcon={Add} onClick={openCreate}>
             New user
           </Button>
         </Tile>
@@ -213,7 +225,7 @@ export default function UsersPage() {
         modalHeading="New user"
         primaryButtonText="Create"
         secondaryButtonText="Cancel"
-        primaryButtonDisabled={!form.username.trim() || createUser.isPending}
+        primaryButtonDisabled={createUser.isPending}
         onRequestClose={() => setCreateOpen(false)}
         onRequestSubmit={submitCreate}
       >
@@ -221,9 +233,11 @@ export default function UsersPage() {
           <TextInput
             id="new-user-username"
             data-testid="user-username-input"
-            labelText="Username"
+            labelText={requiredLabel('Username')}
             value={form.username}
             onChange={(e) => setForm({ ...form, username: e.target.value })}
+            invalid={usernameInvalid}
+            invalidText="Username is required."
           />
           <TextInput
             id="new-user-first"
@@ -246,9 +260,11 @@ export default function UsersPage() {
           <PasswordInput
             id="new-user-password"
             data-testid="user-password-input"
-            labelText="Password"
+            labelText={requiredLabel('Password')}
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
+            invalid={passwordInvalid}
+            invalidText="Password is required."
           />
         </Stack>
         {createUser.isError && (

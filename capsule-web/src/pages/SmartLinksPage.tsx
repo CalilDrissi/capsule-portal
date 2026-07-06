@@ -32,7 +32,7 @@ export default function SmartLinksPage() {
         },
       ]}
       fields={[
-        { name: 'label', label: 'Label' },
+        { name: 'label', label: 'Label', required: true },
         { name: 'dynamic_label', label: 'Dynamic label (template)' },
         { name: 'enabled', label: 'Enabled', type: 'toggle' },
       ]}

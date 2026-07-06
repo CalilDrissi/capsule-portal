@@ -32,8 +32,8 @@ export default function WebLinksPage() {
         },
       ]}
       fields={[
-        { name: 'label', label: 'Label' },
-        { name: 'template', label: 'Template URL' },
+        { name: 'label', label: 'Label', required: true },
+        { name: 'template', label: 'Template URL', required: true },
         { name: 'enabled', label: 'Enabled', type: 'toggle' },
       ]}
       toInitial={(i) => ({

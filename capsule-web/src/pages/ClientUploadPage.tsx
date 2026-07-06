@@ -17,6 +17,7 @@ import {
 import { applyUploadMetadata, uploadDocument } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
 import { notify } from '../store/useNotifications'
+import { requiredLabel } from '../lib/forms'
 import PageBreadcrumb from '../components/PageBreadcrumb'
 
 // Fallback category list used only when the firm has not configured its own
@@ -77,6 +78,10 @@ export default function ClientUploadPage() {
   const [label, setLabel] = useState('')
   const [category, setCategory] = useState(categories[0])
   const [docDate, setDocDate] = useState<string>('')
+  const [attempted, setAttempted] = useState(false)
+
+  // Field-level validity (only surfaced after an upload attempt).
+  const fileInvalid = attempted && !file
 
   const mutation = useMutation({
     meta: { successMessage: 'Document uploaded' },
@@ -115,6 +120,12 @@ export default function ClientUploadPage() {
     },
   })
 
+  function handleSubmit() {
+    setAttempted(true)
+    if (!file) return
+    mutation.mutate()
+  }
+
   return (
     <div className="capsule-page" style={{ maxWidth: '40rem' }}>
       <PageBreadcrumb
@@ -136,7 +147,7 @@ export default function ClientUploadPage() {
           )}
 
           <div>
-            <p className="cds--label">File</p>
+            <p className="cds--label">{requiredLabel('File')}</p>
             <FileUploaderDropContainer
               labelText={`Drag and drop a file here or click to upload (${ACCEPTED_LABEL})`}
               accept={ACCEPTED_EXTENSIONS}
@@ -161,6 +172,11 @@ export default function ClientUploadPage() {
                 status="edit"
                 onDelete={() => setFile(null)}
               />
+            )}
+            {fileInvalid && (
+              <p className="cds--form-requirement" style={{ color: '#da1e28' }}>
+                A file is required.
+              </p>
             )}
           </div>
 
@@ -206,8 +222,8 @@ export default function ClientUploadPage() {
           />
 
           <Button
-            onClick={() => mutation.mutate()}
-            disabled={!file || mutation.isPending}
+            onClick={handleSubmit}
+            disabled={mutation.isPending}
             data-testid="upload-submit"
           >
             {mutation.isPending ? 'Uploading…' : 'Upload'}

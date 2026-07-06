@@ -12,6 +12,7 @@ import {
 } from '@carbon/react'
 import { apiGet, apiPost, obtainToken } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
+import { requiredLabel } from '../lib/forms'
 import type { Whoami } from '../api/types'
 
 interface InviteInfo {
@@ -39,6 +40,13 @@ export default function InviteSetupPage() {
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [attempted, setAttempted] = useState(false)
+
+  const passwordInvalid = attempted && password.trim().length < 8
+  const confirmInvalid = attempted && (!confirm.trim() || password !== confirm)
+  const confirmInvalidText = !confirm.trim()
+    ? 'Confirm password is required.'
+    : 'Passwords do not match.'
 
   useEffect(() => {
     let active = true
@@ -60,6 +68,7 @@ export default function InviteSetupPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+    setAttempted(true)
     if (password.length < 8) {
       setError('Please choose a password of at least 8 characters.')
       return
@@ -152,17 +161,19 @@ export default function InviteSetupPage() {
                 />
                 <PasswordInput
                   id="invite-password"
-                  labelText="Create a password"
+                  labelText={requiredLabel('Create a password')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  invalid={passwordInvalid}
+                  invalidText="Password must be at least 8 characters."
                 />
                 <PasswordInput
                   id="invite-confirm"
-                  labelText="Confirm password"
+                  labelText={requiredLabel('Confirm password')}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
-                  required
+                  invalid={confirmInvalid}
+                  invalidText={confirmInvalidText}
                 />
                 <Button type="submit" disabled={submitting} data-testid="invite-submit">
                   {submitting ? 'Setting up…' : 'Create account'}

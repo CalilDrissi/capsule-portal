@@ -24,6 +24,7 @@ import {
   useDeleteCabinet,
   useUpdateCabinet,
 } from '../api/queries'
+import { requiredLabel } from '../lib/forms'
 import type { Cabinet } from '../api/types'
 
 const headers = [
@@ -42,12 +43,31 @@ export default function CabinetsPage() {
 
   const [createOpen, setCreateOpen] = useState(false)
   const [newLabel, setNewLabel] = useState('')
+  const [createAttempted, setCreateAttempted] = useState(false)
   const [editCabinet, setEditCabinet] = useState<Cabinet | null>(null)
   const [editLabel, setEditLabel] = useState('')
+  const [editAttempted, setEditAttempted] = useState(false)
 
   const cabinets = data?.results ?? []
 
+  // Field-level validity (only surfaced after a save attempt).
+  const createLabelInvalid = createAttempted && !newLabel.trim()
+  const editLabelInvalid = editAttempted && !editLabel.trim()
+
+  function openCreate() {
+    setNewLabel('')
+    setCreateAttempted(false)
+    setCreateOpen(true)
+  }
+
+  function openEdit(cab: Cabinet) {
+    setEditCabinet(cab)
+    setEditLabel(cab.label)
+    setEditAttempted(false)
+  }
+
   function submitCreate() {
+    setCreateAttempted(true)
     const label = newLabel.trim()
     if (!label) return
     createCabinet.mutate(
@@ -63,6 +83,7 @@ export default function CabinetsPage() {
 
   function submitEdit() {
     if (!editCabinet) return
+    setEditAttempted(true)
     const label = editLabel.trim()
     if (!label) return
     updateCabinet.mutate(
@@ -84,7 +105,7 @@ export default function CabinetsPage() {
         <h2 className="capsule-page__title">Cabinets</h2>
         <Button
           renderIcon={Add}
-          onClick={() => setCreateOpen(true)}
+          onClick={openCreate}
           data-testid="new-cabinet"
         >
           New cabinet
@@ -99,7 +120,7 @@ export default function CabinetsPage() {
         <Tile className="capsule-empty">
           <h4>No cabinets yet</h4>
           <p>Create a cabinet to start organizing your documents.</p>
-          <Button renderIcon={Add} onClick={() => setCreateOpen(true)}>
+          <Button renderIcon={Add} onClick={openCreate}>
             New cabinet
           </Button>
         </Tile>
@@ -144,10 +165,7 @@ export default function CabinetsPage() {
                                 <OverflowMenuItem
                                   itemText="Rename"
                                   onClick={() => {
-                                    if (cab) {
-                                      setEditCabinet(cab)
-                                      setEditLabel(cab.label)
-                                    }
+                                    if (cab) openEdit(cab)
                                   }}
                                 />
                                 <OverflowMenuItem
@@ -183,16 +201,18 @@ export default function CabinetsPage() {
         modalHeading="New cabinet"
         primaryButtonText="Create"
         secondaryButtonText="Cancel"
-        primaryButtonDisabled={!newLabel.trim() || createCabinet.isPending}
+        primaryButtonDisabled={createCabinet.isPending}
         onRequestClose={() => setCreateOpen(false)}
         onRequestSubmit={submitCreate}
       >
         <TextInput
           id="new-cabinet-label"
           data-testid="cabinet-label-input"
-          labelText="Label"
+          labelText={requiredLabel('Label')}
           value={newLabel}
           onChange={(e) => setNewLabel(e.target.value)}
+          invalid={createLabelInvalid}
+          invalidText="Label is required."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitCreate()
           }}
@@ -209,15 +229,17 @@ export default function CabinetsPage() {
         modalHeading="Rename cabinet"
         primaryButtonText="Save"
         secondaryButtonText="Cancel"
-        primaryButtonDisabled={!editLabel.trim() || updateCabinet.isPending}
+        primaryButtonDisabled={updateCabinet.isPending}
         onRequestClose={() => setEditCabinet(null)}
         onRequestSubmit={submitEdit}
       >
         <TextInput
           id="edit-cabinet-label"
-          labelText="Label"
+          labelText={requiredLabel('Label')}
           value={editLabel}
           onChange={(e) => setEditLabel(e.target.value)}
+          invalid={editLabelInvalid}
+          invalidText="Label is required."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitEdit()
           }}

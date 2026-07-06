@@ -95,7 +95,7 @@ export default function DocumentTypesPage() {
               i.trash_time_period ? `${i.trash_time_period} ${i.trash_time_unit}` : '—',
           },
         ]}
-        fields={[{ name: 'label', label: 'Label' }]}
+        fields={[{ name: 'label', label: 'Label', required: true }]}
         toInitial={(i) => ({ label: i?.label ?? '' })}
         onCreate={(v) => create.mutate({ label: String(v.label) })}
         onUpdate={(id, v) => update.mutate({ id, body: { label: String(v.label) } })}

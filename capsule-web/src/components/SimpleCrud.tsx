@@ -19,6 +19,7 @@ import {
   Tile,
 } from '@carbon/react'
 import { Add } from '@carbon/icons-react'
+import { requiredLabel } from '../lib/forms'
 
 export interface CrudField {
   name: string
@@ -65,20 +66,45 @@ export default function SimpleCrud<T extends { id: number }>({
   const [editing, setEditing] = useState<T | null>(null)
   const [values, setValues] = useState<Record<string, string | boolean>>({})
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [attempted, setAttempted] = useState(false)
+
+  function isFieldInvalid(f: CrudField): boolean {
+    return (
+      attempted &&
+      !!f.required &&
+      f.type !== 'toggle' &&
+      !String(values[f.name] ?? '').trim()
+    )
+  }
 
   function openCreate() {
     setEditing(null)
     setValues(toInitial(null))
+    setAttempted(false)
     setOpen(true)
   }
   function openEdit(item: T) {
     setEditing(item)
     setValues(toInitial(item))
+    setAttempted(false)
     setOpen(true)
   }
+  function closeModal() {
+    setAttempted(false)
+    setOpen(false)
+  }
   function submit() {
+    setAttempted(true)
+    const hasInvalid = fields.some(
+      (f) =>
+        f.required &&
+        f.type !== 'toggle' &&
+        !String(values[f.name] ?? '').trim(),
+    )
+    if (hasInvalid) return
     if (editing) onUpdate(editing.id, values)
     else onCreate(values)
+    setAttempted(false)
     setOpen(false)
   }
 
@@ -151,7 +177,7 @@ export default function SimpleCrud<T extends { id: number }>({
           primaryButtonText={busy ? 'Saving…' : 'Save'}
           secondaryButtonText="Cancel"
           primaryButtonDisabled={busy}
-          onRequestClose={() => setOpen(false)}
+          onRequestClose={closeModal}
           onRequestSubmit={submit}
         >
           <Stack gap={5}>
@@ -170,11 +196,13 @@ export default function SimpleCrud<T extends { id: number }>({
                 <TextInput
                   key={f.name}
                   id={`f-${f.name}`}
-                  labelText={f.label}
+                  labelText={f.required ? requiredLabel(f.label) : f.label}
                   value={(values[f.name] as string) ?? ''}
                   onChange={(e) =>
                     setValues((v) => ({ ...v, [f.name]: e.target.value }))
                   }
+                  invalid={isFieldInvalid(f)}
+                  invalidText={`${f.label} is required.`}
                 />
               ),
             )}

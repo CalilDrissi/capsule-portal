@@ -11,6 +11,7 @@ import {
 } from '@carbon/react'
 import { Add, Enterprise } from '@carbon/icons-react'
 import { useCreateAccountant, useCreateFirm, useFirms } from '../api/queries'
+import { requiredLabel } from '../lib/forms'
 import type { Firm } from '../api/types'
 
 /** A readable, policy-passing password (>=10 chars, mixed case + digits). */
@@ -25,14 +26,6 @@ function slug(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 20)
 }
 
-/** A field label with a required-marker asterisk. */
-function required(label: string) {
-  return (
-    <span>
-      {label} <span style={{ color: '#da1e28' }} aria-hidden="true">*</span>
-    </span>
-  )
-}
 
 interface Created {
   firm: Firm
@@ -201,7 +194,7 @@ export default function FirmsPage() {
             )}
             <TextInput
               id="firm-name"
-              labelText={required('Firm name')}
+              labelText={requiredLabel('Firm name')}
               placeholder="e.g. Kiloctet Accounting"
               value={firmName}
               onChange={(e) => setFirmName(e.target.value)}
@@ -210,7 +203,7 @@ export default function FirmsPage() {
             />
             <TextInput
               id="acct-name"
-              labelText={required('Accountant full name')}
+              labelText={requiredLabel('Accountant full name')}
               placeholder="e.g. Sam Rivera"
               value={acctName}
               onChange={(e) => setAcctName(e.target.value)}
@@ -227,7 +220,7 @@ export default function FirmsPage() {
             />
             <TextInput
               id="acct-pass"
-              labelText={required('Accountant password')}
+              labelText={requiredLabel('Accountant password')}
               helperText="Auto-generated — you can edit it. At least 10 characters."
               value={acctPass}
               onChange={(e) => setAcctPass(e.target.value)}

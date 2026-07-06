@@ -10,6 +10,7 @@ import {
 } from '@carbon/react'
 import { usePasswordChange } from '../api/queries'
 import { useAppStore } from '../store/useAppStore'
+import { requiredLabel } from '../lib/forms'
 
 /**
  * First-login password change. Forced by the App-level interceptor when
@@ -23,6 +24,13 @@ export default function ChangePasswordPage() {
   const [pw, setPw] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [attempted, setAttempted] = useState(false)
+
+  const pwInvalid = attempted && pw.trim().length < 8
+  const confirmInvalid = attempted && (!confirm.trim() || pw !== confirm)
+  const confirmInvalidText = !confirm.trim()
+    ? 'Confirm new password is required.'
+    : 'Passwords do not match.'
 
   const landing =
     role === 'client'
@@ -34,6 +42,7 @@ export default function ChangePasswordPage() {
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+    setAttempted(true)
     if (pw.length < 8) {
       setError('Password must be at least 8 characters.')
       return
@@ -71,17 +80,19 @@ export default function ChangePasswordPage() {
             <Stack gap={5}>
               <PasswordInput
                 id="new-password"
-                labelText="New password"
+                labelText={requiredLabel('New password')}
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
-                required
+                invalid={pwInvalid}
+                invalidText="New password must be at least 8 characters."
               />
               <PasswordInput
                 id="confirm-password"
-                labelText="Confirm new password"
+                labelText={requiredLabel('Confirm new password')}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                required
+                invalid={confirmInvalid}
+                invalidText={confirmInvalidText}
               />
               <Button type="submit" disabled={change.isPending}>
                 {change.isPending ? 'Saving…' : 'Set password'}

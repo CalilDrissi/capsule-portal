@@ -8,11 +8,26 @@ import {
 } from '@carbon/react'
 import { Send } from '@carbon/icons-react'
 import { useAddComment, useDocumentComments } from '../api/queries'
+import { requiredLabel } from '../lib/forms'
 
 export default function CommentsTab({ docId }: { docId: number }) {
   const { data, isLoading } = useDocumentComments(docId)
   const addComment = useAddComment(docId)
   const [text, setText] = useState('')
+  const [attempted, setAttempted] = useState(false)
+
+  const textInvalid = attempted && !text.trim()
+
+  function handlePost() {
+    setAttempted(true)
+    if (!text.trim()) return
+    addComment.mutate(text.trim(), {
+      onSuccess: () => {
+        setText('')
+        setAttempted(false)
+      },
+    })
+  }
 
   if (isLoading) return <InlineLoading description="Loading comments…" />
 
@@ -44,18 +59,18 @@ export default function CommentsTab({ docId }: { docId: number }) {
         <Stack gap={4}>
           <TextArea
             id="comment-text"
-            labelText="Add a comment"
+            labelText={requiredLabel('Add a comment')}
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={3}
+            invalid={textInvalid}
+            invalidText="Comment is required."
           />
           <Button
             renderIcon={Send}
-            disabled={!text.trim() || addComment.isPending}
+            disabled={addComment.isPending}
             data-testid="comment-submit"
-            onClick={() =>
-              addComment.mutate(text.trim(), { onSuccess: () => setText('') })
-            }
+            onClick={handlePost}
           >
             Post comment
           </Button>

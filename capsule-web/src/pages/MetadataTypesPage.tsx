@@ -26,8 +26,8 @@ export default function MetadataTypesPage() {
         { key: 'default', header: 'Default', render: (i) => i.default || '—' },
       ]}
       fields={[
-        { name: 'name', label: 'Name (internal, no spaces)' },
-        { name: 'label', label: 'Label' },
+        { name: 'name', label: 'Name (internal, no spaces)', required: true },
+        { name: 'label', label: 'Label', required: true },
         { name: 'default', label: 'Default value' },
       ]}
       toInitial={(i) => ({

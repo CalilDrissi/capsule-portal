@@ -13,6 +13,7 @@ import {
 } from '@carbon/react'
 import { uploadDocument } from '../api/client'
 import { useDocumentTypes, useUploadSources } from '../api/queries'
+import { requiredLabel } from '../lib/forms'
 import type { DocumentType } from '../api/types'
 
 export default function UploadPage() {
@@ -25,6 +26,11 @@ export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null)
   const [docType, setDocType] = useState<DocumentType | null>(null)
   const [label, setLabel] = useState('')
+  const [attempted, setAttempted] = useState(false)
+
+  // Field-level validity (only surfaced after an upload attempt).
+  const fileInvalid = attempted && !file
+  const docTypeInvalid = attempted && !docType
 
   const mutation = useMutation({
     meta: { successMessage: 'Document uploaded' },
@@ -41,6 +47,12 @@ export default function UploadPage() {
     },
   })
 
+  function handleSubmit() {
+    setAttempted(true)
+    if (!file || !docType) return
+    mutation.mutate()
+  }
+
   return (
     <div className="capsule-page" style={{ maxWidth: '40rem' }}>
       <h2 className="capsule-page__title">Upload document</h2>
@@ -56,7 +68,7 @@ export default function UploadPage() {
           )}
 
           <div>
-            <p className="cds--label">File</p>
+            <p className="cds--label">{requiredLabel('File')}</p>
             <FileUploaderDropContainer
               labelText="Drag and drop a file here or click to upload"
               accept={[]}
@@ -70,16 +82,23 @@ export default function UploadPage() {
                 onDelete={() => setFile(null)}
               />
             )}
+            {fileInvalid && (
+              <p className="cds--form-requirement" style={{ color: '#da1e28' }}>
+                A file is required.
+              </p>
+            )}
           </div>
 
           <Dropdown
             id="doc-type"
-            titleText="Document type"
+            titleText={requiredLabel('Document type')}
             label="Select a document type"
             items={types}
             itemToString={(t) => (t ? (t as DocumentType).label : '')}
             selectedItem={docType}
             onChange={({ selectedItem }) => setDocType(selectedItem as DocumentType)}
+            invalid={docTypeInvalid}
+            invalidText="Document type is required."
           />
 
           <TextInput
@@ -91,8 +110,8 @@ export default function UploadPage() {
           />
 
           <Button
-            onClick={() => mutation.mutate()}
-            disabled={!file || !docType || mutation.isPending}
+            onClick={handleSubmit}
+            disabled={mutation.isPending}
           >
             {mutation.isPending ? 'Uploading…' : 'Upload'}
           </Button>

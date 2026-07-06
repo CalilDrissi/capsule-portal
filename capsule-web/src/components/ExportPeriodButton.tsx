@@ -3,6 +3,7 @@ import { Button, TextInput } from '@carbon/react'
 import { DocumentExport } from '@carbon/icons-react'
 import { API_BASE, downloadFilePost } from '../api/client'
 import { notify } from '../store/useNotifications'
+import { requiredLabel } from '../lib/forms'
 
 /**
  * Accountant action: download a zip of a client+period's latest document
@@ -12,13 +13,14 @@ import { notify } from '../store/useNotifications'
 export default function ExportPeriodButton({ clientId }: { clientId: number }) {
   const [period, setPeriod] = useState('')
   const [busy, setBusy] = useState(false)
+  const [attempted, setAttempted] = useState(false)
+
+  const periodInvalid = attempted && !period.trim()
 
   async function doExport() {
+    setAttempted(true)
     const key = period.trim()
-    if (!key) {
-      notify.warning('Enter a period', 'e.g. 2026 or 2026-06')
-      return
-    }
+    if (!key) return
     setBusy(true)
     try {
       await downloadFilePost(
@@ -42,9 +44,11 @@ export default function ExportPeriodButton({ clientId }: { clientId: number }) {
     >
       <TextInput
         id="export-period-key"
-        labelText="Export period (YYYY or YYYY-MM)"
+        labelText={requiredLabel('Export period (YYYY or YYYY-MM)')}
         value={period}
         onChange={(e) => setPeriod(e.target.value)}
+        invalid={periodInvalid}
+        invalidText="Export period is required."
         data-testid="export-period-input"
         style={{ maxWidth: '16rem' }}
       />

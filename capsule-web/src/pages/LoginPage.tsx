@@ -11,6 +11,7 @@ import {
 } from '@carbon/react'
 import { apiGet, obtainToken } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
+import { requiredLabel } from '../lib/forms'
 import type { Whoami } from '../api/types'
 
 export default function LoginPage() {
@@ -21,10 +22,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [attempted, setAttempted] = useState(false)
+
+  const usernameInvalid = attempted && !username.trim()
+  const passwordInvalid = attempted && !password.trim()
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+    setAttempted(true)
+    if (!username.trim() || !password.trim()) return
     setLoading(true)
     try {
       const token = await obtainToken(username, password)
@@ -96,17 +103,19 @@ export default function LoginPage() {
             <Stack gap={5}>
               <TextInput
                 id="username"
-                labelText="Username"
+                labelText={requiredLabel('Username')}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                required
+                invalid={usernameInvalid}
+                invalidText="Username is required."
               />
               <PasswordInput
                 id="password"
-                labelText="Password"
+                labelText={requiredLabel('Password')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                invalid={passwordInvalid}
+                invalidText="Password is required."
               />
               <Button type="submit" disabled={loading}>
                 {loading ? 'Signing in…' : 'Sign in'}

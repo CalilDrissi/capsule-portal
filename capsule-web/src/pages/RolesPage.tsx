@@ -24,6 +24,7 @@ import {
   useRoles,
   useUpdateRole,
 } from '../api/queries'
+import { requiredLabel } from '../lib/forms'
 import type { Role } from '../api/types'
 
 const headers = [
@@ -39,13 +40,25 @@ export default function RolesPage() {
   const deleteRole = useDeleteRole()
 
   const [createOpen, setCreateOpen] = useState(false)
+  const [createAttempted, setCreateAttempted] = useState(false)
   const [newLabel, setNewLabel] = useState('')
   const [editRole, setEditRole] = useState<Role | null>(null)
+  const [editAttempted, setEditAttempted] = useState(false)
   const [editLabel, setEditLabel] = useState('')
 
   const roles = data?.results ?? []
 
+  const newLabelInvalid = createAttempted && !newLabel.trim()
+  const editLabelInvalid = editAttempted && !editLabel.trim()
+
+  function openCreate() {
+    setNewLabel('')
+    setCreateAttempted(false)
+    setCreateOpen(true)
+  }
+
   function submitCreate() {
+    setCreateAttempted(true)
     const label = newLabel.trim()
     if (!label) return
     createRole.mutate(
@@ -61,6 +74,7 @@ export default function RolesPage() {
 
   function submitEdit() {
     if (!editRole) return
+    setEditAttempted(true)
     const label = editLabel.trim()
     if (!label) return
     updateRole.mutate(
@@ -75,7 +89,7 @@ export default function RolesPage() {
     <div className="capsule-page">
       <div className="capsule-page__header">
         <h2 className="capsule-page__title">Roles</h2>
-        <Button renderIcon={Add} onClick={() => setCreateOpen(true)} data-testid="new-role">
+        <Button renderIcon={Add} onClick={openCreate} data-testid="new-role">
           New role
         </Button>
       </div>
@@ -88,7 +102,7 @@ export default function RolesPage() {
         <Tile className="capsule-empty">
           <h4>No roles yet</h4>
           <p>Roles bundle permissions and are granted to groups.</p>
-          <Button renderIcon={Add} onClick={() => setCreateOpen(true)}>
+          <Button renderIcon={Add} onClick={openCreate}>
             New role
           </Button>
         </Tile>
@@ -132,6 +146,7 @@ export default function RolesPage() {
                                     if (role) {
                                       setEditRole(role)
                                       setEditLabel(role.label)
+                                      setEditAttempted(false)
                                     }
                                   }}
                                 />
@@ -168,16 +183,18 @@ export default function RolesPage() {
         modalHeading="New role"
         primaryButtonText="Create"
         secondaryButtonText="Cancel"
-        primaryButtonDisabled={!newLabel.trim() || createRole.isPending}
+        primaryButtonDisabled={createRole.isPending}
         onRequestClose={() => setCreateOpen(false)}
         onRequestSubmit={submitCreate}
       >
         <TextInput
           id="new-role-label"
           data-testid="role-label-input"
-          labelText="Label"
+          labelText={requiredLabel('Label')}
           value={newLabel}
           onChange={(e) => setNewLabel(e.target.value)}
+          invalid={newLabelInvalid}
+          invalidText="Label is required."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitCreate()
           }}
@@ -192,15 +209,17 @@ export default function RolesPage() {
         modalHeading="Rename role"
         primaryButtonText="Save"
         secondaryButtonText="Cancel"
-        primaryButtonDisabled={!editLabel.trim() || updateRole.isPending}
+        primaryButtonDisabled={updateRole.isPending}
         onRequestClose={() => setEditRole(null)}
         onRequestSubmit={submitEdit}
       >
         <TextInput
           id="edit-role-label"
-          labelText="Label"
+          labelText={requiredLabel('Label')}
           value={editLabel}
           onChange={(e) => setEditLabel(e.target.value)}
+          invalid={editLabelInvalid}
+          invalidText="Label is required."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitEdit()
           }}

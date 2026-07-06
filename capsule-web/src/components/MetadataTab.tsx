@@ -15,6 +15,7 @@ import {
   useDocumentTypeMetadataTypes,
   useUpdateMetadata,
 } from '../api/queries'
+import { requiredLabel } from '../lib/forms'
 import type { DocumentTypeMetadataType } from '../api/types'
 
 export default function MetadataTab({
@@ -34,6 +35,28 @@ export default function MetadataTab({
   const [editValue, setEditValue] = useState('')
   const [newType, setNewType] = useState<DocumentTypeMetadataType | null>(null)
   const [newValue, setNewValue] = useState('')
+  const [attempted, setAttempted] = useState(false)
+
+  const newTypeInvalid = attempted && !newType
+  const newValueInvalid = attempted && !newValue.trim()
+
+  function handleAdd() {
+    setAttempted(true)
+    if (!newType || !newValue.trim()) return
+    addMeta.mutate(
+      {
+        metadata_type_id: newType.metadata_type.id,
+        value: newValue,
+      },
+      {
+        onSuccess: () => {
+          setNewType(null)
+          setNewValue('')
+          setAttempted(false)
+        },
+      },
+    )
+  }
 
   if (isLoading) return <InlineLoading description="Loading metadata…" />
 
@@ -111,38 +134,28 @@ export default function MetadataTab({
             <strong>Add metadata</strong>
             <Dropdown
               id="meta-add-type"
-              titleText="Type"
+              titleText={requiredLabel('Type')}
               label="Choose a metadata type"
               items={addable}
               selectedItem={newType}
               itemToString={(i) => (i ? i.metadata_type.label : '')}
               onChange={({ selectedItem }) => setNewType(selectedItem ?? null)}
+              invalid={newTypeInvalid}
+              invalidText="Type is required."
             />
             <TextInput
               id="meta-add-value"
-              labelText="Value"
+              labelText={requiredLabel('Value')}
               value={newValue}
               onChange={(e) => setNewValue(e.target.value)}
+              invalid={newValueInvalid}
+              invalidText="Value is required."
             />
             <Button
               renderIcon={Add}
-              disabled={!newType || addMeta.isPending}
+              disabled={addMeta.isPending}
               data-testid="meta-add-btn"
-              onClick={() =>
-                newType &&
-                addMeta.mutate(
-                  {
-                    metadata_type_id: newType.metadata_type.id,
-                    value: newValue,
-                  },
-                  {
-                    onSuccess: () => {
-                      setNewType(null)
-                      setNewValue('')
-                    },
-                  },
-                )
-              }
+              onClick={handleAdd}
             >
               Add metadata
             </Button>
