@@ -21,9 +21,9 @@ import { Add } from '@carbon/icons-react'
 import { useDocuments } from '../api/queries'
 
 const headers = [
-  { key: 'label', header: 'Label' },
+  { key: 'label', header: 'Libellé' },
   { key: 'type', header: 'Type' },
-  { key: 'created', header: 'Created' },
+  { key: 'created', header: 'Créé le' },
 ]
 
 export default function DocumentsPage() {
@@ -46,7 +46,7 @@ export default function DocumentsPage() {
     return (
       <div className="capsule-page">
         <h2 className="capsule-page__title">Documents</h2>
-        <Tile>Failed to load documents: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement des documents : {(error as Error)?.message}</Tile>
       </div>
     )
   }
@@ -61,7 +61,7 @@ export default function DocumentsPage() {
     label: d.label,
     type: d.document_type?.label ?? '—',
     created: d.datetime_created
-      ? new Date(d.datetime_created).toLocaleString()
+      ? new Date(d.datetime_created).toLocaleString('fr-FR')
       : '—',
   }))
 
@@ -70,16 +70,16 @@ export default function DocumentsPage() {
       <div className="capsule-page__header">
         <h2 className="capsule-page__title">Documents</h2>
         <Button renderIcon={Add} onClick={() => navigate('/upload')}>
-          Upload
+          Importer
         </Button>
       </div>
 
       {data && data.count === 0 ? (
         <Tile className="capsule-empty">
-          <h4>No documents yet</h4>
-          <p>Upload your first document to get started.</p>
+          <h4>Aucun document pour le moment</h4>
+          <p>Importez votre premier document pour commencer.</p>
           <Button renderIcon={Add} onClick={() => navigate('/upload')}>
-            Upload a document
+            Importer un document
           </Button>
         </Tile>
       ) : (
@@ -98,7 +98,7 @@ export default function DocumentsPage() {
                   <TableToolbarContent>
                     <TableToolbarSearch
                       persistent
-                      placeholder="Filter by label"
+                      placeholder="Filtrer par libellé"
                       onChange={(e) =>
                         setSearch((e as React.ChangeEvent<HTMLInputElement>)?.target?.value ?? '')
                       }

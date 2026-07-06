@@ -32,14 +32,14 @@ function MetadataAssocModal({ typeId, onClose }: { typeId: number; onClose: () =
   return (
     <Modal
       open
-      modalHeading="Metadata types for this document type"
-      primaryButtonText="Done"
+      modalHeading="Types de métadonnée pour ce type de document"
+      primaryButtonText="Terminé"
       onRequestSubmit={onClose}
       onRequestClose={onClose}
     >
       <Stack gap={5}>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {assigned.length === 0 && <p>None assigned.</p>}
+          {assigned.length === 0 && <p>Aucun attribué.</p>}
           {assigned.map((a) => (
             <Tag key={a.id} filter onClose={() => remove.mutate(a.id)}>
               {a.metadata_type?.label}
@@ -49,8 +49,8 @@ function MetadataAssocModal({ typeId, onClose }: { typeId: number; onClose: () =
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
           <Dropdown
             id="mt-pick"
-            titleText="Add metadata type"
-            label="Choose"
+            titleText="Ajouter un type de métadonnée"
+            label="Choisir"
             style={{ flex: 1 }}
             items={(allTypes?.results ?? []).filter(
               (t) => !assigned.some((a) => a.metadata_type?.id === t.id),
@@ -63,7 +63,7 @@ function MetadataAssocModal({ typeId, onClose }: { typeId: number; onClose: () =
             disabled={!picked || add.isPending}
             onClick={() => picked && add.mutate(picked.id)}
           >
-            Add
+            Ajouter
           </Button>
         </div>
       </Stack>
@@ -81,21 +81,21 @@ export default function DocumentTypesPage() {
   return (
     <>
       <SimpleCrud<DocumentTypeFull>
-        title="Document types"
+        title="Types de document"
         items={data?.results ?? []}
         isLoading={isLoading}
         isError={isError}
         busy={create.isPending || update.isPending}
         columns={[
-          { key: 'label', header: 'Label', render: (i) => i.label },
+          { key: 'label', header: 'Libellé', render: (i) => i.label },
           {
             key: 'trash',
-            header: 'Trash period',
+            header: 'Période de corbeille',
             render: (i) =>
               i.trash_time_period ? `${i.trash_time_period} ${i.trash_time_unit}` : '—',
           },
         ]}
-        fields={[{ name: 'label', label: 'Label', required: true }]}
+        fields={[{ name: 'label', label: 'Libellé', required: true }]}
         toInitial={(i) => ({ label: i?.label ?? '' })}
         onCreate={(v) => create.mutate({ label: String(v.label) })}
         onUpdate={(id, v) => update.mutate({ id, body: { label: String(v.label) } })}
@@ -105,7 +105,7 @@ export default function DocumentTypesPage() {
             kind="ghost"
             size="sm"
             hasIconOnly
-            iconDescription="Metadata types"
+            iconDescription="Types de métadonnée"
             renderIcon={Catalog}
             onClick={() => setAssocType(item.id)}
           />

@@ -31,8 +31,8 @@ export default function ChangePasswordPage() {
   const pwInvalid = attempted && pw.trim().length < MIN_PASSWORD_LENGTH
   const confirmInvalid = attempted && (!confirm.trim() || pw !== confirm)
   const confirmInvalidText = !confirm.trim()
-    ? 'Confirm new password is required.'
-    : 'Passwords do not match.'
+    ? 'La confirmation du nouveau mot de passe est requise.'
+    : 'Les mots de passe ne correspondent pas.'
 
   const landing =
     role === 'client'
@@ -46,18 +46,18 @@ export default function ChangePasswordPage() {
     setError(null)
     setAttempted(true)
     if (pw.length < MIN_PASSWORD_LENGTH) {
-      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`)
+      setError(`Le mot de passe doit comporter au moins ${MIN_PASSWORD_LENGTH} caractères.`)
       return
     }
     if (pw !== confirm) {
-      setError('Passwords do not match.')
+      setError('Les mots de passe ne correspondent pas.')
       return
     }
     change.mutate(pw, {
       onSuccess: () => navigate(landing, { replace: true }),
       onError: (err) =>
         setError(
-          apiErrorMessage(err, 'Could not set your password. Please try again.'),
+          apiErrorMessage(err, 'Impossible de définir votre mot de passe. Veuillez réessayer.'),
         ),
     })
   }
@@ -67,15 +67,15 @@ export default function ChangePasswordPage() {
       <Tile className="capsule-login-card">
         <Stack gap={6}>
           <div>
-            <h1 className="capsule-login-title">Set a new password</h1>
+            <h1 className="capsule-login-title">Définir un nouveau mot de passe</h1>
             <p className="capsule-login-subtitle">
-              For security, please choose a new password before continuing.
+              Pour des raisons de sécurité, veuillez choisir un nouveau mot de passe avant de continuer.
             </p>
           </div>
           {error && (
             <InlineNotification
               kind="error"
-              title="Could not set password"
+              title="Impossible de définir le mot de passe"
               subtitle={error}
               lowContrast
               hideCloseButton
@@ -86,22 +86,22 @@ export default function ChangePasswordPage() {
             <Stack gap={5}>
               <PasswordInput
                 id="new-password"
-                labelText={requiredLabel('New password')}
+                labelText={requiredLabel('Nouveau mot de passe')}
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 invalid={pwInvalid}
-                invalidText={`New password must be at least ${MIN_PASSWORD_LENGTH} characters.`}
+                invalidText={`Le nouveau mot de passe doit comporter au moins ${MIN_PASSWORD_LENGTH} caractères.`}
               />
               <PasswordInput
                 id="confirm-password"
-                labelText={requiredLabel('Confirm new password')}
+                labelText={requiredLabel('Confirmer le nouveau mot de passe')}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 invalid={confirmInvalid}
                 invalidText={confirmInvalidText}
               />
               <Button type="submit" disabled={change.isPending} renderIcon={ArrowRight}>
-                {change.isPending ? 'Saving…' : 'Set password'}
+                {change.isPending ? 'Enregistrement…' : 'Définir le mot de passe'}
               </Button>
             </Stack>
           </Form>

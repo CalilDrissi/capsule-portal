@@ -46,8 +46,8 @@ export default function InviteSetupPage() {
   const passwordInvalid = attempted && password.trim().length < MIN_PASSWORD_LENGTH
   const confirmInvalid = attempted && (!confirm.trim() || password !== confirm)
   const confirmInvalidText = !confirm.trim()
-    ? 'Confirm password is required.'
-    : 'Passwords do not match.'
+    ? 'La confirmation du mot de passe est requise.'
+    : 'Les mots de passe ne correspondent pas.'
 
   useEffect(() => {
     let active = true
@@ -71,11 +71,11 @@ export default function InviteSetupPage() {
     setError(null)
     setAttempted(true)
     if (password.length < MIN_PASSWORD_LENGTH) {
-      setError(`Please choose a password of at least ${MIN_PASSWORD_LENGTH} characters.`)
+      setError(`Veuillez choisir un mot de passe d'au moins ${MIN_PASSWORD_LENGTH} caractères.`)
       return
     }
     if (password !== confirm) {
-      setError('Passwords do not match.')
+      setError('Les mots de passe ne correspondent pas.')
       return
     }
     setSubmitting(true)
@@ -89,7 +89,7 @@ export default function InviteSetupPage() {
         setInvalid(true)
       } else {
         setError(
-          apiErrorMessage(err, 'Could not complete setup. Please try again.'),
+          apiErrorMessage(err, "Impossible de finaliser la configuration. Veuillez réessayer."),
         )
       }
       setSubmitting(false)
@@ -141,28 +141,28 @@ export default function InviteSetupPage() {
             <h1 className="capsule-login-title">Capsule</h1>
             <InlineNotification
               kind="error"
-              title="Invite link invalid or already used"
-              subtitle="Please ask your accountant to send you a new invite link."
+              title="Lien d'invitation invalide ou déjà utilisé"
+              subtitle="Veuillez demander à votre comptable de vous envoyer un nouveau lien d'invitation."
               lowContrast
               hideCloseButton
             />
             <Button kind="tertiary" onClick={() => navigate('/login')}>
-              Go to sign in
+              Aller à la connexion
             </Button>
           </Stack>
         ) : (
           <Stack gap={6}>
             <div>
-              <h1 className="capsule-login-title">Welcome to Capsule</h1>
+              <h1 className="capsule-login-title">Bienvenue sur Capsule</h1>
               <p className="capsule-login-subtitle">
-                Set up your account for <strong>{info?.display_name}</strong>
+                Configurez votre compte pour <strong>{info?.display_name}</strong>
                 {info?.firm_name ? ` — ${info.firm_name}` : ''}
               </p>
             </div>
             {error && (
               <InlineNotification
                 kind="error"
-                title="Could not complete setup"
+                title="Impossible de finaliser la configuration"
                 subtitle={error}
                 lowContrast
                 hideCloseButton
@@ -173,28 +173,28 @@ export default function InviteSetupPage() {
               <Stack gap={5}>
                 <TextInput
                   id="invite-username"
-                  labelText="Username"
+                  labelText="Nom d'utilisateur"
                   value={info?.username ?? ''}
                   readOnly
                 />
                 <PasswordInput
                   id="invite-password"
-                  labelText={requiredLabel('Create a password')}
+                  labelText={requiredLabel('Créer un mot de passe')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   invalid={passwordInvalid}
-                  invalidText={`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`}
+                  invalidText={`Le mot de passe doit comporter au moins ${MIN_PASSWORD_LENGTH} caractères.`}
                 />
                 <PasswordInput
                   id="invite-confirm"
-                  labelText={requiredLabel('Confirm password')}
+                  labelText={requiredLabel('Confirmer le mot de passe')}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   invalid={confirmInvalid}
                   invalidText={confirmInvalidText}
                 />
                 <Button type="submit" disabled={submitting} data-testid="invite-submit" renderIcon={ArrowRight}>
-                  {submitting ? 'Setting up…' : 'Create account'}
+                  {submitting ? 'Configuration…' : 'Créer le compte'}
                 </Button>
               </Stack>
             </Form>

@@ -38,7 +38,7 @@ export default function CabinetsTab({ docId }: { docId: number }) {
   const remove = useRemoveDocumentFromCabinet()
   const [picked, setPicked] = useState<Cabinet | null>(null)
 
-  if (isLoading) return <InlineLoading description="Loading cabinets…" />
+  if (isLoading) return <InlineLoading description="Chargement des classeurs…" />
 
   const inCabinets = docCabinets?.results ?? []
   const inIds = new Set(inCabinets.map((c) => c.id))
@@ -50,7 +50,7 @@ export default function CabinetsTab({ docId }: { docId: number }) {
     <Stack gap={5}>
       <div data-testid="doc-cabinets-list">
         {inCabinets.length === 0 ? (
-          <Tile>This document is not in any cabinet.</Tile>
+          <Tile>Ce document ne figure dans aucun classeur.</Tile>
         ) : (
           inCabinets.map((c) => (
             <span
@@ -68,7 +68,7 @@ export default function CabinetsTab({ docId }: { docId: number }) {
                 kind="ghost"
                 size="sm"
                 hasIconOnly
-                iconDescription={`Remove from ${c.label}`}
+                iconDescription={`Retirer de ${c.label}`}
                 renderIcon={Close}
                 data-testid={`doc-cabinet-remove-${c.id}`}
                 disabled={remove.isPending}
@@ -84,11 +84,11 @@ export default function CabinetsTab({ docId }: { docId: number }) {
       {addable.length > 0 && (
         <Tile>
           <Stack gap={4}>
-            <strong>Add to a cabinet</strong>
+            <strong>Ajouter à un classeur</strong>
             <Dropdown
               id="cabinet-pick"
-              titleText="Cabinet"
-              label="Choose a cabinet"
+              titleText="Classeur"
+              label="Choisir un classeur"
               items={addable}
               selectedItem={picked}
               itemToString={(i) => (i ? i.full_path : '')}
@@ -106,7 +106,7 @@ export default function CabinetsTab({ docId }: { docId: number }) {
                 )
               }
             >
-              Add to cabinet
+              Ajouter au classeur
             </Button>
           </Stack>
         </Tile>

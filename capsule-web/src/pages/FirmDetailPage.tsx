@@ -49,9 +49,9 @@ function generatePassword(): string {
 }
 
 const acctHeaders = [
-  { key: 'username', header: 'Username' },
-  { key: 'name', header: 'Name' },
-  { key: 'status', header: 'Status' },
+  { key: 'username', header: "Nom d'utilisateur" },
+  { key: 'name', header: 'Nom' },
+  { key: 'status', header: 'Statut' },
   { key: 'actions', header: '' },
 ]
 
@@ -147,7 +147,7 @@ export default function FirmDetailPage() {
       setAddError(
         e instanceof Error
           ? e.message.replace(/^[A-Z]+ \/[^:]+: \d+: /, '')
-          : 'Could not add the accountant. Please try again.',
+          : "Impossible d'ajouter le comptable. Veuillez réessayer.",
       )
     }
   }
@@ -192,14 +192,14 @@ export default function FirmDetailPage() {
   }
 
   /* -------------------------------- Render ------------------------------- */
-  if (isLoading) return <InlineLoading description="Loading firm…" />
+  if (isLoading) return <InlineLoading description="Chargement du cabinet…" />
   if (isError || !firm)
     return (
       <div className="capsule-page">
         <PageBreadcrumb
-          items={[{ label: 'Firms', to: '/firms' }, { label: 'Not found' }]}
+          items={[{ label: 'Cabinets', to: '/firms' }, { label: 'Introuvable' }]}
         />
-        <Tile>Firm not found.</Tile>
+        <Tile>Cabinet introuvable.</Tile>
       </div>
     )
 
@@ -214,23 +214,23 @@ export default function FirmDetailPage() {
   return (
     <div className="capsule-page">
       <PageBreadcrumb
-        items={[{ label: 'Firms', to: '/firms' }, { label: firm.name }]}
+        items={[{ label: 'Cabinets', to: '/firms' }, { label: firm.name }]}
       />
       <div className="capsule-page__header">
         <h2 className="capsule-page__title">{firm.name}</h2>
         <Tag type={isActive ? 'green' : 'gray'}>
-          {isActive ? 'Active' : 'Inactive'}
+          {isActive ? 'Actif' : 'Inactif'}
         </Tag>
       </div>
 
       {/* --------------------------- Firm details -------------------------- */}
       <div className="capsule-tabs">
-        <h3 className="capsule-section-title">Firm details</h3>
+        <h3 className="capsule-section-title">Détails du cabinet</h3>
         <Stack gap={5}>
           {updateFirm.isError && (
             <InlineNotification
               kind="error"
-              title="Could not save firm"
+              title="Impossible d'enregistrer le cabinet"
               subtitle={(updateFirm.error as Error)?.message}
               lowContrast
               hideCloseButton
@@ -239,22 +239,22 @@ export default function FirmDetailPage() {
           <LogoUpload name={name} value={logo} onChange={setLogo} />
           <TextInput
             id="firm-detail-name"
-            labelText={requiredLabel('Firm name')}
+            labelText={requiredLabel('Nom du cabinet')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             invalid={nameInvalid}
-            invalidText="Firm name is required."
+            invalidText="Le nom du cabinet est obligatoire."
           />
           <TextInput
             id="firm-detail-email"
-            labelText="Contact email"
-            placeholder="e.g. hello@firm.example"
+            labelText="E-mail de contact"
+            placeholder="ex. bonjour@cabinet.example"
             value={contactEmail}
             onChange={(e) => setContactEmail(e.target.value)}
           />
           <div>
             <Button onClick={saveDetails} disabled={updateFirm.isPending}>
-              Save
+              Enregistrer
             </Button>
           </div>
         </Stack>
@@ -263,24 +263,24 @@ export default function FirmDetailPage() {
       {/* ---------------------------- Accountants -------------------------- */}
       <div className="capsule-tabs">
         <div className="capsule-page__header">
-          <h3 className="capsule-section-title">Accountants</h3>
+          <h3 className="capsule-section-title">Comptables</h3>
           <Button
             renderIcon={Add}
             onClick={openAdd}
             data-testid="add-accountant"
           >
-            Add accountant
+            Ajouter un comptable
           </Button>
         </div>
 
         {acctLoading ? (
           <DataTableSkeleton columnCount={4} rowCount={3} showHeader={false} />
         ) : acctError ? (
-          <Tile>Failed to load accountants.</Tile>
+          <Tile>Impossible de charger les comptables.</Tile>
         ) : rows.length === 0 ? (
           <Tile className="capsule-empty">
-            <h4>No accountants yet</h4>
-            <p>Add the firm's first accountant login to get started.</p>
+            <h4>Aucun comptable pour le moment</h4>
+            <p>Ajoutez le premier compte comptable du cabinet pour commencer.</p>
           </Tile>
         ) : (
           <DataTable rows={rows} headers={acctHeaders} isSortable>
@@ -310,16 +310,16 @@ export default function FirmDetailPage() {
                             cell.info.header === 'actions' ? (
                               <TableCell key={cell.id}>
                                 <OverflowMenu
-                                  aria-label="Accountant actions"
+                                  aria-label="Actions du comptable"
                                   flipped
                                 >
                                   <OverflowMenuItem
-                                    itemText="Reset password"
+                                    itemText="Réinitialiser le mot de passe"
                                     onClick={() => acct && openReset(acct)}
                                   />
                                   <OverflowMenuItem
                                     itemText={
-                                      acct?.is_active ? 'Deactivate' : 'Activate'
+                                      acct?.is_active ? 'Désactiver' : 'Activer'
                                     }
                                     onClick={() =>
                                       acct &&
@@ -332,7 +332,7 @@ export default function FirmDetailPage() {
                                   <OverflowMenuItem
                                     hasDivider
                                     isDelete
-                                    itemText="Remove"
+                                    itemText="Retirer"
                                     onClick={() =>
                                       acct &&
                                       deleteAccountant.mutate(acct.user_id)
@@ -348,8 +348,8 @@ export default function FirmDetailPage() {
                                   }
                                 >
                                   {cell.value === 'active'
-                                    ? 'Active'
-                                    : 'Inactive'}
+                                    ? 'Actif'
+                                    : 'Inactif'}
                                 </Tag>
                               </TableCell>
                             ) : (
@@ -369,15 +369,15 @@ export default function FirmDetailPage() {
 
       {/* ---------------------------- Danger zone -------------------------- */}
       <div className="capsule-tabs">
-        <h3 className="capsule-section-title">Danger zone</h3>
+        <h3 className="capsule-section-title">Zone de danger</h3>
         <Stack gap={5}>
           <InlineNotification
             kind="warning"
-            title={isActive ? 'Deactivate this firm' : 'Reactivate this firm'}
+            title={isActive ? 'Désactiver ce cabinet' : 'Réactiver ce cabinet'}
             subtitle={
               isActive
-                ? 'Deactivating disables ALL of the firm’s logins, including its accountants and clients. You can reactivate later.'
-                : 'Reactivating restores the firm. Individual logins keep their own active state.'
+                ? 'La désactivation désactive TOUS les comptes du cabinet, y compris ses comptables et ses clients. Vous pourrez le réactiver plus tard.'
+                : 'La réactivation restaure le cabinet. Chaque compte conserve son propre état d’activité.'
             }
             lowContrast
             hideCloseButton
@@ -389,14 +389,14 @@ export default function FirmDetailPage() {
               disabled={setFirmActive.isPending}
               data-testid="toggle-firm-active"
             >
-              {isActive ? 'Deactivate firm' : 'Activate firm'}
+              {isActive ? 'Désactiver le cabinet' : 'Activer le cabinet'}
             </Button>
           </div>
 
           <InlineNotification
             kind="error"
-            title="Delete this firm"
-            subtitle="Permanently removes the firm and its provisioning. This cannot be undone."
+            title="Supprimer ce cabinet"
+            subtitle="Supprime définitivement le cabinet et son provisionnement. Cette action est irréversible."
             lowContrast
             hideCloseButton
           />
@@ -407,7 +407,7 @@ export default function FirmDetailPage() {
               disabled={deleteFirm.isPending}
               data-testid="delete-firm"
             >
-              Delete firm
+              Supprimer le cabinet
             </Button>
           </div>
         </Stack>
@@ -416,9 +416,9 @@ export default function FirmDetailPage() {
       {/* -------------------------- Add accountant ------------------------- */}
       <Modal
         open={addOpen}
-        modalHeading={created ? 'Accountant added' : 'Add accountant'}
-        primaryButtonText={created ? 'Done' : 'Add accountant'}
-        secondaryButtonText={created ? undefined : 'Cancel'}
+        modalHeading={created ? 'Comptable ajouté' : 'Ajouter un comptable'}
+        primaryButtonText={created ? 'Terminé' : 'Ajouter un comptable'}
+        secondaryButtonText={created ? undefined : 'Annuler'}
         primaryButtonDisabled={!created && createAccountant.isPending}
         onRequestClose={() => setAddOpen(false)}
         onRequestSubmit={created ? () => setAddOpen(false) : submitAdd}
@@ -429,22 +429,22 @@ export default function FirmDetailPage() {
           <Stack gap={5}>
             <InlineNotification
               kind="success"
-              title="Accountant login is ready"
-              subtitle="Share the login below. Ask them to change the password after first sign-in."
+              title="Le compte comptable est prêt"
+              subtitle="Partagez les identifiants ci-dessous. Demandez-lui de modifier le mot de passe après la première connexion."
               lowContrast
               hideCloseButton
             />
             <div>
-              <p className="cds--label">Sign-in URL</p>
+              <p className="cds--label">URL de connexion</p>
               <CodeSnippet type="single">{window.location.origin}</CodeSnippet>
               <p className="cds--label" style={{ marginTop: '0.5rem' }}>
-                Username
+                Nom d'utilisateur
               </p>
               <CodeSnippet type="single" data-testid="new-acct-username">
                 {created.username}
               </CodeSnippet>
               <p className="cds--label" style={{ marginTop: '0.5rem' }}>
-                Password
+                Mot de passe
               </p>
               <CodeSnippet type="single" data-testid="new-acct-password">
                 {created.password}
@@ -456,7 +456,7 @@ export default function FirmDetailPage() {
             {addError && (
               <InlineNotification
                 kind="error"
-                title="Could not add accountant"
+                title="Impossible d'ajouter le comptable"
                 subtitle={addError}
                 lowContrast
                 hideCloseButton
@@ -464,28 +464,28 @@ export default function FirmDetailPage() {
             )}
             <TextInput
               id="add-acct-name"
-              labelText={requiredLabel('Full name')}
-              placeholder="e.g. Sam Rivera"
+              labelText={requiredLabel('Nom complet')}
+              placeholder="ex. Sam Rivera"
               value={addName}
               onChange={(e) => setAddName(e.target.value)}
               invalid={addNameInvalid}
-              invalidText="Full name is required."
+              invalidText="Le nom complet est obligatoire."
             />
             <TextInput
               id="add-acct-user"
-              labelText="Username (optional)"
-              helperText="Used to sign in. Leave blank to auto-generate."
+              labelText="Nom d'utilisateur (facultatif)"
+              helperText="Utilisé pour se connecter. Laissez vide pour le générer automatiquement."
               value={addUser}
               onChange={(e) => setAddUser(e.target.value)}
             />
             <PasswordInput
               id="add-acct-pass"
-              labelText={requiredLabel('Password')}
-              helperText={`Auto-generated — you can edit it. At least ${MIN_PASSWORD_LENGTH} characters.`}
+              labelText={requiredLabel('Mot de passe')}
+              helperText={`Généré automatiquement — vous pouvez le modifier. Au moins ${MIN_PASSWORD_LENGTH} caractères.`}
               value={addPass}
               onChange={(e) => setAddPass(e.target.value)}
               invalid={addPassInvalid}
-              invalidText={`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`}
+              invalidText={`Le mot de passe doit comporter au moins ${MIN_PASSWORD_LENGTH} caractères.`}
             />
           </Stack>
         )}
@@ -496,11 +496,11 @@ export default function FirmDetailPage() {
         open={!!resetTarget}
         modalHeading={
           resetDone
-            ? 'Password reset'
-            : `Reset password — ${resetTarget?.username ?? ''}`
+            ? 'Mot de passe réinitialisé'
+            : `Réinitialiser le mot de passe — ${resetTarget?.username ?? ''}`
         }
-        primaryButtonText={resetDone ? 'Done' : 'Reset password'}
-        secondaryButtonText={resetDone ? undefined : 'Cancel'}
+        primaryButtonText={resetDone ? 'Terminé' : 'Réinitialiser le mot de passe'}
+        secondaryButtonText={resetDone ? undefined : 'Annuler'}
         primaryButtonDisabled={!resetDone && resetPassword.isPending}
         onRequestClose={() => setResetTarget(null)}
         onRequestSubmit={resetDone ? () => setResetTarget(null) : submitReset}
@@ -511,13 +511,13 @@ export default function FirmDetailPage() {
           <Stack gap={5}>
             <InlineNotification
               kind="success"
-              title="Password updated"
-              subtitle="Share the new password below."
+              title="Mot de passe mis à jour"
+              subtitle="Partagez le nouveau mot de passe ci-dessous."
               lowContrast
               hideCloseButton
             />
             <div>
-              <p className="cds--label">New password</p>
+              <p className="cds--label">Nouveau mot de passe</p>
               <CodeSnippet type="single" data-testid="reset-acct-password">
                 {resetPass}
               </CodeSnippet>
@@ -528,7 +528,7 @@ export default function FirmDetailPage() {
             {resetPassword.isError && (
               <InlineNotification
                 kind="error"
-                title="Could not reset password"
+                title="Impossible de réinitialiser le mot de passe"
                 subtitle={(resetPassword.error as Error)?.message}
                 lowContrast
                 hideCloseButton
@@ -536,12 +536,12 @@ export default function FirmDetailPage() {
             )}
             <PasswordInput
               id="reset-acct-pass"
-              labelText={requiredLabel('New password')}
-              helperText={`Auto-generated — you can edit it. At least ${MIN_PASSWORD_LENGTH} characters.`}
+              labelText={requiredLabel('Nouveau mot de passe')}
+              helperText={`Généré automatiquement — vous pouvez le modifier. Au moins ${MIN_PASSWORD_LENGTH} caractères.`}
               value={resetPass}
               onChange={(e) => setResetPass(e.target.value)}
               invalid={resetPassInvalid}
-              invalidText={`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`}
+              invalidText={`Le mot de passe doit comporter au moins ${MIN_PASSWORD_LENGTH} caractères.`}
             />
           </Stack>
         )}
@@ -551,9 +551,9 @@ export default function FirmDetailPage() {
       <Modal
         open={confirmDelete}
         danger
-        modalHeading={`Delete ${firm.name}?`}
-        primaryButtonText="Delete firm"
-        secondaryButtonText="Cancel"
+        modalHeading={`Supprimer ${firm.name} ?`}
+        primaryButtonText="Supprimer le cabinet"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={deleteFirm.isPending}
         onRequestClose={() => setConfirmDelete(false)}
         onRequestSubmit={handleDelete}
@@ -561,8 +561,8 @@ export default function FirmDetailPage() {
         data-testid="delete-firm-modal"
       >
         <p>
-          This permanently deletes the firm and its provisioning. This action
-          cannot be undone.
+          Cette action supprime définitivement le cabinet et son provisionnement.
+          Elle est irréversible.
         </p>
       </Modal>
     </div>

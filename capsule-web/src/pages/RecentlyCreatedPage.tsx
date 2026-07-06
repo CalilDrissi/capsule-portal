@@ -15,14 +15,14 @@ export default function RecentlyCreatedPage() {
 
   return (
     <div className="capsule-page">
-      <h2 className="capsule-page__title">Recently created</h2>
+      <h2 className="capsule-page__title">Créés récemment</h2>
       {isLoading ? (
         <DataTableSkeleton columnCount={3} rowCount={5} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load documents: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement des documents : {(error as Error)?.message}</Tile>
       ) : sorted.length === 0 ? (
         <Tile className="capsule-empty">
-          <h4>No documents yet</h4>
+          <h4>Aucun document pour l'instant</h4>
         </Tile>
       ) : (
         <DocumentsTable documents={sorted.slice(0, 25)} />

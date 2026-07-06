@@ -36,10 +36,10 @@ export default function ParsedContentTab({ doc }: { doc: DocumentDetail }) {
   )
 
   if (fLoading || pLoading)
-    return <InlineLoading description="Loading parsed content…" />
+    return <InlineLoading description="Chargement du contenu analysé…" />
 
   if (pages.length === 0)
-    return <Tile data-testid="parsed-empty">No pages available.</Tile>
+    return <Tile data-testid="parsed-empty">Aucune page disponible.</Tile>
 
   const content = data?.content ?? ''
 
@@ -51,19 +51,19 @@ export default function ParsedContentTab({ doc }: { doc: DocumentDetail }) {
             hasIconOnly
             kind="ghost"
             size="sm"
-            iconDescription="Previous page"
+            iconDescription="Page précédente"
             renderIcon={ChevronLeft}
             disabled={pageIndex === 0}
             onClick={() => setPageIndex((i) => Math.max(0, i - 1))}
           />
           <span>
-            Page {pageIndex + 1} of {pages.length}
+            Page {pageIndex + 1} sur {pages.length}
           </span>
           <Button
             hasIconOnly
             kind="ghost"
             size="sm"
-            iconDescription="Next page"
+            iconDescription="Page suivante"
             renderIcon={ChevronRight}
             disabled={pageIndex >= pages.length - 1}
             onClick={() =>
@@ -74,24 +74,24 @@ export default function ParsedContentTab({ doc }: { doc: DocumentDetail }) {
       )}
 
       {isLoading ? (
-        <InlineLoading description="Loading parsed text…" />
+        <InlineLoading description="Chargement du texte analysé…" />
       ) : isError ? (
         <Tile data-testid="parsed-error">
-          Parsed content unavailable: {(error as Error)?.message}
+          Contenu analysé indisponible : {(error as Error)?.message}
         </Tile>
       ) : content.trim() ? (
         <CodeSnippet
           type="multi"
-          feedback="Copied"
+          feedback="Copié"
           data-testid="parsed-content"
-          aria-label="Parsed text"
+          aria-label="Texte analysé"
         >
           {content}
         </CodeSnippet>
       ) : (
         <Tile data-testid="parsed-empty">
-          No parsed text content for this page. Content is extracted from the
-          file by the server-side parser.
+          Aucun texte analysé pour cette page. Le contenu est extrait du fichier
+          par l'analyseur côté serveur.
         </Tile>
       )}
     </div>

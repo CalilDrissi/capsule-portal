@@ -26,7 +26,7 @@ def notify_accountants_of_upload(client, document):
     CapsuleNotification = _model()
 
     firm = client.firm
-    message = '{} uploaded "{}".'.format(
+    message = "{} a importé « {} ».".format(
         client.display_name, getattr(document, 'label', document)
     )
 
@@ -62,8 +62,8 @@ def notify_accountants_of_orphan_upload(firm, document):
     CapsuleNotification = _model()
 
     message = (
-        'A document ("{}") was uploaded but could not be linked to a client. '
-        'Please review it.'
+        "Un document (« {} ») a été importé mais n'a pas pu être rattaché à un client. "
+        "Veuillez le vérifier."
     ).format(getattr(document, 'label', document))
 
     memberships = FirmMembership.objects.filter(

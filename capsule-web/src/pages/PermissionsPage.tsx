@@ -26,14 +26,14 @@ export default function PermissionsPage() {
         <h2 className="capsule-page__title">Permissions</h2>
       </div>
       <p className="capsule-hint">
-        The full catalog of system permissions (read-only). Grant these to roles
-        on the role detail page.
+        Le catalogue complet des permissions système (lecture seule). Accordez-les
+        aux rôles depuis la page de détail du rôle.
       </p>
 
       {isLoading ? (
         <DataTableSkeleton columnCount={2} rowCount={8} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load permissions: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement des permissions : {(error as Error)?.message}</Tile>
       ) : (
         <div data-testid="permissions-list">
           {namespaces.map((ns) => (
@@ -43,7 +43,7 @@ export default function PermissionsPage() {
                 <StructuredListHead>
                   <StructuredListRow head>
                     <StructuredListCell head>Permission</StructuredListCell>
-                    <StructuredListCell head>Identifier</StructuredListCell>
+                    <StructuredListCell head>Identifiant</StructuredListCell>
                   </StructuredListRow>
                 </StructuredListHead>
                 <StructuredListBody>

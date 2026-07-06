@@ -16,25 +16,25 @@ export default function SmartLinksPage() {
 
   return (
     <SimpleCrud<SmartLink>
-      title="Smart links"
+      title="Liens intelligents"
       items={data?.results ?? []}
       isLoading={isLoading}
       isError={isError}
       busy={create.isPending || update.isPending}
       columns={[
-        { key: 'label', header: 'Label', render: (i) => i.label },
-        { key: 'dynamic_label', header: 'Dynamic label', render: (i) => i.dynamic_label || '—' },
+        { key: 'label', header: 'Libellé', render: (i) => i.label },
+        { key: 'dynamic_label', header: 'Libellé dynamique', render: (i) => i.dynamic_label || '—' },
         {
           key: 'enabled',
-          header: 'Enabled',
+          header: 'Activé',
           render: (i) =>
-            i.enabled ? <Tag type="green">Enabled</Tag> : <Tag type="gray">Disabled</Tag>,
+            i.enabled ? <Tag type="green">Activé</Tag> : <Tag type="gray">Désactivé</Tag>,
         },
       ]}
       fields={[
-        { name: 'label', label: 'Label', required: true },
-        { name: 'dynamic_label', label: 'Dynamic label (template)' },
-        { name: 'enabled', label: 'Enabled', type: 'toggle' },
+        { name: 'label', label: 'Libellé', required: true },
+        { name: 'dynamic_label', label: 'Libellé dynamique (modèle)' },
+        { name: 'enabled', label: 'Activé', type: 'toggle' },
       ]}
       toInitial={(i) => ({
         label: i?.label ?? '',

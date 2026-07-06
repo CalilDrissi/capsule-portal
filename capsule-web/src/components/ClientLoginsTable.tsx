@@ -35,10 +35,10 @@ import { MIN_PASSWORD_LENGTH, requiredLabel } from '../lib/forms'
 import type { ClientUser } from '../api/types'
 
 const headers = [
-  { key: 'username', header: 'Username' },
-  { key: 'name', header: 'Name' },
-  { key: 'primary', header: 'Primary' },
-  { key: 'status', header: 'Status' },
+  { key: 'username', header: 'Nom d’utilisateur' },
+  { key: 'name', header: 'Nom' },
+  { key: 'primary', header: 'Principal' },
+  { key: 'status', header: 'Statut' },
   { key: 'actions', header: '' },
 ]
 
@@ -146,24 +146,24 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
   return (
     <Stack gap={5}>
       <div className="capsule-page__header">
-        <h4>Logins</h4>
+        <h4>Comptes</h4>
         <Button
           size="sm"
           renderIcon={Add}
           onClick={openAdd}
           data-testid="add-employee-login"
         >
-          Add employee login
+          Ajouter un compte employé
         </Button>
       </div>
 
       {isLoading ? (
         <DataTableSkeleton columnCount={5} rowCount={3} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load logins.</Tile>
+        <Tile>Impossible de charger les comptes.</Tile>
       ) : users.length === 0 ? (
         <Tile className="capsule-empty">
-          <p>No logins yet.</p>
+          <p>Aucun compte pour le moment.</p>
         </Tile>
       ) : (
         <DataTable rows={rows} headers={headers} isSortable>
@@ -194,7 +194,7 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
                             return (
                               <TableCell key={cell.id}>
                                 {cell.value === 'primary' ? (
-                                  <Tag type="purple">Primary</Tag>
+                                  <Tag type="purple">Principal</Tag>
                                 ) : (
                                   ''
                                 )}
@@ -210,8 +210,8 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
                                   }
                                 >
                                   {cell.value === 'active'
-                                    ? 'Active'
-                                    : 'Inactive'}
+                                    ? 'Actif'
+                                    : 'Inactif'}
                                 </Tag>
                               </TableCell>
                             )
@@ -223,18 +223,18 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
                             return (
                               <TableCell key={cell.id}>
                                 <OverflowMenu
-                                  aria-label="Login actions"
+                                  aria-label="Actions du compte"
                                   flipped
                                 >
                                   <OverflowMenuItem
-                                    itemText="Reset password"
+                                    itemText="Réinitialiser le mot de passe"
                                     onClick={() => openReset(user)}
                                   />
                                   <OverflowMenuItem
                                     itemText={
                                       user.is_active
-                                        ? 'Deactivate'
-                                        : 'Activate'
+                                        ? 'Désactiver'
+                                        : 'Activer'
                                     }
                                     onClick={() =>
                                       updateUser.mutate({
@@ -247,7 +247,7 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
                                     <OverflowMenuItem
                                       hasDivider
                                       isDelete
-                                      itemText="Remove"
+                                      itemText="Retirer"
                                       onClick={() =>
                                         deleteUser.mutate(user.user_id)
                                       }
@@ -274,9 +274,9 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
       {/* Add employee login */}
       <Modal
         open={addOpen}
-        modalHeading={addInvite ? 'Employee login added' : 'Add employee login'}
-        primaryButtonText={addInvite ? 'Done' : 'Add login'}
-        secondaryButtonText={addInvite ? undefined : 'Cancel'}
+        modalHeading={addInvite ? 'Compte employé ajouté' : 'Ajouter un compte employé'}
+        primaryButtonText={addInvite ? 'Terminé' : 'Ajouter le compte'}
+        secondaryButtonText={addInvite ? undefined : 'Annuler'}
         primaryButtonDisabled={!addInvite && addUser.isPending}
         onRequestClose={() => setAddOpen(false)}
         onRequestSubmit={addInvite ? () => setAddOpen(false) : submitAdd}
@@ -287,13 +287,13 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
           <Stack gap={5}>
             <InlineNotification
               kind="success"
-              title="Employee login added"
-              subtitle="Send this link to the employee. They open it, set their own password, and are taken straight to the workspace. The link can only be used once."
+              title="Compte employé ajouté"
+              subtitle="Envoyez ce lien à l’employé. Il l’ouvre, définit son propre mot de passe et accède directement à l’espace de travail. Le lien ne peut être utilisé qu’une seule fois."
               lowContrast
               hideCloseButton
             />
             <div>
-              <p className="cds--label">Invite link</p>
+              <p className="cds--label">Lien d’invitation</p>
               <CodeSnippet type="multi" data-testid="employee-invite-link">
                 {addInvite}
               </CodeSnippet>
@@ -303,16 +303,16 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
           <Stack gap={5}>
             <TextInput
               id="employee-full-name"
-              labelText={requiredLabel('Full name')}
+              labelText={requiredLabel('Nom complet')}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               invalid={fullNameInvalid}
-              invalidText="Full name is required."
+              invalidText="Le nom complet est obligatoire."
             />
             <TextInput
               id="employee-username"
-              labelText="Username (optional)"
-              helperText="Leave blank to auto-generate."
+              labelText="Nom d’utilisateur (facultatif)"
+              helperText="Laissez vide pour générer automatiquement."
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -325,17 +325,17 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
         open={!!resetUser}
         modalHeading={
           resetSettled
-            ? 'Password reset'
-            : `Reset password — ${resetUser?.username ?? ''}`
+            ? 'Mot de passe réinitialisé'
+            : `Réinitialiser le mot de passe — ${resetUser?.username ?? ''}`
         }
         primaryButtonText={
           resetSettled
-            ? 'Done'
+            ? 'Terminé'
             : resetMode === 'password'
-              ? 'Set password'
-              : 'Generate link'
+              ? 'Définir le mot de passe'
+              : 'Générer le lien'
         }
-        secondaryButtonText={resetSettled ? undefined : 'Cancel'}
+        secondaryButtonText={resetSettled ? undefined : 'Annuler'}
         primaryButtonDisabled={!resetSettled && resetPassword.isPending}
         onRequestClose={closeReset}
         onRequestSubmit={resetSettled ? closeReset : submitReset}
@@ -346,13 +346,13 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
           <Stack gap={5}>
             <InlineNotification
               kind="success"
-              title="Setup link ready"
-              subtitle="Send this link to the user. It can only be used once."
+              title="Lien de configuration prêt"
+              subtitle="Envoyez ce lien à l’utilisateur. Il ne peut être utilisé qu’une seule fois."
               lowContrast
               hideCloseButton
             />
             <div>
-              <p className="cds--label">Setup link</p>
+              <p className="cds--label">Lien de configuration</p>
               <CodeSnippet type="multi" data-testid="reset-link">
                 {resetLink}
               </CodeSnippet>
@@ -361,15 +361,15 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
         ) : resetDone ? (
           <InlineNotification
             kind="success"
-            title="Password updated"
-            subtitle="The new password is now active."
+            title="Mot de passe mis à jour"
+            subtitle="Le nouveau mot de passe est désormais actif."
             lowContrast
             hideCloseButton
           />
         ) : (
           <Stack gap={5}>
             <RadioButtonGroup
-              legendText="How would you like to reset it?"
+              legendText="Comment souhaitez-vous le réinitialiser ?"
               name="reset-mode"
               orientation="vertical"
               valueSelected={resetMode}
@@ -378,12 +378,12 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
               }
             >
               <RadioButton
-                labelText="Set a new password now"
+                labelText="Définir un nouveau mot de passe maintenant"
                 value="password"
                 id="reset-mode-password"
               />
               <RadioButton
-                labelText="Send a setup link (they choose their own)"
+                labelText="Envoyer un lien de configuration (l’utilisateur choisit le sien)"
                 value="link"
                 id="reset-mode-link"
               />
@@ -391,12 +391,12 @@ export default function ClientLoginsTable({ clientId }: { clientId: number }) {
             {resetMode === 'password' && (
               <PasswordInput
                 id="reset-new-password"
-                labelText={requiredLabel('New password')}
-                helperText={`At least ${MIN_PASSWORD_LENGTH} characters.`}
+                labelText={requiredLabel('Nouveau mot de passe')}
+                helperText={`Au moins ${MIN_PASSWORD_LENGTH} caractères.`}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 invalid={passwordInvalid}
-                invalidText={`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`}
+                invalidText={`Le mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères.`}
               />
             )}
           </Stack>

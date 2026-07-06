@@ -41,17 +41,17 @@ function WorkflowTemplateDetail({ templateId }: { templateId: number }) {
     <div className="capsule-page">
       <PageBreadcrumb
         items={[
-          { label: 'Workflows', to: '/workflows' },
-          { label: template?.label ?? 'Workflow' },
+          { label: 'Flux de travail', to: '/workflows' },
+          { label: template?.label ?? 'Flux de travail' },
         ]}
       />
-      <h2 className="capsule-page__title">{template?.label ?? 'Workflow'}</h2>
+      <h2 className="capsule-page__title">{template?.label ?? 'Flux de travail'}</h2>
 
-      <h4 className="capsule-section-title">States</h4>
+      <h4 className="capsule-section-title">États</h4>
       {sLoading ? (
         <DataTableSkeleton columnCount={1} rowCount={3} showHeader={false} />
       ) : states.length === 0 ? (
-        <Tile data-testid="wf-states-empty">No states defined.</Tile>
+        <Tile data-testid="wf-states-empty">Aucun état défini.</Tile>
       ) : (
         <div className="capsule-wf-progress" data-testid="wf-states">
           <ProgressIndicator
@@ -77,15 +77,15 @@ function WorkflowTemplateDetail({ templateId }: { templateId: number }) {
       {tLoading ? (
         <DataTableSkeleton columnCount={3} rowCount={3} showHeader={false} />
       ) : transitions.length === 0 ? (
-        <Tile data-testid="wf-transitions-empty">No transitions defined.</Tile>
+        <Tile data-testid="wf-transitions-empty">Aucune transition définie.</Tile>
       ) : (
         <TableContainer>
           <Table data-testid="wf-transitions-table">
             <TableHead>
               <TableRow>
                 <TableHeader>Transition</TableHeader>
-                <TableHeader>From</TableHeader>
-                <TableHeader>To</TableHeader>
+                <TableHeader>De</TableHeader>
+                <TableHeader>Vers</TableHeader>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -122,24 +122,24 @@ export default function WorkflowsPage() {
 
   return (
     <div className="capsule-page">
-      <h2 className="capsule-page__title">Workflows</h2>
+      <h2 className="capsule-page__title">Flux de travail</h2>
       {isLoading ? (
         <DataTableSkeleton columnCount={3} rowCount={4} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load workflows: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement des flux de travail : {(error as Error)?.message}</Tile>
       ) : templates.length === 0 ? (
         <Tile className="capsule-empty" data-testid="workflows-empty">
-          <h4>No workflow templates</h4>
-          <p>Workflow templates are defined server-side.</p>
+          <h4>Aucun modèle de flux de travail</h4>
+          <p>Les modèles de flux de travail sont définis côté serveur.</p>
         </Tile>
       ) : (
         <TableContainer>
           <Table data-testid="workflows-table">
             <TableHead>
               <TableRow>
-                <TableHeader>Workflow</TableHeader>
-                <TableHeader>Internal name</TableHeader>
-                <TableHeader>Auto-launch</TableHeader>
+                <TableHeader>Flux de travail</TableHeader>
+                <TableHeader>Nom interne</TableHeader>
+                <TableHeader>Lancement automatique</TableHeader>
                 <TableHeader> </TableHeader>
               </TableRow>
             </TableHead>
@@ -159,10 +159,10 @@ export default function WorkflowsPage() {
                     {wt.label}
                   </TableCell>
                   <TableCell>{wt.internal_name}</TableCell>
-                  <TableCell>{wt.auto_launch ? 'Yes' : 'No'}</TableCell>
+                  <TableCell>{wt.auto_launch ? 'Oui' : 'Non'}</TableCell>
                   <TableCell>
                     <Button kind="ghost" size="sm">
-                      View
+                      Afficher
                     </Button>
                   </TableCell>
                 </TableRow>

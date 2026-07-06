@@ -29,7 +29,7 @@ export default function CommentsTab({ docId }: { docId: number }) {
     })
   }
 
-  if (isLoading) return <InlineLoading description="Loading comments…" />
+  if (isLoading) return <InlineLoading description="Chargement des commentaires…" />
 
   const comments = data?.results ?? []
 
@@ -37,15 +37,15 @@ export default function CommentsTab({ docId }: { docId: number }) {
     <Stack gap={5}>
       <div data-testid="comments-list">
         {comments.length === 0 ? (
-          <Tile>No comments yet.</Tile>
+          <Tile>Aucun commentaire pour le moment.</Tile>
         ) : (
           <Stack gap={3}>
             {comments.map((c) => (
               <Tile key={c.id} data-testid={`comment-${c.id}`}>
                 <div className="capsule-comment__meta">
-                  {c.user?.username ?? 'unknown'} ·{' '}
+                  {c.user?.username ?? 'inconnu'} ·{' '}
                   {c.submit_date
-                    ? new Date(c.submit_date).toLocaleString()
+                    ? new Date(c.submit_date).toLocaleString('fr-FR')
                     : ''}
                 </div>
                 <div>{c.text}</div>
@@ -59,12 +59,12 @@ export default function CommentsTab({ docId }: { docId: number }) {
         <Stack gap={4}>
           <TextArea
             id="comment-text"
-            labelText={requiredLabel('Add a comment')}
+            labelText={requiredLabel('Ajouter un commentaire')}
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={3}
             invalid={textInvalid}
-            invalidText="Comment is required."
+            invalidText="Le commentaire est obligatoire."
           />
           <Button
             renderIcon={Send}
@@ -72,7 +72,7 @@ export default function CommentsTab({ docId }: { docId: number }) {
             data-testid="comment-submit"
             onClick={handlePost}
           >
-            Post comment
+            Publier le commentaire
           </Button>
         </Stack>
       </Tile>

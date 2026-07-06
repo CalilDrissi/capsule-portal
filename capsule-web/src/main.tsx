@@ -1,3 +1,4 @@
+import 'flatpickr/dist/l10n/fr.js'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
@@ -19,7 +20,7 @@ const queryClient = new QueryClient({
     onError: (error) => {
       const status = error instanceof ApiError ? error.status : 0
       notify.error(
-        'Action failed',
+        "Échec de l'action",
         status ? `${(error as Error).message}` : (error as Error).message,
       )
     },

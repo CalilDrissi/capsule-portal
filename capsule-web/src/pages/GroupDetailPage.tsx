@@ -28,12 +28,12 @@ export default function GroupDetailPage() {
   const remove = useRemoveUserFromGroup(groupId ?? 0)
   const [pickedId, setPickedId] = useState<number | null>(null)
 
-  if (isLoading) return <InlineLoading description="Loading group…" />
+  if (isLoading) return <InlineLoading description="Chargement du groupe…" />
   if (isError || !group)
     return (
       <div className="capsule-page">
-        <PageBreadcrumb items={[{ label: 'Groups', to: '/admin/groups' }, { label: 'Not found' }]} />
-        <Tile>Group not found.</Tile>
+        <PageBreadcrumb items={[{ label: 'Groupes', to: '/admin/groups' }, { label: 'Introuvable' }]} />
+        <Tile>Groupe introuvable.</Tile>
       </div>
     )
 
@@ -44,14 +44,14 @@ export default function GroupDetailPage() {
 
   return (
     <div className="capsule-page">
-      <PageBreadcrumb items={[{ label: 'Groups', to: '/admin/groups' }, { label: group.name }]} />
+      <PageBreadcrumb items={[{ label: 'Groupes', to: '/admin/groups' }, { label: group.name }]} />
       <h2 className="capsule-page__title">{group.name}</h2>
 
-      <h3 className="capsule-section-title">Members</h3>
+      <h3 className="capsule-section-title">Membres</h3>
       <Stack gap={5}>
         <div data-testid="group-members-list">
           {memberList.length === 0 ? (
-            <Tile>This group has no members.</Tile>
+            <Tile>Ce groupe n'a aucun membre.</Tile>
           ) : (
             memberList.map((u) => (
               <span key={u.id} style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -60,7 +60,7 @@ export default function GroupDetailPage() {
                   kind="ghost"
                   size="sm"
                   hasIconOnly
-                  iconDescription={`Remove ${u.username}`}
+                  iconDescription={`Retirer ${u.username}`}
                   renderIcon={Close}
                   data-testid={`group-member-remove-${u.id}`}
                   disabled={remove.isPending}
@@ -74,11 +74,11 @@ export default function GroupDetailPage() {
         {addable.length > 0 && (
           <Tile>
             <Stack gap={4}>
-              <strong>Add a member</strong>
+              <strong>Ajouter un membre</strong>
               <Dropdown
                 id="group-user-pick"
-                titleText="User"
-                label="Choose a user"
+                titleText="Utilisateur"
+                label="Choisir un utilisateur"
                 items={addable}
                 selectedItem={picked}
                 itemToString={(i) => (i ? i.username : '')}
@@ -95,7 +95,7 @@ export default function GroupDetailPage() {
                   add.mutate(picked.id, { onSuccess: () => setPickedId(null) })
                 }
               >
-                Add member
+                Ajouter le membre
               </Button>
             </Stack>
           </Tile>

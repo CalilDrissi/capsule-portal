@@ -28,7 +28,7 @@ import { useAppStore } from '../store/useAppStore'
 function StatusTag({ status }: { status: 'requested' | 'fulfilled' }) {
   return (
     <Tag type={status === 'fulfilled' ? 'green' : 'blue'}>
-      {status === 'fulfilled' ? 'Fulfilled' : 'Open'}
+      {status === 'fulfilled' ? 'Fournie' : 'Ouverte'}
     </Tag>
   )
 }
@@ -77,24 +77,24 @@ export function AccountantRequestsPanel({ clientId }: { clientId: number }) {
           onClick={() => setOpen(true)}
           data-testid="request-documents"
         >
-          Request documents
+          Demander des documents
         </Button>
       </div>
 
       {isLoading ? (
-        <InlineLoading description="Loading requests…" />
+        <InlineLoading description="Chargement des demandes…" />
       ) : requests.length === 0 ? (
         <Tile className="capsule-empty" data-testid="requests-empty">
-          <h4>No requests yet</h4>
-          <p>Request a document to add it to the client&apos;s checklist.</p>
+          <h4>Aucune demande pour le moment</h4>
+          <p>Demandez un document pour l&apos;ajouter à la liste du client.</p>
         </Tile>
       ) : (
         <StructuredListWrapper isCondensed data-testid="requests-list">
           <StructuredListHead>
             <StructuredListRow head>
-              <StructuredListCell head>Category</StructuredListCell>
-              <StructuredListCell head>Period</StructuredListCell>
-              <StructuredListCell head>Status</StructuredListCell>
+              <StructuredListCell head>Catégorie</StructuredListCell>
+              <StructuredListCell head>Période</StructuredListCell>
+              <StructuredListCell head>Statut</StructuredListCell>
               <StructuredListCell head>Action</StructuredListCell>
             </StructuredListRow>
           </StructuredListHead>
@@ -117,7 +117,7 @@ export function AccountantRequestsPanel({ clientId }: { clientId: number }) {
                         update.mutate({ id: r.id, status: 'fulfilled' })
                       }
                     >
-                      Mark fulfilled
+                      Marquer comme fournie
                     </Button>
                   )}
                 </StructuredListCell>
@@ -129,9 +129,9 @@ export function AccountantRequestsPanel({ clientId }: { clientId: number }) {
 
       <Modal
         open={open}
-        modalHeading="Request a document"
-        primaryButtonText={create.isPending ? 'Requesting…' : 'Request'}
-        secondaryButtonText="Cancel"
+        modalHeading="Demander un document"
+        primaryButtonText={create.isPending ? 'Envoi en cours…' : 'Demander'}
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={create.isPending}
         onRequestClose={() => setOpen(false)}
         onRequestSubmit={submit}
@@ -140,8 +140,8 @@ export function AccountantRequestsPanel({ clientId }: { clientId: number }) {
           <Stack gap={5}>
             <Dropdown
               id="request-category"
-              titleText="Category"
-              label="Choose a category"
+              titleText="Catégorie"
+              label="Choisir une catégorie"
               items={categories}
               selectedItem={category}
               itemToString={(i) => i ?? ''}
@@ -149,14 +149,14 @@ export function AccountantRequestsPanel({ clientId }: { clientId: number }) {
             />
             <TextInput
               id="request-period"
-              labelText="Period (e.g. 2026-06 or 2026)"
+              labelText="Période (ex. 2026-06 ou 2026)"
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
               data-testid="request-period"
             />
             <TextArea
               id="request-note"
-              labelText="Note (optional)"
+              labelText="Note (facultatif)"
               value={note}
               onChange={(e) => setNote(e.target.value)}
             />
@@ -179,20 +179,20 @@ export function ClientChecklistPanel({ clientId }: { clientId: number }) {
   const requests = data ?? []
   const open = requests.filter((r) => r.status === 'requested')
 
-  if (isLoading) return <InlineLoading description="Loading checklist…" />
+  if (isLoading) return <InlineLoading description="Chargement de la liste…" />
 
   if (open.length === 0) return null
 
   return (
     <Tile data-testid="client-checklist" style={{ marginBottom: '1.5rem' }}>
-      <h4 className="capsule-section-title">Requested by your accountant</h4>
+      <h4 className="capsule-section-title">Demandé par votre comptable</h4>
       <StructuredListWrapper isCondensed>
         <StructuredListBody>
           {open.map((r) => (
             <StructuredListRow key={r.id} data-testid={`checklist-${r.id}`}>
               <StructuredListCell>
-                {r.category || 'A document'}
-                {r.period_key ? ` for ${r.period_key}` : ''}
+                {r.category || 'Un document'}
+                {r.period_key ? ` pour ${r.period_key}` : ''}
               </StructuredListCell>
               <StructuredListCell>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -201,7 +201,7 @@ export function ClientChecklistPanel({ clientId }: { clientId: number }) {
                     onClick={() => navigate('/workspace/upload')}
                     data-testid={`checklist-upload-${r.id}`}
                   >
-                    Upload
+                    Importer
                   </Button>
                   <Button
                     kind="ghost"
@@ -212,7 +212,7 @@ export function ClientChecklistPanel({ clientId }: { clientId: number }) {
                       update.mutate({ id: r.id, status: 'fulfilled' })
                     }
                   >
-                    Mark provided
+                    Marquer comme fourni
                   </Button>
                 </div>
               </StructuredListCell>

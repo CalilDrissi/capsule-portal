@@ -90,8 +90,8 @@ export default function CabinetDetailPage() {
   if (isError || !cabinet)
     return (
       <div className="capsule-page">
-        <PageBreadcrumb items={[{ label: 'Cabinets', to: '/cabinets' }, { label: 'Not found' }]} />
-        <Tile>Cabinet not found.</Tile>
+        <PageBreadcrumb items={[{ label: 'Classeurs', to: '/cabinets' }, { label: 'Introuvable' }]} />
+        <Tile>Classeur introuvable.</Tile>
       </div>
     )
 
@@ -135,7 +135,7 @@ export default function CabinetDetailPage() {
 
   return (
     <div className="capsule-page">
-      <PageBreadcrumb items={[{ label: 'Cabinets', to: '/cabinets' }, { label: cabinet.full_path }]} />
+      <PageBreadcrumb items={[{ label: 'Classeurs', to: '/cabinets' }, { label: cabinet.full_path }]} />
 
       <div className="capsule-page__header">
         <h2 className="capsule-page__title">{cabinet.full_path}</h2>
@@ -146,22 +146,22 @@ export default function CabinetDetailPage() {
             onClick={openChild}
             data-testid="new-subcabinet"
           >
-            New sub-cabinet
+            Nouveau sous-classeur
           </Button>
           <Button
             renderIcon={Add}
             onClick={() => setAddOpen(true)}
             data-testid="add-doc-to-cabinet"
           >
-            Add document
+            Ajouter un document
           </Button>
         </div>
       </div>
 
       <div className="capsule-detail capsule-detail--browse">
         <div className="capsule-meta" data-testid="cabinet-tree">
-          <h4 style={{ marginBottom: '0.5rem' }}>Hierarchy</h4>
-          <TreeView label="Cabinet hierarchy" hideLabel>
+          <h4 style={{ marginBottom: '0.5rem' }}>Hiérarchie</h4>
+          <TreeView label="Hiérarchie des classeurs" hideLabel>
             {renderTree(treeRoot, cabinet.id, navigate)}
           </TreeView>
         </div>
@@ -176,16 +176,16 @@ export default function CabinetDetailPage() {
             />
           ) : docs.length === 0 ? (
             <Tile className="capsule-empty">
-              <p>No documents in this cabinet.</p>
+              <p>Aucun document dans ce classeur.</p>
             </Tile>
           ) : (
             <TableContainer>
               <Table data-testid="cabinet-docs">
                 <TableHead>
                   <TableRow>
-                    <TableHeader>Label</TableHeader>
+                    <TableHeader>Libellé</TableHeader>
                     <TableHeader>Type</TableHeader>
-                    <TableHeader>Created</TableHeader>
+                    <TableHeader>Créé le</TableHeader>
                     <TableHeader> </TableHeader>
                   </TableRow>
                 </TableHead>
@@ -201,7 +201,7 @@ export default function CabinetDetailPage() {
                       <TableCell>{d.document_type?.label ?? '—'}</TableCell>
                       <TableCell>
                         {d.datetime_created
-                          ? new Date(d.datetime_created).toLocaleString()
+                          ? new Date(d.datetime_created).toLocaleString('fr-FR')
                           : '—'}
                       </TableCell>
                       <TableCell>
@@ -209,7 +209,7 @@ export default function CabinetDetailPage() {
                           hasIconOnly
                           kind="ghost"
                           size="sm"
-                          iconDescription="Remove from cabinet"
+                          iconDescription="Retirer du classeur"
                           renderIcon={TrashCan}
                           disabled={removeDoc.isPending}
                           data-testid={`remove-doc-${d.id}`}
@@ -233,9 +233,9 @@ export default function CabinetDetailPage() {
 
       <Modal
         open={addOpen}
-        modalHeading="Add document to cabinet"
-        primaryButtonText="Add"
-        secondaryButtonText="Cancel"
+        modalHeading="Ajouter un document au classeur"
+        primaryButtonText="Ajouter"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={selectedDocId == null || addDoc.isPending}
         onRequestClose={() => setAddOpen(false)}
         onRequestSubmit={submitAdd}
@@ -244,7 +244,7 @@ export default function CabinetDetailPage() {
           id="add-doc-combo"
           data-testid="add-doc-combo"
           titleText="Document"
-          placeholder="Search documents…"
+          placeholder="Rechercher des documents…"
           items={candidateDocs}
           itemToString={(d) => (d ? d.label : '')}
           onChange={({ selectedItem }) =>
@@ -258,27 +258,27 @@ export default function CabinetDetailPage() {
 
       <Modal
         open={childOpen}
-        modalHeading="New sub-cabinet"
-        primaryButtonText="Create"
-        secondaryButtonText="Cancel"
+        modalHeading="Nouveau sous-classeur"
+        primaryButtonText="Créer"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={createCabinet.isPending}
         onRequestClose={() => setChildOpen(false)}
         onRequestSubmit={submitChild}
       >
         <p style={{ marginBottom: '0.5rem' }}>
-          Parent: <strong>{cabinet.full_path}</strong>
+          Parent : <strong>{cabinet.full_path}</strong>
         </p>
         <TextInput
           id="new-subcabinet-label"
-          labelText={requiredLabel('Sub-cabinet label')}
+          labelText={requiredLabel('Libellé du sous-classeur')}
           value={childLabel}
           onChange={(e) => setChildLabel(e.target.value)}
           invalid={childLabelInvalid}
-          invalidText="Sub-cabinet label is required."
+          invalidText="Le libellé du sous-classeur est obligatoire."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitChild()
           }}
-          placeholder="Label"
+          placeholder="Libellé"
         />
       </Modal>
     </div>

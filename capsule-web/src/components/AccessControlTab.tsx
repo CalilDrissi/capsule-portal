@@ -52,7 +52,7 @@ function AclCard({
   return (
     <Tile data-testid={`acl-card-${acl.id}`}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <strong>Role: {acl.role?.label}</strong>
+        <strong>Rôle : {acl.role?.label}</strong>
         <Button
           kind="danger--ghost"
           size="sm"
@@ -61,13 +61,13 @@ function AclCard({
           disabled={deleteAcl.isPending}
           onClick={() => deleteAcl.mutate(acl.id)}
         >
-          Delete ACL
+          Supprimer l'ACL
         </Button>
       </div>
 
       <div style={{ margin: '0.75rem 0' }} data-testid={`acl-perms-${acl.id}`}>
         {granted.length === 0 ? (
-          <span className="capsule-hint">No permissions granted yet.</span>
+          <span className="capsule-hint">Aucune permission accordée pour le moment.</span>
         ) : (
           granted.map((p) => (
             <span key={p.pk} style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -78,7 +78,7 @@ function AclCard({
                 kind="ghost"
                 size="sm"
                 hasIconOnly
-                iconDescription={`Revoke ${p.label}`}
+                iconDescription={`Révoquer ${p.label}`}
                 renderIcon={Close}
                 data-testid={`acl-perm-remove-${acl.id}-${p.pk}`}
                 disabled={removePerm.isPending}
@@ -92,8 +92,8 @@ function AclCard({
       <Stack gap={4}>
         <ComboBox
           id={`acl-perm-pick-${acl.id}`}
-          titleText="Grant a permission"
-          placeholder="Search permissions"
+          titleText="Accorder une permission"
+          placeholder="Rechercher des permissions"
           items={addable}
           selectedItem={picked}
           itemToString={(i) => (i ? `${i.namespace}: ${i.label}` : '')}
@@ -109,7 +109,7 @@ function AclCard({
             addPerm.mutate(picked.pk, { onSuccess: () => setPicked(null) })
           }
         >
-          Grant permission
+          Accorder la permission
         </Button>
       </Stack>
     </Tile>
@@ -123,7 +123,7 @@ export default function AccessControlTab({ docId }: { docId: number }) {
   const createAcl = useCreateDocumentAcl(docId)
   const [pickedRoleId, setPickedRoleId] = useState<number | null>(null)
 
-  if (isLoading) return <InlineLoading description="Loading access control…" />
+  if (isLoading) return <InlineLoading description="Chargement du contrôle d'accès…" />
 
   const aclList = acls?.results ?? []
   const usedRoleIds = new Set(aclList.map((a) => a.role?.id))
@@ -134,12 +134,12 @@ export default function AccessControlTab({ docId }: { docId: number }) {
   return (
     <Stack gap={5}>
       <p className="capsule-hint">
-        Access control lists grant a role specific permissions on this document.
+        Les listes de contrôle d'accès accordent à un rôle des permissions spécifiques sur ce document.
       </p>
 
       <div data-testid="acl-list">
         {aclList.length === 0 ? (
-          <Tile>No access control entries for this document.</Tile>
+          <Tile>Aucune entrée de contrôle d'accès pour ce document.</Tile>
         ) : (
           <Stack gap={4}>
             {aclList.map((acl) => (
@@ -152,11 +152,11 @@ export default function AccessControlTab({ docId }: { docId: number }) {
       {addableRoles.length > 0 && (
         <Tile>
           <Stack gap={4}>
-            <strong>Add an ACL for a role</strong>
+            <strong>Ajouter une ACL pour un rôle</strong>
             <Dropdown
               id="acl-role-pick"
-              titleText="Role"
-              label="Choose a role"
+              titleText="Rôle"
+              label="Choisir un rôle"
               items={addableRoles}
               selectedItem={pickedRole}
               itemToString={(i) => (i ? i.label : '')}
@@ -175,7 +175,7 @@ export default function AccessControlTab({ docId }: { docId: number }) {
                 })
               }
             >
-              Add ACL
+              Ajouter une ACL
             </Button>
           </Stack>
         </Tile>

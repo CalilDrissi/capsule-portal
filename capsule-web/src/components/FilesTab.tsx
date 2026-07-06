@@ -17,19 +17,19 @@ import { downloadFile } from '../api/client'
 import type { DocumentFile } from '../api/types'
 
 const headers = [
-  { key: 'filename', header: 'Filename' },
+  { key: 'filename', header: 'Nom du fichier' },
   { key: 'mimetype', header: 'Type' },
-  { key: 'size', header: 'Size' },
-  { key: 'timestamp', header: 'Created' },
+  { key: 'size', header: 'Taille' },
+  { key: 'timestamp', header: 'Créé le' },
   { key: 'actions', header: '' },
 ]
 
 export default function FilesTab({ docId }: { docId: number }) {
   const { data, isLoading } = useDocumentFiles(docId)
-  if (isLoading) return <InlineLoading description="Loading files…" />
+  if (isLoading) return <InlineLoading description="Chargement des fichiers…" />
 
   const files = data?.results ?? []
-  if (files.length === 0) return <Tile>No files.</Tile>
+  if (files.length === 0) return <Tile>Aucun fichier.</Tile>
 
   const byId = new Map<string, DocumentFile>(
     files.map((f) => [String(f.id), f]),
@@ -39,7 +39,7 @@ export default function FilesTab({ docId }: { docId: number }) {
     filename: f.filename,
     mimetype: f.mimetype,
     size: f.size != null ? `${(f.size / 1024).toFixed(1)} KB` : '—',
-    timestamp: f.timestamp ? new Date(f.timestamp).toLocaleString() : '—',
+    timestamp: f.timestamp ? new Date(f.timestamp).toLocaleString('fr-FR') : '—',
     actions: '',
   }))
 
@@ -82,7 +82,7 @@ export default function FilesTab({ docId }: { docId: number }) {
                               )
                             }
                           >
-                            Download
+                            Télécharger
                           </Button>
                         </TableCell>
                       ) : (

@@ -80,7 +80,7 @@ export default function NotificationBell() {
                 >
                   <span className="capsule-bell-panel__msg">{n.message}</span>
                   <span className="capsule-bell-panel__time">
-                    {new Date(n.datetime_created).toLocaleString()}
+                    {new Date(n.datetime_created).toLocaleString('fr-FR')}
                   </span>
                 </li>
               ))}

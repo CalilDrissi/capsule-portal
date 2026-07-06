@@ -21,15 +21,15 @@ export default function CheckoutsPage() {
 
   return (
     <div className="capsule-page">
-      <h2 className="capsule-page__title">Checked-out documents</h2>
+      <h2 className="capsule-page__title">Documents empruntés</h2>
       {isLoading ? (
         <DataTableSkeleton columnCount={4} rowCount={4} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load checkouts: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement des emprunts : {(error as Error)?.message}</Tile>
       ) : rows.length === 0 ? (
         <Tile className="capsule-empty" data-testid="checkouts-empty">
-          <h4>No documents are checked out</h4>
-          <p>Check out a document from its detail page to lock it for editing.</p>
+          <h4>Aucun document n'est emprunté</h4>
+          <p>Empruntez un document depuis sa page de détail pour le verrouiller en modification.</p>
         </Tile>
       ) : (
         <TableContainer>
@@ -37,9 +37,9 @@ export default function CheckoutsPage() {
             <TableHead>
               <TableRow>
                 <TableHeader>Document</TableHeader>
-                <TableHeader>Checked out by</TableHeader>
-                <TableHeader>When</TableHeader>
-                <TableHeader>Expires</TableHeader>
+                <TableHeader>Emprunté par</TableHeader>
+                <TableHeader>Date</TableHeader>
+                <TableHeader>Expire le</TableHeader>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -54,12 +54,12 @@ export default function CheckoutsPage() {
                   <TableCell>{c.user?.username ?? '—'}</TableCell>
                   <TableCell>
                     {c.checkout_datetime
-                      ? new Date(c.checkout_datetime).toLocaleString()
+                      ? new Date(c.checkout_datetime).toLocaleString('fr-FR')
                       : '—'}
                   </TableCell>
                   <TableCell>
                     {c.expiration_datetime
-                      ? new Date(c.expiration_datetime).toLocaleString()
+                      ? new Date(c.expiration_datetime).toLocaleString('fr-FR')
                       : '—'}
                   </TableCell>
                 </TableRow>

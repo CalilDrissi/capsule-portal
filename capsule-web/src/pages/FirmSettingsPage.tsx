@@ -17,14 +17,14 @@ import { useAppStore } from '../store/useAppStore'
 import { notify } from '../store/useNotifications'
 
 const BASIS_OPTIONS = [
-  { value: 'document_date', label: 'Document date' },
-  { value: 'upload_date', label: 'Upload date' },
-  { value: 'created_date', label: 'Created date' },
+  { value: 'document_date', label: 'Date du document' },
+  { value: 'upload_date', label: "Date d'importation" },
+  { value: 'created_date', label: 'Date de création' },
 ]
 const DEPTH_OPTIONS = [
-  { value: 'Y', label: 'Year' },
-  { value: 'YM', label: 'Year / Month' },
-  { value: 'YQM', label: 'Year / Quarter / Month' },
+  { value: 'Y', label: 'Année' },
+  { value: 'YM', label: 'Année / Mois' },
+  { value: 'YQM', label: 'Année / Trimestre / Mois' },
 ]
 
 /**
@@ -67,7 +67,7 @@ export default function FirmSettingsPage() {
       { period_basis: basis as never, period_depth: depth as never, categories },
       {
         onSuccess: () =>
-          notify.success('Settings saved', 'Grouping configuration updated.'),
+          notify.success('Paramètres enregistrés', 'Configuration du regroupement mise à jour.'),
       },
     )
   }
@@ -75,14 +75,14 @@ export default function FirmSettingsPage() {
   if (!firmId) {
     return (
       <div className="capsule-page">
-        <h2 className="capsule-page__title">Grouping</h2>
+        <h2 className="capsule-page__title">Regroupement</h2>
         <Tile>
           <InlineNotification
             kind="warning"
             lowContrast
             hideCloseButton
-            title="No firm context"
-            subtitle="Grouping settings are only available to firm accountants."
+            title="Aucun contexte de cabinet"
+            subtitle="Les paramètres de regroupement sont réservés aux comptables du cabinet."
           />
         </Tile>
       </div>
@@ -92,9 +92,9 @@ export default function FirmSettingsPage() {
   return (
     <div className="capsule-page" style={{ maxWidth: '44rem' }}>
       <PageBreadcrumb
-        items={[{ label: 'Clients', to: '/clients' }, { label: 'Grouping' }]}
+        items={[{ label: 'Clients', to: '/clients' }, { label: 'Regroupement' }]}
       />
-      <h2 className="capsule-page__title">Grouping &amp; categories</h2>
+      <h2 className="capsule-page__title">Regroupement &amp; catégories</h2>
 
       {settings.isLoading ? (
         <Tile>
@@ -105,8 +105,8 @@ export default function FirmSettingsPage() {
           <Stack gap={6}>
             <Select
               id="settings-basis"
-              labelText="Period basis"
-              helperText="Which date documents are grouped by."
+              labelText="Base de la période"
+              helperText="Date selon laquelle les documents sont regroupés."
               value={basis}
               onChange={(e) => setBasis(e.target.value)}
             >
@@ -117,8 +117,8 @@ export default function FirmSettingsPage() {
 
             <Select
               id="settings-depth"
-              labelText="Period depth"
-              helperText="Saving a new depth rebuilds the firm's period index."
+              labelText="Profondeur de la période"
+              helperText="Enregistrer une nouvelle profondeur reconstruit l'index de périodes du cabinet."
               value={depth}
               onChange={(e) => setDepth(e.target.value)}
             >
@@ -128,7 +128,7 @@ export default function FirmSettingsPage() {
             </Select>
 
             <div>
-              <p className="cds--label">Categories</p>
+              <p className="cds--label">Catégories</p>
               <div
                 style={{
                   display: 'flex',
@@ -140,7 +140,7 @@ export default function FirmSettingsPage() {
               >
                 {categories.length === 0 && (
                   <span style={{ color: 'var(--cds-text-secondary, #6f6f6f)' }}>
-                    No categories yet.
+                    Aucune catégorie pour le moment.
                   </span>
                 )}
                 {categories.map((c) => (
@@ -157,7 +157,7 @@ export default function FirmSettingsPage() {
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
                 <TextInput
                   id="settings-new-category"
-                  labelText="Add a category"
+                  labelText="Ajouter une catégorie"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
                   onKeyDown={(e) => {
@@ -173,7 +173,7 @@ export default function FirmSettingsPage() {
                   onClick={addCategory}
                   data-testid="settings-add-category"
                 >
-                  Add
+                  Ajouter
                 </Button>
               </div>
             </div>
@@ -184,7 +184,7 @@ export default function FirmSettingsPage() {
               renderIcon={Save}
               data-testid="settings-save"
             >
-              {update.isPending ? 'Saving…' : 'Save settings'}
+              {update.isPending ? 'Enregistrement…' : 'Enregistrer les paramètres'}
             </Button>
           </Stack>
         </Tile>

@@ -21,7 +21,7 @@ def validate_capsule_password(value):
     """
     if not value or len(value) < MINIMUM_PASSWORD_LENGTH:
         raise serializers.ValidationError(
-            'Password must be at least {} characters long.'.format(
+            "Le mot de passe doit contenir au moins {} caractères.".format(
                 MINIMUM_PASSWORD_LENGTH
             )
         )
@@ -53,7 +53,7 @@ class FirmCreateSerializer(serializers.Serializer):
         # with a clear message instead of an IntegrityError 500.
         if Firm.objects.filter(name=value).exists():
             raise serializers.ValidationError(
-                'A firm with this name already exists.'
+                "Un cabinet portant ce nom existe déjà."
             )
         return value
 
@@ -77,7 +77,7 @@ class FirmUpdateSerializer(serializers.Serializer):
             queryset = queryset.exclude(pk=instance.pk)
         if queryset.exists():
             raise serializers.ValidationError(
-                'A firm with this name already exists.'
+                "Un cabinet portant ce nom existe déjà."
             )
         return value
 
@@ -239,8 +239,8 @@ class FirmSettingsSerializer(serializers.Serializer):
             # necessarily names the very brace sequences it forbids, and
             # str.format() would parse those as fields and raise KeyError.
             raise serializers.ValidationError(
-                'Categories may not contain template characters '
-                '(curly braces or percent-braces). Rejected: '
+                "Les catégories ne peuvent pas contenir de caractères de gabarit "
+                "(accolades ou accolades-pourcent). Refusé : "
                 + ', '.join(unsafe)
             )
         return value

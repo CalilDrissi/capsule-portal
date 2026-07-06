@@ -33,7 +33,7 @@ export default function WorkspaceDocumentPage() {
 
   const backCrumb =
     role === 'client'
-      ? { label: 'My documents', to: '/workspace' }
+      ? { label: 'Mes documents', to: '/workspace' }
       : cid
         ? { label: 'Client', to: `/clients/${cid}` }
         : { label: 'Clients', to: '/clients' }
@@ -51,11 +51,11 @@ export default function WorkspaceDocumentPage() {
   if (isError || !doc) {
     return (
       <div className="capsule-page">
-        <PageBreadcrumb items={[backCrumb, { label: 'Not found' }]} />
+        <PageBreadcrumb items={[backCrumb, { label: 'Introuvable' }]} />
         <InlineNotification
           kind="error"
-          title="Document not found"
-          subtitle="You may not have access to this document."
+          title="Document introuvable"
+          subtitle="Vous n'avez peut-être pas accès à ce document."
           lowContrast
           hideCloseButton
         />
@@ -71,8 +71,8 @@ export default function WorkspaceDocumentPage() {
       <Tabs>
         <TabList aria-label="Document" contained>
           <Tab>Document</Tab>
-          <Tab>Status</Tab>
-          <Tab>Comments</Tab>
+          <Tab>Statut</Tab>
+          <Tab>Commentaires</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>

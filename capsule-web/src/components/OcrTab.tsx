@@ -35,10 +35,10 @@ export default function OcrTab({ doc }: { doc: DocumentDetail }) {
   )
 
   if (vLoading || pLoading)
-    return <InlineLoading description="Loading OCR…" />
+    return <InlineLoading description="Chargement de l'OCR…" />
 
   if (pages.length === 0)
-    return <Tile data-testid="ocr-empty">No pages available for OCR.</Tile>
+    return <Tile data-testid="ocr-empty">Aucune page disponible pour l'OCR.</Tile>
 
   const content = data?.content ?? ''
 
@@ -50,19 +50,19 @@ export default function OcrTab({ doc }: { doc: DocumentDetail }) {
             hasIconOnly
             kind="ghost"
             size="sm"
-            iconDescription="Previous page"
+            iconDescription="Page précédente"
             renderIcon={ChevronLeft}
             disabled={pageIndex === 0}
             onClick={() => setPageIndex((i) => Math.max(0, i - 1))}
           />
           <span>
-            Page {pageIndex + 1} of {pages.length}
+            Page {pageIndex + 1} sur {pages.length}
           </span>
           <Button
             hasIconOnly
             kind="ghost"
             size="sm"
-            iconDescription="Next page"
+            iconDescription="Page suivante"
             renderIcon={ChevronRight}
             disabled={pageIndex >= pages.length - 1}
             onClick={() =>
@@ -73,24 +73,24 @@ export default function OcrTab({ doc }: { doc: DocumentDetail }) {
       )}
 
       {isLoading ? (
-        <InlineLoading description="Loading OCR text…" />
+        <InlineLoading description="Chargement du texte OCR…" />
       ) : isError ? (
         <Tile data-testid="ocr-error">
-          OCR content unavailable: {(error as Error)?.message}
+          Contenu OCR indisponible : {(error as Error)?.message}
         </Tile>
       ) : content.trim() ? (
         <CodeSnippet
           type="multi"
-          feedback="Copied"
+          feedback="Copié"
           data-testid="ocr-content"
-          aria-label="OCR text"
+          aria-label="Texte OCR"
         >
           {content}
         </CodeSnippet>
       ) : (
         <Tile data-testid="ocr-empty">
-          No OCR text has been extracted for this page yet. OCR is performed
-          server-side after upload.
+          Aucun texte OCR n'a encore été extrait pour cette page. L'OCR est
+          effectué côté serveur après l'importation.
         </Tile>
       )}
     </div>

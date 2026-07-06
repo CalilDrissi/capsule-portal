@@ -60,19 +60,19 @@ export default function DocumentViewer({ doc }: { doc: DocumentDetail }) {
                 kind="ghost"
                 size="sm"
                 hasIconOnly
-                iconDescription="Previous page"
+                iconDescription="Page précédente"
                 renderIcon={CaretLeft}
                 disabled={pageIndex === 0}
                 onClick={() => setPageIndex((i) => Math.max(0, i - 1))}
               />
               <span className="capsule-hint">
-                Page {pageIndex + 1} of {pages.length}
+                Page {pageIndex + 1} sur {pages.length}
               </span>
               <Button
                 kind="ghost"
                 size="sm"
                 hasIconOnly
-                iconDescription="Next page"
+                iconDescription="Page suivante"
                 renderIcon={CaretRight}
                 disabled={pageIndex >= pages.length - 1}
                 onClick={() =>
@@ -92,7 +92,7 @@ export default function DocumentViewer({ doc }: { doc: DocumentDetail }) {
               downloadFile(`${latestFile.url}download/`, latestFile.filename)
             }
           >
-            Download
+            Télécharger
           </Button>
         )}
       </div>
@@ -106,7 +106,7 @@ export default function DocumentViewer({ doc }: { doc: DocumentDetail }) {
             style={{ maxWidth: '100%', display: 'block', margin: '0 auto' }}
           />
         ) : (
-          <p className="capsule-hint">No preview available for this document.</p>
+          <p className="capsule-hint">Aucun aperçu disponible pour ce document.</p>
         )}
       </Tile>
     </div>

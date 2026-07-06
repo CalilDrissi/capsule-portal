@@ -60,7 +60,7 @@ export default function DashboardPage() {
 
   return (
     <div className="capsule-page">
-      <h2 className="capsule-page__title">Dashboard</h2>
+      <h2 className="capsule-page__title">Tableau de bord</h2>
 
       <div className="capsule-stats">
         <StatTile
@@ -71,21 +71,21 @@ export default function DashboardPage() {
           onClick={() => navigate('/documents')}
         />
         <StatTile
-          label="Document types"
+          label="Types de document"
           value={types.data?.count}
           loading={types.isLoading}
           icon={<Document size={24} />}
           onClick={() => navigate('/documents')}
         />
         <StatTile
-          label="Recently created"
+          label="Créés récemment"
           value={docs.data?.count}
           loading={docs.isLoading}
           icon={<Time size={24} />}
           onClick={() => navigate('/recently-created')}
         />
         <StatTile
-          label="Favorites"
+          label="Favoris"
           value={favorites.data?.count}
           loading={favorites.isLoading}
           icon={<Favorite size={24} />}
@@ -94,7 +94,7 @@ export default function DashboardPage() {
       </div>
 
       <h3 style={{ margin: '2rem 0 1rem', fontWeight: 400 }}>
-        Recent documents
+        Documents récents
       </h3>
       {docs.isLoading ? (
         <Tile>
@@ -102,13 +102,13 @@ export default function DashboardPage() {
         </Tile>
       ) : recent.length === 0 ? (
         <Tile className="capsule-empty">
-          <h4>No documents yet</h4>
+          <h4>Aucun document pour l'instant</h4>
         </Tile>
       ) : (
         <StructuredListWrapper
           isCondensed
           className="capsule-recent"
-          aria-label="Recent documents"
+          aria-label="Documents récents"
         >
           <StructuredListBody>
             {recent.map((d) => (
@@ -124,7 +124,7 @@ export default function DashboardPage() {
                 </StructuredListCell>
                 <StructuredListCell>
                   {d.datetime_created
-                    ? new Date(d.datetime_created).toLocaleDateString()
+                    ? new Date(d.datetime_created).toLocaleDateString('fr-FR')
                     : '—'}
                 </StructuredListCell>
               </StructuredListRow>

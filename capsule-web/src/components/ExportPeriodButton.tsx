@@ -29,9 +29,9 @@ export default function ExportPeriodButton({ clientId }: { clientId: number }) {
         )}/export/`,
         `capsule_${clientId}_${key}.zip`,
       )
-      notify.success('Export started', `Downloaded period ${key}.`)
+      notify.success('Export lancé', `Période ${key} téléchargée.`)
     } catch {
-      notify.error('Export failed', 'No documents for that period, or no access.')
+      notify.error('Échec de l\'export', 'Aucun document pour cette période, ou accès refusé.')
     } finally {
       setBusy(false)
     }
@@ -44,11 +44,11 @@ export default function ExportPeriodButton({ clientId }: { clientId: number }) {
     >
       <TextInput
         id="export-period-key"
-        labelText={requiredLabel('Export period (YYYY or YYYY-MM)')}
+        labelText={requiredLabel('Période à exporter (AAAA ou AAAA-MM)')}
         value={period}
         onChange={(e) => setPeriod(e.target.value)}
         invalid={periodInvalid}
-        invalidText="Export period is required."
+        invalidText="La période à exporter est requise."
         data-testid="export-period-input"
         style={{ maxWidth: '16rem' }}
       />
@@ -58,7 +58,7 @@ export default function ExportPeriodButton({ clientId }: { clientId: number }) {
         onClick={doExport}
         data-testid="export-period-button"
       >
-        {busy ? 'Exporting…' : 'Export period'}
+        {busy ? 'Export en cours…' : 'Exporter la période'}
       </Button>
     </div>
   )

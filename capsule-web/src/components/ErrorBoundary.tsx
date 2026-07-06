@@ -36,11 +36,11 @@ export default class ErrorBoundary extends Component<Props, State> {
     return (
       <div className="capsule-login">
         <Tile className="capsule-login-card">
-          <h1 className="capsule-login-title">Something went wrong</h1>
+          <h1 className="capsule-login-title">Une erreur est survenue</h1>
           <p className="capsule-login-subtitle" style={{ marginBottom: '1.5rem' }}>
-            The app hit an unexpected error. Reloading usually fixes it.
+            L'application a rencontré une erreur inattendue. Recharger la page suffit généralement à la corriger.
           </p>
-          <Button onClick={this.handleReload}>Reload</Button>
+          <Button onClick={this.handleReload}>Recharger</Button>
         </Tile>
       </div>
     )

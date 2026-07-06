@@ -28,7 +28,7 @@ export default function VersionsTab({ docId }: { docId: number }) {
   const rows = versions.map((v) => ({
     id: String(v.id),
     active: v.active ? 'Yes' : 'No',
-    timestamp: v.timestamp ? new Date(v.timestamp).toLocaleString() : '—',
+    timestamp: v.timestamp ? new Date(v.timestamp).toLocaleString('fr-FR') : '—',
   }))
 
   return (

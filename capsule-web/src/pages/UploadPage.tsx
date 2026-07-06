@@ -33,12 +33,12 @@ export default function UploadPage() {
   const docTypeInvalid = attempted && !docType
 
   const mutation = useMutation({
-    meta: { successMessage: 'Document uploaded' },
+    meta: { successMessage: 'Document importé' },
     mutationFn: () => {
       const sourceId = sources?.[0]?.id
-      if (!sourceId) throw new Error('No upload source available')
-      if (!file) throw new Error('Choose a file')
-      if (!docType) throw new Error('Choose a document type')
+      if (!sourceId) throw new Error("Aucune source d'importation disponible")
+      if (!file) throw new Error('Choisissez un fichier')
+      if (!docType) throw new Error('Choisissez un type de document')
       return uploadDocument(sourceId, docType.id, file, label || file.name)
     },
     onSuccess: async () => {
@@ -55,22 +55,22 @@ export default function UploadPage() {
 
   return (
     <div className="capsule-page" style={{ maxWidth: '40rem' }}>
-      <h2 className="capsule-page__title">Upload document</h2>
+      <h2 className="capsule-page__title">Importer un document</h2>
       <Tile>
         <Stack gap={6}>
           {mutation.isError && (
             <InlineNotification
               kind="error"
-              title="Upload failed"
+              title="Échec de l'importation"
               subtitle={(mutation.error as Error)?.message}
               lowContrast
             />
           )}
 
           <div>
-            <p className="cds--label">{requiredLabel('File')}</p>
+            <p className="cds--label">{requiredLabel('Fichier')}</p>
             <FileUploaderDropContainer
-              labelText="Drag and drop a file here or click to upload"
+              labelText="Glissez-déposez un fichier ici ou cliquez pour importer"
               accept={[]}
               multiple={false}
               onAddFiles={(_e, { addedFiles }) => setFile(addedFiles?.[0] ?? null)}
@@ -84,27 +84,27 @@ export default function UploadPage() {
             )}
             {fileInvalid && (
               <p className="cds--form-requirement" style={{ color: '#da1e28' }}>
-                A file is required.
+                Un fichier est obligatoire.
               </p>
             )}
           </div>
 
           <Dropdown
             id="doc-type"
-            titleText={requiredLabel('Document type')}
-            label="Select a document type"
+            titleText={requiredLabel('Type de document')}
+            label="Sélectionnez un type de document"
             items={types}
             itemToString={(t) => (t ? (t as DocumentType).label : '')}
             selectedItem={docType}
             onChange={({ selectedItem }) => setDocType(selectedItem as DocumentType)}
             invalid={docTypeInvalid}
-            invalidText="Document type is required."
+            invalidText="Le type de document est obligatoire."
           />
 
           <TextInput
             id="doc-label"
-            labelText="Label (optional)"
-            placeholder="Defaults to the file name"
+            labelText="Libellé (facultatif)"
+            placeholder="Par défaut, le nom du fichier"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
           />
@@ -113,7 +113,7 @@ export default function UploadPage() {
             onClick={handleSubmit}
             disabled={mutation.isPending}
           >
-            {mutation.isPending ? 'Uploading…' : 'Upload'}
+            {mutation.isPending ? 'Importation…' : 'Importer'}
           </Button>
         </Stack>
       </Tile>

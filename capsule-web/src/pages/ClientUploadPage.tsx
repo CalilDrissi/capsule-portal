@@ -23,12 +23,12 @@ import PageBreadcrumb from '../components/PageBreadcrumb'
 // Fallback category list used only when the firm has not configured its own
 // categories (whoami returns an empty list).
 const FALLBACK_CATEGORIES = [
-  'Invoice',
-  'Receipt',
-  'Bank statement',
-  'Tax document',
-  'Contract',
-  'Other',
+  'Facture',
+  'Reçu',
+  'Relevé bancaire',
+  'Document fiscal',
+  'Contrat',
+  'Autre',
 ]
 
 // Accepted upload formats. Plain text/CSV are intentionally excluded — Mayan's
@@ -52,7 +52,7 @@ const ACCEPTED_EXTENSIONS = [
   '.ods',
   '.odp',
 ]
-const ACCEPTED_LABEL = 'PDF, images, or Office documents'
+const ACCEPTED_LABEL = 'PDF, images ou documents Office'
 
 function isAcceptedFile(name: string): boolean {
   const lower = name.toLowerCase()
@@ -84,12 +84,12 @@ export default function ClientUploadPage() {
   const fileInvalid = attempted && !file
 
   const mutation = useMutation({
-    meta: { successMessage: 'Document uploaded' },
+    meta: { successMessage: 'Document importé' },
     mutationFn: async () => {
-      if (!file) throw new Error('Choose a file')
+      if (!file) throw new Error('Choisissez un fichier')
       if (inferredTypeId == null)
         throw new Error(
-          'Could not determine your firm document type. Please contact your accountant.',
+          'Impossible de déterminer le type de document de votre cabinet. Veuillez contacter votre comptable.',
         )
       const extra: Record<string, unknown> = {}
       if (category) extra.category = category
@@ -115,7 +115,7 @@ export default function ClientUploadPage() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['cabinet_documents'] })
       await queryClient.invalidateQueries({ queryKey: ['documents'] })
-      notify.success('Document uploaded', 'It is now visible in your workspace.')
+      notify.success('Document importé', 'Il est maintenant visible dans votre espace de travail.')
       navigate('/workspace')
     },
   })
@@ -130,26 +130,26 @@ export default function ClientUploadPage() {
     <div className="capsule-page" style={{ maxWidth: '40rem' }}>
       <PageBreadcrumb
         items={[
-          { label: 'My documents', to: '/workspace' },
-          { label: 'Upload' },
+          { label: 'Mes documents', to: '/workspace' },
+          { label: 'Importer' },
         ]}
       />
-      <h2 className="capsule-page__title">Upload document</h2>
+      <h2 className="capsule-page__title">Importer un document</h2>
       <Tile>
         <Stack gap={6}>
           {mutation.isError && (
             <InlineNotification
               kind="error"
-              title="Upload failed"
+              title="Échec de l’import"
               subtitle={(mutation.error as Error)?.message}
               lowContrast
             />
           )}
 
           <div>
-            <p className="cds--label">{requiredLabel('File')}</p>
+            <p className="cds--label">{requiredLabel('Fichier')}</p>
             <FileUploaderDropContainer
-              labelText={`Drag and drop a file here or click to upload (${ACCEPTED_LABEL})`}
+              labelText={`Glissez-déposez un fichier ici ou cliquez pour importer (${ACCEPTED_LABEL})`}
               accept={ACCEPTED_EXTENSIONS}
               multiple={false}
               onAddFiles={(_e, { addedFiles }) => {
@@ -157,15 +157,15 @@ export default function ClientUploadPage() {
                 // Guard drag-drop, which bypasses the `accept` filter.
                 if (f && !isAcceptedFile(f.name)) {
                   notify.error(
-                    'Unsupported file type',
-                    `Please upload a ${ACCEPTED_LABEL}.`,
+                    'Type de fichier non pris en charge',
+                    `Veuillez importer un fichier de type ${ACCEPTED_LABEL}.`,
                   )
                   return
                 }
                 setFile(f)
               }}
             />
-            <p className="cds--form__helper-text">Accepted: {ACCEPTED_LABEL}.</p>
+            <p className="cds--form__helper-text">Formats acceptés : {ACCEPTED_LABEL}.</p>
             {file && (
               <FileUploaderItem
                 name={file.name}
@@ -175,14 +175,14 @@ export default function ClientUploadPage() {
             )}
             {fileInvalid && (
               <p className="cds--form-requirement" style={{ color: '#da1e28' }}>
-                A file is required.
+                Un fichier est obligatoire.
               </p>
             )}
           </div>
 
           <Select
             id="upload-category"
-            labelText="Category"
+            labelText="Catégorie"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
@@ -193,6 +193,7 @@ export default function ClientUploadPage() {
 
           <DatePicker
             datePickerType="single"
+            locale="fr"
             dateFormat="Y-m-d"
             value={docDate}
             onChange={(dates) => {
@@ -202,8 +203,8 @@ export default function ClientUploadPage() {
           >
             <DatePickerInput
               id="upload-document-date"
-              labelText="Document date"
-              placeholder="yyyy-mm-dd"
+              labelText="Date du document"
+              placeholder="aaaa-mm-jj"
               // Also honor a directly-typed ISO date so the value is captured
               // even if the flatpickr calendar onChange does not fire.
               onChange={(e) => {
@@ -215,8 +216,8 @@ export default function ClientUploadPage() {
 
           <TextInput
             id="upload-label"
-            labelText="Label (optional)"
-            placeholder="Defaults to the file name"
+            labelText="Libellé (facultatif)"
+            placeholder="Par défaut, le nom du fichier"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
           />
@@ -226,7 +227,7 @@ export default function ClientUploadPage() {
             disabled={mutation.isPending}
             data-testid="upload-submit"
           >
-            {mutation.isPending ? 'Uploading…' : 'Upload'}
+            {mutation.isPending ? 'Import en cours…' : 'Importer'}
           </Button>
         </Stack>
       </Tile>

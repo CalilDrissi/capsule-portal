@@ -67,7 +67,7 @@ export default function AppShell() {
         <HeaderGlobalBar>
           {isPlatform && (
             <HeaderGlobalAction
-              aria-label="Search"
+              aria-label="Rechercher"
               tooltipAlignment="end"
               onClick={() => navigate('/search')}
               data-testid="header-search"
@@ -77,7 +77,7 @@ export default function AppShell() {
           )}
           {(isClient || isAccountant) && <NotificationBell />}
           <HeaderGlobalAction
-            aria-label="Toggle theme"
+            aria-label="Changer de thème"
             tooltipAlignment="end"
             onClick={toggleTheme}
             data-testid="theme-toggle"
@@ -85,7 +85,7 @@ export default function AppShell() {
             {theme === 'g10' ? <Asleep size={20} /> : <Light size={20} />}
           </HeaderGlobalAction>
           <HeaderGlobalAction
-            aria-label="Log out"
+            aria-label="Se déconnecter"
             tooltipAlignment="end"
             onClick={handleLogout}
             data-testid="logout"
@@ -95,7 +95,7 @@ export default function AppShell() {
         </HeaderGlobalBar>
       </Header>
 
-      <SideNav aria-label="Side navigation" isRail expanded={false}>
+      <SideNav aria-label="Navigation latérale" isRail expanded={false}>
         <SideNavItems>
           {isClient && (
             <>
@@ -105,7 +105,7 @@ export default function AppShell() {
                 onClick={() => navigate('/workspace')}
                 href="#"
               >
-                My documents
+                Mes documents
               </SideNavLink>
               <SideNavLink
                 renderIcon={Upload}
@@ -113,7 +113,7 @@ export default function AppShell() {
                 onClick={() => navigate('/workspace/upload')}
                 href="#"
               >
-                Upload
+                Importer
               </SideNavLink>
             </>
           )}
@@ -135,7 +135,7 @@ export default function AppShell() {
                 href="#"
                 data-testid="nav-grouping"
               >
-                Grouping
+                Regroupement
               </SideNavLink>
             </>
           )}
@@ -155,7 +155,7 @@ export default function AppShell() {
                     href="#"
                     data-testid="nav-firms"
                   >
-                    Firms
+                    Cabinets
                   </SideNavLink>
                   <SideNavLink
                     renderIcon={Dashboard}
@@ -163,7 +163,7 @@ export default function AppShell() {
                     onClick={() => navigate('/dashboard')}
                     href="#"
                   >
-                    Dashboard
+                    Tableau de bord
                   </SideNavLink>
                 </>
               )}
@@ -181,7 +181,7 @@ export default function AppShell() {
                 onClick={() => navigate('/cabinets')}
                 href="#"
               >
-                Cabinets
+                Classeurs
               </SideNavLink>
               <SideNavLink
                 renderIcon={Catalog}
@@ -189,7 +189,7 @@ export default function AppShell() {
                 onClick={() => navigate('/indexes')}
                 href="#"
               >
-                Indexes
+                Index
               </SideNavLink>
               <SideNavLink
                 renderIcon={SearchIcon}
@@ -197,7 +197,7 @@ export default function AppShell() {
                 onClick={() => navigate('/search')}
                 href="#"
               >
-                Search
+                Recherche
               </SideNavLink>
               <SideNavLink
                 renderIcon={FlowConnection}
@@ -205,7 +205,7 @@ export default function AppShell() {
                 onClick={() => navigate('/workflows')}
                 href="#"
               >
-                Workflows
+                Flux de travail
               </SideNavLink>
               <SideNavLink
                 renderIcon={Locked}
@@ -213,7 +213,7 @@ export default function AppShell() {
                 onClick={() => navigate('/checkouts')}
                 href="#"
               >
-                Checkouts
+                Emprunts
               </SideNavLink>
               <SideNavLink
                 renderIcon={Favorite}
@@ -221,7 +221,7 @@ export default function AppShell() {
                 onClick={() => navigate('/favorites')}
                 href="#"
               >
-                Favorites
+                Favoris
               </SideNavLink>
               <SideNavLink
                 renderIcon={Time}
@@ -229,7 +229,7 @@ export default function AppShell() {
                 onClick={() => navigate('/recently-created')}
                 href="#"
               >
-                Recently created
+                Créés récemment
               </SideNavLink>
               <SideNavLink
                 renderIcon={TrashCan}
@@ -237,7 +237,7 @@ export default function AppShell() {
                 onClick={() => navigate('/trash')}
                 href="#"
               >
-                Trash
+                Corbeille
               </SideNavLink>
               <SideNavLink
                 renderIcon={Upload}
@@ -245,7 +245,7 @@ export default function AppShell() {
                 onClick={() => navigate('/upload')}
                 href="#"
               >
-                Upload
+                Importer
               </SideNavLink>
             </>
           )}
@@ -262,21 +262,21 @@ export default function AppShell() {
                 onClick={() => navigate('/admin/users')}
                 href="#"
               >
-                Users
+                Utilisateurs
               </SideNavMenuItem>
               <SideNavMenuItem
                 isActive={isActive('/admin/groups')}
                 onClick={() => navigate('/admin/groups')}
                 href="#"
               >
-                Groups
+                Groupes
               </SideNavMenuItem>
               <SideNavMenuItem
                 isActive={isActive('/admin/roles')}
                 onClick={() => navigate('/admin/roles')}
                 href="#"
               >
-                Roles
+                Rôles
               </SideNavMenuItem>
               <SideNavMenuItem
                 isActive={isActive('/admin/permissions')}
@@ -290,42 +290,42 @@ export default function AppShell() {
                 onClick={() => navigate('/admin/document-types')}
                 href="#"
               >
-                Document types
+                Types de document
               </SideNavMenuItem>
               <SideNavMenuItem
                 isActive={isActive('/admin/metadata-types')}
                 onClick={() => navigate('/admin/metadata-types')}
                 href="#"
               >
-                Metadata types
+                Types de métadonnée
               </SideNavMenuItem>
               <SideNavMenuItem
                 isActive={isActive('/admin/smart-links')}
                 onClick={() => navigate('/admin/smart-links')}
                 href="#"
               >
-                Smart links
+                Liens intelligents
               </SideNavMenuItem>
               <SideNavMenuItem
                 isActive={isActive('/admin/web-links')}
                 onClick={() => navigate('/admin/web-links')}
                 href="#"
               >
-                Web links
+                Liens web
               </SideNavMenuItem>
               <SideNavMenuItem
                 isActive={isActive('/admin/events')}
                 onClick={() => navigate('/admin/events')}
                 href="#"
               >
-                Events
+                Événements
               </SideNavMenuItem>
               <SideNavMenuItem
                 isActive={isActive('/admin/settings')}
                 onClick={() => navigate('/admin/settings')}
                 href="#"
               >
-                Settings
+                Paramètres
               </SideNavMenuItem>
             </SideNavMenu>
           )}

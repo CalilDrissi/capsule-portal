@@ -41,12 +41,12 @@ export default function RoleDetailPage() {
   const [pickedGroupId, setPickedGroupId] = useState<number | null>(null)
   const [pickedPerm, setPickedPerm] = useState<Permission | null>(null)
 
-  if (isLoading) return <InlineLoading description="Loading role…" />
+  if (isLoading) return <InlineLoading description="Chargement du rôle…" />
   if (isError || !role)
     return (
       <div className="capsule-page">
-        <PageBreadcrumb items={[{ label: 'Roles', to: '/admin/roles' }, { label: 'Not found' }]} />
-        <Tile>Role not found.</Tile>
+        <PageBreadcrumb items={[{ label: 'Rôles', to: '/admin/roles' }, { label: 'Introuvable' }]} />
+        <Tile>Rôle introuvable.</Tile>
       </div>
     )
 
@@ -65,17 +65,17 @@ export default function RoleDetailPage() {
 
   return (
     <div className="capsule-page">
-      <PageBreadcrumb items={[{ label: 'Roles', to: '/admin/roles' }, { label: role.label }]} />
+      <PageBreadcrumb items={[{ label: 'Rôles', to: '/admin/roles' }, { label: role.label }]} />
       <h2 className="capsule-page__title">{role.label}</h2>
 
       <Stack gap={7}>
         {/* Groups */}
         <div>
-          <h3 className="capsule-section-title">Groups</h3>
+          <h3 className="capsule-section-title">Groupes</h3>
           <Stack gap={5}>
             <div data-testid="role-groups-list">
               {groups.length === 0 ? (
-                <Tile>No groups assigned to this role.</Tile>
+                <Tile>Aucun groupe attribué à ce rôle.</Tile>
               ) : (
                 groups.map((g) => (
                   <span key={g.id} style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -84,7 +84,7 @@ export default function RoleDetailPage() {
                       kind="ghost"
                       size="sm"
                       hasIconOnly
-                      iconDescription={`Remove ${g.name}`}
+                      iconDescription={`Retirer ${g.name}`}
                       renderIcon={Close}
                       data-testid={`role-group-remove-${g.id}`}
                       disabled={removeGroup.isPending}
@@ -97,11 +97,11 @@ export default function RoleDetailPage() {
             {addableGroups.length > 0 && (
               <Tile>
                 <Stack gap={4}>
-                  <strong>Assign a group</strong>
+                  <strong>Attribuer un groupe</strong>
                   <Dropdown
                     id="role-group-pick"
-                    titleText="Group"
-                    label="Choose a group"
+                    titleText="Groupe"
+                    label="Choisir un groupe"
                     items={addableGroups}
                     selectedItem={pickedGroup}
                     itemToString={(i) => (i ? i.name : '')}
@@ -120,7 +120,7 @@ export default function RoleDetailPage() {
                       })
                     }
                   >
-                    Assign group
+                    Attribuer le groupe
                   </Button>
                 </Stack>
               </Tile>
@@ -134,7 +134,7 @@ export default function RoleDetailPage() {
           <Stack gap={5}>
             <div data-testid="role-permissions-list">
               {perms.length === 0 ? (
-                <Tile>No permissions granted to this role.</Tile>
+                <Tile>Aucune permission accordée à ce rôle.</Tile>
               ) : (
                 perms.map((p) => (
                   <span key={p.pk} style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -145,7 +145,7 @@ export default function RoleDetailPage() {
                       kind="ghost"
                       size="sm"
                       hasIconOnly
-                      iconDescription={`Revoke ${p.label}`}
+                      iconDescription={`Révoquer ${p.label}`}
                       renderIcon={Close}
                       data-testid={`role-perm-remove-${p.pk}`}
                       disabled={removePerm.isPending}
@@ -157,11 +157,11 @@ export default function RoleDetailPage() {
             </div>
             <Tile>
               <Stack gap={4}>
-                <strong>Grant a permission</strong>
+                <strong>Accorder une permission</strong>
                 <ComboBox
                   id="role-perm-pick"
                   titleText="Permission"
-                  placeholder="Search permissions"
+                  placeholder="Rechercher des permissions"
                   items={addablePerms}
                   selectedItem={pickedPerm}
                   itemToString={(i) => (i ? `${i.namespace}: ${i.label}` : '')}
@@ -180,7 +180,7 @@ export default function RoleDetailPage() {
                     })
                   }
                 >
-                  Grant permission
+                  Accorder la permission
                 </Button>
               </Stack>
             </Tile>

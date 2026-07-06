@@ -16,25 +16,25 @@ export default function WebLinksPage() {
 
   return (
     <SimpleCrud<WebLink>
-      title="Web links"
+      title="Liens web"
       items={data?.results ?? []}
       isLoading={isLoading}
       isError={isError}
       busy={create.isPending || update.isPending}
       columns={[
-        { key: 'label', header: 'Label', render: (i) => i.label },
-        { key: 'template', header: 'Template URL', render: (i) => i.template },
+        { key: 'label', header: 'Libellé', render: (i) => i.label },
+        { key: 'template', header: 'URL modèle', render: (i) => i.template },
         {
           key: 'enabled',
-          header: 'Enabled',
+          header: 'Activé',
           render: (i) =>
-            i.enabled ? <Tag type="green">Enabled</Tag> : <Tag type="gray">Disabled</Tag>,
+            i.enabled ? <Tag type="green">Activé</Tag> : <Tag type="gray">Désactivé</Tag>,
         },
       ]}
       fields={[
-        { name: 'label', label: 'Label', required: true },
-        { name: 'template', label: 'Template URL', required: true },
-        { name: 'enabled', label: 'Enabled', type: 'toggle' },
+        { name: 'label', label: 'Libellé', required: true },
+        { name: 'template', label: 'URL modèle', required: true },
+        { name: 'enabled', label: 'Activé', type: 'toggle' },
       ]}
       toInitial={(i) => ({
         label: i?.label ?? '',

@@ -28,7 +28,7 @@ import { requiredLabel } from '../lib/forms'
 import type { Role } from '../api/types'
 
 const headers = [
-  { key: 'label', header: 'Label' },
+  { key: 'label', header: 'Libellé' },
   { key: 'actions', header: '' },
 ]
 
@@ -88,22 +88,22 @@ export default function RolesPage() {
   return (
     <div className="capsule-page">
       <div className="capsule-page__header">
-        <h2 className="capsule-page__title">Roles</h2>
+        <h2 className="capsule-page__title">Rôles</h2>
         <Button renderIcon={Add} onClick={openCreate} data-testid="new-role">
-          New role
+          Nouveau rôle
         </Button>
       </div>
 
       {isLoading ? (
         <DataTableSkeleton columnCount={2} rowCount={5} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load roles: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement des rôles : {(error as Error)?.message}</Tile>
       ) : roles.length === 0 ? (
         <Tile className="capsule-empty">
-          <h4>No roles yet</h4>
-          <p>Roles bundle permissions and are granted to groups.</p>
+          <h4>Aucun rôle pour le moment</h4>
+          <p>Les rôles regroupent des permissions et sont attribués aux groupes.</p>
           <Button renderIcon={Add} onClick={openCreate}>
-            New role
+            Nouveau rôle
           </Button>
         </Tile>
       ) : (
@@ -132,16 +132,16 @@ export default function RolesPage() {
                           cell.info.header === 'actions' ? (
                             <TableCell key={cell.id}>
                               <OverflowMenu
-                                aria-label="Role actions"
+                                aria-label="Actions sur le rôle"
                                 flipped
                                 onClick={(e: React.MouseEvent) => e.stopPropagation()}
                               >
                                 <OverflowMenuItem
-                                  itemText="Open"
+                                  itemText="Ouvrir"
                                   onClick={() => navigate(`/admin/roles/${row.id}`)}
                                 />
                                 <OverflowMenuItem
-                                  itemText="Rename"
+                                  itemText="Renommer"
                                   onClick={() => {
                                     if (role) {
                                       setEditRole(role)
@@ -153,7 +153,7 @@ export default function RolesPage() {
                                 <OverflowMenuItem
                                   hasDivider
                                   isDelete
-                                  itemText="Delete"
+                                  itemText="Supprimer"
                                   onClick={() => deleteRole.mutate(Number(row.id))}
                                 />
                               </OverflowMenu>
@@ -180,9 +180,9 @@ export default function RolesPage() {
 
       <Modal
         open={createOpen}
-        modalHeading="New role"
-        primaryButtonText="Create"
-        secondaryButtonText="Cancel"
+        modalHeading="Nouveau rôle"
+        primaryButtonText="Créer"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={createRole.isPending}
         onRequestClose={() => setCreateOpen(false)}
         onRequestSubmit={submitCreate}
@@ -190,11 +190,11 @@ export default function RolesPage() {
         <TextInput
           id="new-role-label"
           data-testid="role-label-input"
-          labelText={requiredLabel('Label')}
+          labelText={requiredLabel('Libellé')}
           value={newLabel}
           onChange={(e) => setNewLabel(e.target.value)}
           invalid={newLabelInvalid}
-          invalidText="Label is required."
+          invalidText="Le libellé est obligatoire."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitCreate()
           }}
@@ -206,20 +206,20 @@ export default function RolesPage() {
 
       <Modal
         open={!!editRole}
-        modalHeading="Rename role"
-        primaryButtonText="Save"
-        secondaryButtonText="Cancel"
+        modalHeading="Renommer le rôle"
+        primaryButtonText="Enregistrer"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={updateRole.isPending}
         onRequestClose={() => setEditRole(null)}
         onRequestSubmit={submitEdit}
       >
         <TextInput
           id="edit-role-label"
-          labelText={requiredLabel('Label')}
+          labelText={requiredLabel('Libellé')}
           value={editLabel}
           onChange={(e) => setEditLabel(e.target.value)}
           invalid={editLabelInvalid}
-          invalidText="Label is required."
+          invalidText="Le libellé est obligatoire."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitEdit()
           }}

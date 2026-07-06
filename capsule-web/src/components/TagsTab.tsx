@@ -23,7 +23,7 @@ export default function TagsTab({ docId }: { docId: number }) {
   const remove = useRemoveTag(docId)
   const [picked, setPicked] = useState<Tag | null>(null)
 
-  if (isLoading) return <InlineLoading description="Loading tags…" />
+  if (isLoading) return <InlineLoading description="Chargement des étiquettes…" />
 
   const attached = docTags?.results ?? []
   const attachedIds = new Set(attached.map((t) => t.id))
@@ -35,7 +35,7 @@ export default function TagsTab({ docId }: { docId: number }) {
     <Stack gap={5}>
       <div data-testid="tags-list">
         {attached.length === 0 ? (
-          <Tile>No tags attached.</Tile>
+          <Tile>Aucune étiquette attachée.</Tile>
         ) : (
           attached.map((t) => (
             <span
@@ -48,7 +48,7 @@ export default function TagsTab({ docId }: { docId: number }) {
                 kind="ghost"
                 size="sm"
                 hasIconOnly
-                iconDescription={`Remove ${t.label}`}
+                iconDescription={`Retirer ${t.label}`}
                 renderIcon={Close}
                 data-testid={`tag-remove-${t.id}`}
                 disabled={remove.isPending}
@@ -62,11 +62,11 @@ export default function TagsTab({ docId }: { docId: number }) {
       {attachable.length > 0 && (
         <Tile>
           <Stack gap={4}>
-            <strong>Attach a tag</strong>
+            <strong>Attacher une étiquette</strong>
             <Dropdown
               id="tag-pick"
-              titleText="Tag"
-              label="Choose a tag"
+              titleText="Étiquette"
+              label="Choisir une étiquette"
               items={attachable}
               selectedItem={picked}
               itemToString={(i) => (i ? i.label : '')}
@@ -81,7 +81,7 @@ export default function TagsTab({ docId }: { docId: number }) {
                 attach.mutate(picked.id, { onSuccess: () => setPicked(null) })
               }
             >
-              Attach tag
+              Attacher l'étiquette
             </Button>
           </Stack>
         </Tile>

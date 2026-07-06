@@ -22,11 +22,11 @@ import DocumentsTable from '../components/DocumentsTable'
 
 /** Pragmatic advanced-search fields mapped to documentsearchresult fields. */
 const ADVANCED_FIELDS: { key: string; label: string }[] = [
-  { key: 'label', label: 'Label' },
+  { key: 'label', label: 'Libellé' },
   { key: 'description', label: 'Description' },
-  { key: 'document_type__label', label: 'Document type' },
-  { key: 'metadata__value', label: 'Metadata value' },
-  { key: 'files__file_pages__content__content', label: 'File content' },
+  { key: 'document_type__label', label: 'Type de document' },
+  { key: 'metadata__value', label: 'Valeur de métadonnée' },
+  { key: 'files__file_pages__content__content', label: 'Contenu du fichier' },
 ]
 
 function SimpleSearch() {
@@ -53,8 +53,8 @@ function SimpleSearch() {
           <Search
             id="simple-search"
             data-testid="search-input"
-            labelText="Search documents"
-            placeholder="Search documents…"
+            labelText="Rechercher des documents"
+            placeholder="Rechercher des documents…"
             value={term}
             onChange={(e) => setTerm(e.target.value)}
             onKeyDown={(e) => {
@@ -63,26 +63,26 @@ function SimpleSearch() {
           />
         </div>
         <Button renderIcon={SearchIcon} onClick={submit} data-testid="search-submit">
-          Search
+          Rechercher
         </Button>
       </div>
 
       {!q ? (
         <Tile className="capsule-empty">
-          <p>Enter a term to search documents.</p>
+          <p>Saisissez un terme pour rechercher des documents.</p>
         </Tile>
       ) : isLoading || isFetching ? (
         <DataTableSkeleton columnCount={3} rowCount={5} showHeader={false} />
       ) : isError ? (
-        <Tile>Search failed: {(error as Error)?.message}</Tile>
+        <Tile>Échec de la recherche : {(error as Error)?.message}</Tile>
       ) : results.length === 0 ? (
         <Tile className="capsule-empty" data-testid="search-empty">
-          <p>No documents matched "{q}".</p>
+          <p>Aucun document ne correspond à « {q} ».</p>
         </Tile>
       ) : (
         <div data-testid="search-results">
           <p style={{ marginBottom: '0.5rem' }}>
-            {data?.count ?? results.length} result(s)
+            {data?.count ?? results.length} résultat(s)
           </p>
           <DocumentsTable documents={results} />
         </div>
@@ -126,27 +126,27 @@ function AdvancedSearch() {
             onClick={submit}
             data-testid="adv-search-submit"
           >
-            Advanced search
+            Recherche avancée
           </Button>
         </div>
       </Stack>
 
       {!submitted ? (
         <Tile className="capsule-empty">
-          <p>Fill one or more fields and run an advanced search.</p>
+          <p>Renseignez un ou plusieurs champs et lancez une recherche avancée.</p>
         </Tile>
       ) : isLoading ? (
         <DataTableSkeleton columnCount={3} rowCount={5} showHeader={false} />
       ) : isError ? (
-        <Tile>Search failed: {(error as Error)?.message}</Tile>
+        <Tile>Échec de la recherche : {(error as Error)?.message}</Tile>
       ) : results.length === 0 ? (
         <Tile className="capsule-empty">
-          <p>No documents matched the criteria.</p>
+          <p>Aucun document ne correspond aux critères.</p>
         </Tile>
       ) : (
         <div data-testid="adv-search-results">
           <p style={{ marginBottom: '0.5rem' }}>
-            {data?.count ?? results.length} result(s)
+            {data?.count ?? results.length} résultat(s)
           </p>
           <DocumentsTable documents={results} />
         </div>
@@ -162,15 +162,15 @@ function SavedSearches() {
   if (isLoading)
     return <DataTableSkeleton columnCount={2} rowCount={3} showHeader={false} />
   if (isError)
-    return <Tile>Failed to load saved searches: {(error as Error)?.message}</Tile>
+    return <Tile>Échec du chargement des recherches enregistrées : {(error as Error)?.message}</Tile>
 
   if (items.length === 0)
     return (
       <Tile className="capsule-empty">
-        <h4>No saved searches</h4>
+        <h4>Aucune recherche enregistrée</h4>
         <p>
-          The Mayan API exposes saved resultsets read-only (no create action on{' '}
-          <code>/saved_resultsets/</code>); none exist yet.
+          L'API Mayan expose les ensembles de résultats enregistrés en lecture seule (aucune action de création sur{' '}
+          <code>/saved_resultsets/</code>) ; aucun n'existe pour l'instant.
         </p>
       </Tile>
     )
@@ -179,10 +179,10 @@ function SavedSearches() {
     <Stack gap={3} data-testid="saved-list">
       {items.map((s) => (
         <Tile key={s.id}>
-          <strong>Saved resultset #{s.id}</strong>
-          {s.search_model_pk ? <p>Model: {s.search_model_pk}</p> : null}
+          <strong>Ensemble de résultats enregistré n° {s.id}</strong>
+          {s.search_model_pk ? <p>Modèle : {s.search_model_pk}</p> : null}
           {s.datetime_created ? (
-            <p>Created: {new Date(s.datetime_created).toLocaleString()}</p>
+            <p>Créé le : {new Date(s.datetime_created).toLocaleString('fr-FR')}</p>
           ) : null}
         </Tile>
       ))}
@@ -193,12 +193,12 @@ function SavedSearches() {
 export default function SearchPage() {
   return (
     <div className="capsule-page">
-      <h2 className="capsule-page__title">Search</h2>
+      <h2 className="capsule-page__title">Recherche</h2>
       <Tabs>
-        <TabList aria-label="Search modes" contained>
+        <TabList aria-label="Modes de recherche" contained>
           <Tab>Simple</Tab>
-          <Tab>Advanced</Tab>
-          <Tab>Saved</Tab>
+          <Tab>Avancée</Tab>
+          <Tab>Enregistrées</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>

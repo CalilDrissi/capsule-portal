@@ -30,7 +30,7 @@ export function CheckoutButton({ docId }: { docId: number }) {
         data-testid="checkin-doc"
         onClick={() => checkin.mutate()}
       >
-        Check in
+        Restituer
       </Button>
     )
   }
@@ -48,7 +48,7 @@ export function CheckoutButton({ docId }: { docId: number }) {
         })
       }
     >
-      Check out
+      Emprunter
     </Button>
   )
 }
@@ -58,12 +58,12 @@ export function CheckoutBanner({ docId }: { docId: number }) {
   const { data: checkout } = useDocumentCheckout(docId)
   if (!checkout) return null
 
-  const who = checkout.user?.username ?? 'someone'
+  const who = checkout.user?.username ?? 'quelqu\'un'
   const when = checkout.checkout_datetime
-    ? new Date(checkout.checkout_datetime).toLocaleString()
+    ? new Date(checkout.checkout_datetime).toLocaleString('fr-FR')
     : '—'
   const until = checkout.expiration_datetime
-    ? new Date(checkout.expiration_datetime).toLocaleString()
+    ? new Date(checkout.expiration_datetime).toLocaleString('fr-FR')
     : '—'
 
   return (
@@ -72,8 +72,8 @@ export function CheckoutBanner({ docId }: { docId: number }) {
       lowContrast
       hideCloseButton
       data-testid="checkout-banner"
-      title="Checked out"
-      subtitle={`Checked out by ${who} on ${when}. Editing of new files is blocked until ${until}.`}
+      title="Emprunté"
+      subtitle={`Emprunté par ${who} le ${when}. La modification de nouveaux fichiers est bloquée jusqu'au ${until}.`}
     />
   )
 }

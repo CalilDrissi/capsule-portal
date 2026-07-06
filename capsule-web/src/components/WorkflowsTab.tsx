@@ -31,27 +31,27 @@ function WorkflowHistory({
   instanceId: number
 }) {
   const { data, isLoading } = useWorkflowLogEntries(docId, instanceId)
-  if (isLoading) return <InlineLoading description="Loading history…" />
+  if (isLoading) return <InlineLoading description="Chargement de l'historique…" />
   const entries = data?.results ?? []
   if (entries.length === 0)
-    return <Tile data-testid="wf-history-empty">No transitions yet.</Tile>
+    return <Tile data-testid="wf-history-empty">Aucune transition pour le moment.</Tile>
 
   return (
     <StructuredListWrapper isCondensed data-testid="wf-history">
       <StructuredListHead>
         <StructuredListRow head>
-          <StructuredListCell head>When</StructuredListCell>
+          <StructuredListCell head>Date</StructuredListCell>
           <StructuredListCell head>Transition</StructuredListCell>
-          <StructuredListCell head>To state</StructuredListCell>
-          <StructuredListCell head>User</StructuredListCell>
-          <StructuredListCell head>Comment</StructuredListCell>
+          <StructuredListCell head>Vers l'état</StructuredListCell>
+          <StructuredListCell head>Utilisateur</StructuredListCell>
+          <StructuredListCell head>Commentaire</StructuredListCell>
         </StructuredListRow>
       </StructuredListHead>
       <StructuredListBody>
         {entries.map((e) => (
           <StructuredListRow key={e.id}>
             <StructuredListCell>
-              {e.datetime ? new Date(e.datetime).toLocaleString() : '—'}
+              {e.datetime ? new Date(e.datetime).toLocaleString('fr-FR') : '—'}
             </StructuredListCell>
             <StructuredListCell>{e.transition?.label ?? '—'}</StructuredListCell>
             <StructuredListCell>
@@ -95,10 +95,10 @@ function WorkflowInstanceCard({
       <Stack gap={5}>
         <div className="capsule-wf-header">
           <h4 className="capsule-section-title">
-            {instance.workflow_template?.label ?? 'Workflow'}
+            {instance.workflow_template?.label ?? 'Flux de travail'}
           </h4>
           <Tag type="blue" data-testid={`wf-state-${instance.id}`}>
-            {instance.current_state?.label ?? 'No state'}
+            {instance.current_state?.label ?? 'Aucun état'}
             {instance.current_state?.completion != null
               ? ` · ${instance.current_state.completion}%`
               : ''}
@@ -112,15 +112,15 @@ function WorkflowInstanceCard({
             kind="info"
             lowContrast
             hideCloseButton
-            title="Read-only"
-            subtitle="Your accountant manages this document's status."
+            title="Lecture seule"
+            subtitle="Votre comptable gère le statut de ce document."
           />
         ) : available.length > 0 ? (
           <div className="capsule-wf-transition">
             <Dropdown
               id={`wf-transition-${instance.id}`}
               titleText="Transition"
-              label="Choose a transition"
+              label="Choisir une transition"
               data-testid={`wf-transition-dd-${instance.id}`}
               items={available}
               selectedItem={chosen}
@@ -129,7 +129,7 @@ function WorkflowInstanceCard({
             />
             <TextInput
               id={`wf-comment-${instance.id}`}
-              labelText="Comment (optional)"
+              labelText="Commentaire (facultatif)"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
@@ -153,7 +153,7 @@ function WorkflowInstanceCard({
                 )
               }
             >
-              Apply transition
+              Appliquer la transition
             </Button>
           </div>
         ) : (
@@ -161,8 +161,8 @@ function WorkflowInstanceCard({
             kind="info"
             lowContrast
             hideCloseButton
-            title="No transitions"
-            subtitle="This workflow has no available transitions from its current state."
+            title="Aucune transition"
+            subtitle="Ce flux de travail ne propose aucune transition disponible depuis son état actuel."
           />
         )}
 
@@ -170,13 +170,13 @@ function WorkflowInstanceCard({
           <InlineNotification
             kind="error"
             lowContrast
-            title="Transition failed"
+            title="Échec de la transition"
             subtitle={(transition.error as Error)?.message}
           />
         )}
 
         <div>
-          <h5 className="capsule-section-subtitle">History</h5>
+          <h5 className="capsule-section-subtitle">Historique</h5>
           <WorkflowHistory docId={docId} instanceId={instance.id} />
         </div>
       </Stack>
@@ -197,14 +197,15 @@ export default function WorkflowsTab({
   canTransition?: boolean
 }) {
   const { data, isLoading } = useDocumentWorkflows(docId)
-  if (isLoading) return <InlineLoading description="Loading workflows…" />
+  if (isLoading) return <InlineLoading description="Chargement des flux de travail…" />
 
   const instances = data?.results ?? []
   if (instances.length === 0)
     return (
       <Tile data-testid="wf-empty">
-        This document has no active workflows. Workflows launch automatically
-        when their template is assigned to the document type.
+        Ce document n'a aucun flux de travail actif. Les flux de travail se
+        lancent automatiquement lorsque leur modèle est associé au type de
+        document.
       </Tile>
     )
 

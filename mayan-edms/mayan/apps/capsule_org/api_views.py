@@ -130,7 +130,7 @@ class APIFirmListCreateView(APIView):
     def post(self, request, *args, **kwargs):
         if not request.user.is_superuser:
             return Response(
-                data={'detail': 'Superuser required.'},
+                data={'detail': "Super-utilisateur requis."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -159,7 +159,7 @@ class APIFirmAccountantCreateView(APIView):
 
         if not _can_manage_firm(user=request.user, firm=firm):
             return Response(
-                data={'detail': 'Not permitted for this firm.'},
+                data={'detail': "Non autorisé pour ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -211,7 +211,7 @@ class APIClientListCreateView(APIView):
 
         if not _can_manage_firm(user=request.user, firm=firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -250,7 +250,7 @@ class APIClientInviteView(APIView):
         )
         if not _can_manage_firm(user=request.user, firm=client.firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -374,7 +374,7 @@ class APIFirmSettingsView(APIView):
         firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
         if not _can_manage_firm(user=request.user, firm=firm):
             return Response(
-                data={'detail': 'Not permitted for this firm.'},
+                data={'detail': "Non autorisé pour ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
         return Response(data=self._serialize(firm=firm))
@@ -383,7 +383,7 @@ class APIFirmSettingsView(APIView):
         firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
         if not _can_manage_firm(user=request.user, firm=firm):
             return Response(
-                data={'detail': 'Not permitted for this firm.'},
+                data={'detail': "Non autorisé pour ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -445,9 +445,9 @@ class APIFirmSettingsView(APIView):
             return Response(
                 data={
                     'detail': (
-                        'Failed to apply settings: the period index rebuild '
-                        'did not complete. No changes were saved; the firm '
-                        'retains its previous settings and index.'
+                        "Échec de l'application des paramètres : la reconstruction "
+                        "de l'index de période n'a pas abouti. Aucune modification "
+                        "n'a été enregistrée ; le cabinet conserve ses paramètres et son index précédents."
                     )
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -494,12 +494,12 @@ class APIPasswordChangeView(APIView):
         if current_password:
             if not user.check_password(raw_password=current_password):
                 return Response(
-                    data={'detail': 'Current password is incorrect.'},
+                    data={'detail': "Le mot de passe actuel est incorrect."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         elif require_current:
             return Response(
-                data={'detail': 'Current password is required.'},
+                data={'detail': "Le mot de passe actuel est requis."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -511,7 +511,7 @@ class APIPasswordChangeView(APIView):
             client.save(update_fields=['must_change_password'])
 
         return Response(
-            data={'detail': 'Password changed.'}, status=status.HTTP_200_OK
+            data={'detail': "Mot de passe modifié."}, status=status.HTTP_200_OK
         )
 
 
@@ -530,7 +530,7 @@ class APIClientRequestListCreateView(APIView):
         )
         if not _can_access_client(user=request.user, client=client):
             return Response(
-                data={'detail': 'Not permitted for this client.'},
+                data={'detail': "Non autorisé pour ce client."},
                 status=status.HTTP_403_FORBIDDEN
             )
         serializer = DocumentRequestSerializer(
@@ -545,7 +545,7 @@ class APIClientRequestListCreateView(APIView):
         # Only an accountant of the client's firm may create a request.
         if not _can_manage_firm(user=request.user, firm=client.firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -590,7 +590,7 @@ class APIDocumentRequestUpdateView(APIView):
             user=request.user, client=document_request.client
         ):
             return Response(
-                data={'detail': 'Not permitted for this request.'},
+                data={'detail': "Non autorisé pour cette demande."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -659,7 +659,7 @@ class APIPeriodExportView(APIView):
         )
         if not _can_access_client(user=request.user, client=client):
             return Response(
-                data={'detail': 'Not permitted for this client.'},
+                data={'detail': "Non autorisé pour ce client."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -669,7 +669,7 @@ class APIPeriodExportView(APIView):
 
         if count == 0:
             return Response(
-                data={'detail': 'No documents found for this period.'},
+                data={'detail': "Aucun document trouvé pour cette période."},
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -703,7 +703,7 @@ class APIClientDetailView(APIView):
         client = self._get_client(client_id=client_id)
         if not _can_access_client(user=request.user, client=client):
             return Response(
-                data={'detail': 'Not permitted for this client.'},
+                data={'detail': "Non autorisé pour ce client."},
                 status=status.HTTP_403_FORBIDDEN
             )
         return Response(data=ClientSerializer(instance=client).data)
@@ -712,7 +712,7 @@ class APIClientDetailView(APIView):
         client = self._get_client(client_id=client_id)
         if not _can_manage_firm(user=request.user, firm=client.firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -731,7 +731,7 @@ class APIClientDetailView(APIView):
         client = self._get_client(client_id=client_id)
         if not _can_manage_firm(user=request.user, firm=client.firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
         provisioning.delete_client(client=client)
@@ -751,7 +751,7 @@ class APIClientActiveView(APIView):
         )
         if not _can_manage_firm(user=request.user, firm=client.firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
         active = bool((request.data or {}).get('active'))
@@ -774,7 +774,7 @@ class APIClientUserListCreateView(APIView):
         )
         if not _can_access_client(user=request.user, client=client):
             return Response(
-                data={'detail': 'Not permitted for this client.'},
+                data={'detail': "Non autorisé pour ce client."},
                 status=status.HTTP_403_FORBIDDEN
             )
         serializer = ClientUserSerializer(
@@ -788,7 +788,7 @@ class APIClientUserListCreateView(APIView):
         )
         if not _can_manage_firm(user=request.user, firm=client.firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -833,7 +833,7 @@ class APIClientUserDetailView(APIView):
         client, client_user = self._get(client_id=client_id, user_id=user_id)
         if not _can_manage_firm(user=request.user, firm=client.firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -861,12 +861,12 @@ class APIClientUserDetailView(APIView):
         client, client_user = self._get(client_id=client_id, user_id=user_id)
         if not _can_manage_firm(user=request.user, firm=client.firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
         if client_user.is_primary:
             return Response(
-                data={'detail': 'Delete the client instead.'},
+                data={'detail': "Supprimez plutôt le client."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         client_user.user.delete()
@@ -887,7 +887,7 @@ class APIClientUserResetPasswordView(APIView):
         )
         if not _can_manage_firm(user=request.user, firm=client.firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
         client_user = get_object_or_404(
@@ -933,7 +933,7 @@ class APIClientDocumentUploadersView(APIView):
         )
         if not _can_access_client(user=request.user, client=client):
             return Response(
-                data={'detail': 'Not permitted for this client.'},
+                data={'detail': "Non autorisé pour ce client."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -973,7 +973,7 @@ class APIClientDocumentAttachView(APIView):
         )
         if not _can_manage_firm(user=request.user, firm=client.firm):
             return Response(
-                data={'detail': 'Must be an accountant of this firm.'},
+                data={'detail': "Vous devez être comptable de ce cabinet."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -984,7 +984,7 @@ class APIClientDocumentAttachView(APIView):
         if document is None:
             return Response(
                 data={
-                    'detail': 'Could not find the uploaded document to attach.'
+                    'detail': "Impossible de trouver le document importé à rattacher."
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
@@ -1031,7 +1031,7 @@ class APIFirmDetailView(APIView):
     def get(self, request, firm_id, *args, **kwargs):
         if not request.user.is_superuser:
             return Response(
-                data={'detail': 'Superuser required.'},
+                data={'detail': "Super-utilisateur requis."},
                 status=status.HTTP_403_FORBIDDEN
             )
         firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
@@ -1040,7 +1040,7 @@ class APIFirmDetailView(APIView):
     def patch(self, request, firm_id, *args, **kwargs):
         if not request.user.is_superuser:
             return Response(
-                data={'detail': 'Superuser required.'},
+                data={'detail': "Super-utilisateur requis."},
                 status=status.HTTP_403_FORBIDDEN
             )
         firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
@@ -1061,7 +1061,7 @@ class APIFirmDetailView(APIView):
     def delete(self, request, firm_id, *args, **kwargs):
         if not request.user.is_superuser:
             return Response(
-                data={'detail': 'Superuser required.'},
+                data={'detail': "Super-utilisateur requis."},
                 status=status.HTTP_403_FORBIDDEN
             )
         firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
@@ -1079,7 +1079,7 @@ class APIFirmActiveView(APIView):
     def post(self, request, firm_id, *args, **kwargs):
         if not request.user.is_superuser:
             return Response(
-                data={'detail': 'Superuser required.'},
+                data={'detail': "Super-utilisateur requis."},
                 status=status.HTTP_403_FORBIDDEN
             )
         firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
@@ -1097,7 +1097,7 @@ class APIFirmAccountantListView(APIView):
     def get(self, request, firm_id, *args, **kwargs):
         if not request.user.is_superuser:
             return Response(
-                data={'detail': 'Superuser required.'},
+                data={'detail': "Super-utilisateur requis."},
                 status=status.HTTP_403_FORBIDDEN
             )
         firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)
@@ -1128,7 +1128,7 @@ class APIAccountantDetailView(APIView):
     def patch(self, request, firm_id, user_id, *args, **kwargs):
         if not request.user.is_superuser:
             return Response(
-                data={'detail': 'Superuser required.'},
+                data={'detail': "Super-utilisateur requis."},
                 status=status.HTTP_403_FORBIDDEN
             )
         firm, membership = self._get(firm_id=firm_id, user_id=user_id)
@@ -1154,7 +1154,7 @@ class APIAccountantDetailView(APIView):
     def delete(self, request, firm_id, user_id, *args, **kwargs):
         if not request.user.is_superuser:
             return Response(
-                data={'detail': 'Superuser required.'},
+                data={'detail': "Super-utilisateur requis."},
                 status=status.HTTP_403_FORBIDDEN
             )
         firm, membership = self._get(firm_id=firm_id, user_id=user_id)
@@ -1173,7 +1173,7 @@ class APIAccountantResetPasswordView(APIView):
     def post(self, request, firm_id, user_id, *args, **kwargs):
         if not request.user.is_superuser:
             return Response(
-                data={'detail': 'Superuser required.'},
+                data={'detail': "Super-utilisateur requis."},
                 status=status.HTTP_403_FORBIDDEN
             )
         firm = get_object_or_404(queryset=Firm.objects.all(), pk=firm_id)

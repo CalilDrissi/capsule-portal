@@ -15,20 +15,20 @@ export default function MetadataTypesPage() {
 
   return (
     <SimpleCrud<MetadataType>
-      title="Metadata types"
+      title="Types de métadonnée"
       items={data?.results ?? []}
       isLoading={isLoading}
       isError={isError}
       busy={create.isPending || update.isPending}
       columns={[
-        { key: 'name', header: 'Name', render: (i) => i.name },
-        { key: 'label', header: 'Label', render: (i) => i.label },
-        { key: 'default', header: 'Default', render: (i) => i.default || '—' },
+        { key: 'name', header: 'Nom', render: (i) => i.name },
+        { key: 'label', header: 'Libellé', render: (i) => i.label },
+        { key: 'default', header: 'Valeur par défaut', render: (i) => i.default || '—' },
       ]}
       fields={[
-        { name: 'name', label: 'Name (internal, no spaces)', required: true },
-        { name: 'label', label: 'Label', required: true },
-        { name: 'default', label: 'Default value' },
+        { name: 'name', label: 'Nom (interne, sans espaces)', required: true },
+        { name: 'label', label: 'Libellé', required: true },
+        { name: 'default', label: 'Valeur par défaut' },
       ]}
       toInitial={(i) => ({
         name: i?.name ?? '',

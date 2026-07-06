@@ -31,10 +31,10 @@ import { requiredLabel } from '../lib/forms'
 import type { User } from '../api/types'
 
 const headers = [
-  { key: 'username', header: 'Username' },
-  { key: 'name', header: 'Name' },
-  { key: 'email', header: 'Email' },
-  { key: 'active', header: 'Active' },
+  { key: 'username', header: "Nom d'utilisateur" },
+  { key: 'name', header: 'Nom' },
+  { key: 'email', header: 'E-mail' },
+  { key: 'active', header: 'Actif' },
   { key: 'actions', header: '' },
 ]
 
@@ -118,32 +118,32 @@ export default function UsersPage() {
     username: u.username,
     name: [u.first_name, u.last_name].filter(Boolean).join(' ') || '—',
     email: u.email || '—',
-    active: u.is_active ? 'active' : 'inactive',
+    active: u.is_active ? 'Actif' : 'Inactif',
   }))
 
   return (
     <div className="capsule-page">
       <div className="capsule-page__header">
-        <h2 className="capsule-page__title">Users</h2>
+        <h2 className="capsule-page__title">Utilisateurs</h2>
         <Button
           renderIcon={Add}
           onClick={openCreate}
           data-testid="new-user"
         >
-          New user
+          Nouvel utilisateur
         </Button>
       </div>
 
       {isLoading ? (
         <DataTableSkeleton columnCount={5} rowCount={5} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load users: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement des utilisateurs : {(error as Error)?.message}</Tile>
       ) : users.length === 0 ? (
         <Tile className="capsule-empty">
-          <h4>No users yet</h4>
-          <p>Superusers are managed separately and not listed here.</p>
+          <h4>Aucun utilisateur pour le moment</h4>
+          <p>Les super-utilisateurs sont gérés séparément et ne figurent pas ici.</p>
           <Button renderIcon={Add} onClick={openCreate}>
-            New user
+            Nouvel utilisateur
           </Button>
         </Tile>
       ) : (
@@ -172,31 +172,31 @@ export default function UsersPage() {
                           cell.info.header === 'actions' ? (
                             <TableCell key={cell.id}>
                               <OverflowMenu
-                                aria-label="User actions"
+                                aria-label="Actions sur l'utilisateur"
                                 flipped
                                 onClick={(e: React.MouseEvent) =>
                                   e.stopPropagation()
                                 }
                               >
                                 <OverflowMenuItem
-                                  itemText="Open"
+                                  itemText="Ouvrir"
                                   onClick={() => navigate(`/admin/users/${row.id}`)}
                                 />
                                 <OverflowMenuItem
-                                  itemText="Edit"
+                                  itemText="Modifier"
                                   onClick={() => user && openEdit(user)}
                                 />
                                 <OverflowMenuItem
                                   hasDivider
                                   isDelete
-                                  itemText="Delete"
+                                  itemText="Supprimer"
                                   onClick={() => deleteUser.mutate(Number(row.id))}
                                 />
                               </OverflowMenu>
                             </TableCell>
                           ) : cell.info.header === 'active' ? (
                             <TableCell key={cell.id}>
-                              <Tag type={cell.value === 'active' ? 'green' : 'gray'}>
+                              <Tag type={cell.value === 'Actif' ? 'green' : 'gray'}>
                                 {cell.value}
                               </Tag>
                             </TableCell>
@@ -222,9 +222,9 @@ export default function UsersPage() {
 
       <Modal
         open={createOpen}
-        modalHeading="New user"
-        primaryButtonText="Create"
-        secondaryButtonText="Cancel"
+        modalHeading="Nouvel utilisateur"
+        primaryButtonText="Créer"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={createUser.isPending}
         onRequestClose={() => setCreateOpen(false)}
         onRequestSubmit={submitCreate}
@@ -233,38 +233,38 @@ export default function UsersPage() {
           <TextInput
             id="new-user-username"
             data-testid="user-username-input"
-            labelText={requiredLabel('Username')}
+            labelText={requiredLabel("Nom d'utilisateur")}
             value={form.username}
             onChange={(e) => setForm({ ...form, username: e.target.value })}
             invalid={usernameInvalid}
-            invalidText="Username is required."
+            invalidText="Le nom d'utilisateur est obligatoire."
           />
           <TextInput
             id="new-user-first"
-            labelText="First name"
+            labelText="Prénom"
             value={form.first_name}
             onChange={(e) => setForm({ ...form, first_name: e.target.value })}
           />
           <TextInput
             id="new-user-last"
-            labelText="Last name"
+            labelText="Nom"
             value={form.last_name}
             onChange={(e) => setForm({ ...form, last_name: e.target.value })}
           />
           <TextInput
             id="new-user-email"
-            labelText="Email"
+            labelText="E-mail"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
           <PasswordInput
             id="new-user-password"
             data-testid="user-password-input"
-            labelText={requiredLabel('Password')}
+            labelText={requiredLabel('Mot de passe')}
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             invalid={passwordInvalid}
-            invalidText="Password is required."
+            invalidText="Le mot de passe est obligatoire."
           />
         </Stack>
         {createUser.isError && (
@@ -276,9 +276,9 @@ export default function UsersPage() {
 
       <Modal
         open={!!editUser}
-        modalHeading={`Edit ${editUser?.username ?? ''}`}
-        primaryButtonText="Save"
-        secondaryButtonText="Cancel"
+        modalHeading={`Modifier ${editUser?.username ?? ''}`}
+        primaryButtonText="Enregistrer"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={updateUser.isPending}
         onRequestClose={() => setEditUser(null)}
         onRequestSubmit={submitEdit}
@@ -287,7 +287,7 @@ export default function UsersPage() {
           <TextInput
             id="edit-user-first"
             data-testid="user-edit-first"
-            labelText="First name"
+            labelText="Prénom"
             value={editForm.first_name}
             onChange={(e) =>
               setEditForm({ ...editForm, first_name: e.target.value })
@@ -295,7 +295,7 @@ export default function UsersPage() {
           />
           <TextInput
             id="edit-user-last"
-            labelText="Last name"
+            labelText="Nom"
             value={editForm.last_name}
             onChange={(e) =>
               setEditForm({ ...editForm, last_name: e.target.value })
@@ -303,7 +303,7 @@ export default function UsersPage() {
           />
           <TextInput
             id="edit-user-email"
-            labelText="Email"
+            labelText="E-mail"
             value={editForm.email}
             onChange={(e) =>
               setEditForm({ ...editForm, email: e.target.value })

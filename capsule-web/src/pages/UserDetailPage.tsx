@@ -43,11 +43,11 @@ function GroupAdder({
   return (
     <Tile>
       <Stack gap={4}>
-        <strong>Add to a group</strong>
+        <strong>Ajouter à un groupe</strong>
         <Dropdown
           id="user-group-pick"
-          titleText="Group"
-          label="Choose a group"
+          titleText="Groupe"
+          label="Choisir un groupe"
           items={addable}
           selectedItem={picked}
           itemToString={(i) => (i ? i.name : '')}
@@ -67,7 +67,7 @@ function GroupAdder({
             })
           }
         >
-          Add to group
+          Ajouter au groupe
         </Button>
       </Stack>
     </Tile>
@@ -83,7 +83,7 @@ function GroupChip({ userId, group }: { userId: number; group: Group }) {
         kind="ghost"
         size="sm"
         hasIconOnly
-        iconDescription={`Remove from ${group.name}`}
+        iconDescription={`Retirer de ${group.name}`}
         renderIcon={Close}
         data-testid={`user-group-remove-${group.id}`}
         disabled={remove.isPending}
@@ -100,12 +100,12 @@ export default function UserDetailPage() {
   const { data: userGroups, refetch } = useUserGroups(userId)
   const { data: allGroups } = useGroups()
 
-  if (isLoading) return <InlineLoading description="Loading user…" />
+  if (isLoading) return <InlineLoading description="Chargement de l'utilisateur…" />
   if (isError || !user)
     return (
       <div className="capsule-page">
-        <PageBreadcrumb items={[{ label: 'Users', to: '/admin/users' }, { label: 'Not found' }]} />
-        <Tile>User not found.</Tile>
+        <PageBreadcrumb items={[{ label: 'Utilisateurs', to: '/admin/users' }, { label: 'Introuvable' }]} />
+        <Tile>Utilisateur introuvable.</Tile>
       </div>
     )
 
@@ -115,19 +115,19 @@ export default function UserDetailPage() {
 
   return (
     <div className="capsule-page">
-      <PageBreadcrumb items={[{ label: 'Users', to: '/admin/users' }, { label: user.username }]} />
+      <PageBreadcrumb items={[{ label: 'Utilisateurs', to: '/admin/users' }, { label: user.username }]} />
       <h2 className="capsule-page__title">{user.username}</h2>
 
       <div className="capsule-meta">
         <StructuredListWrapper isCondensed>
           <StructuredListBody>
             {[
-              ['Username', user.username],
-              ['First name', user.first_name],
-              ['Last name', user.last_name],
-              ['Email', user.email],
-              ['Active', user.is_active ? 'Yes' : 'No'],
-              ['Joined', user.date_joined ? new Date(user.date_joined).toLocaleString() : '—'],
+              ["Nom d'utilisateur", user.username],
+              ['Prénom', user.first_name],
+              ['Nom', user.last_name],
+              ['E-mail', user.email],
+              ['Actif', user.is_active ? 'Oui' : 'Non'],
+              ['Inscrit le', user.date_joined ? new Date(user.date_joined).toLocaleString('fr-FR') : '—'],
             ].map(([k, v]) => (
               <StructuredListRow key={k as string}>
                 <StructuredListCell head>{k}</StructuredListCell>
@@ -139,11 +139,11 @@ export default function UserDetailPage() {
       </div>
 
       <div className="capsule-tabs">
-        <h3 className="capsule-section-title">Groups</h3>
+        <h3 className="capsule-section-title">Groupes</h3>
         <Stack gap={5}>
           <div data-testid="user-groups-list">
             {memberOf.length === 0 ? (
-              <Tile>This user is not in any group.</Tile>
+              <Tile>Cet utilisateur n'appartient à aucun groupe.</Tile>
             ) : (
               memberOf.map((g) => (
                 <GroupChip key={g.id} userId={user.id} group={g} />

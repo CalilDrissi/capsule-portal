@@ -40,7 +40,7 @@ function IndexNode({
   return (
     <TreeNode
       id={`node-${node.id}`}
-      label={`${node.value || '(blank)'}${isLeaf ? '' : ` (${node.node_count})`}`}
+      label={`${node.value || '(vide)'}${isLeaf ? '' : ` (${node.node_count})`}`}
       renderIcon={Folder}
       isExpanded={expanded}
       onToggle={(_e: unknown, value: { isExpanded?: boolean }) =>
@@ -67,16 +67,16 @@ function NodeDocuments({ node }: { node: IndexInstanceNode }) {
   if (docs.length === 0)
     return (
       <Tile className="capsule-empty">
-        <p>No documents at "{node.value}".</p>
+        <p>Aucun document dans « {node.value} ».</p>
       </Tile>
     )
 
   return (
-    <TableContainer title={`Documents in "${node.value}"`}>
+    <TableContainer title={`Documents dans « ${node.value} »`}>
       <Table data-testid="index-node-docs">
         <TableHead>
           <TableRow>
-            <TableHeader>Label</TableHeader>
+            <TableHeader>Libellé</TableHeader>
             <TableHeader>Type</TableHeader>
           </TableRow>
         </TableHead>
@@ -108,7 +108,7 @@ function IndexInstanceBrowser({ instanceId }: { instanceId: number }) {
     <div className="capsule-page">
       <PageBreadcrumb
         items={[
-          { label: 'Indexes', to: '/indexes' },
+          { label: 'Index', to: '/indexes' },
           { label: instance?.label ?? 'Index' },
         ]}
       />
@@ -122,10 +122,10 @@ function IndexInstanceBrowser({ instanceId }: { instanceId: number }) {
             <DataTableSkeleton columnCount={1} rowCount={5} showHeader={false} />
           ) : topNodes.length === 0 ? (
             <Tile className="capsule-empty">
-              <p>This index has no nodes.</p>
+              <p>Cet index ne comporte aucun nœud.</p>
             </Tile>
           ) : (
-            <TreeView label="Index node tree" hideLabel>
+            <TreeView label="Arborescence des nœuds d'index" hideLabel>
               {topNodes.map((n) => (
                 <IndexNode key={n.id} node={n} onSelectLeaf={setLeaf} />
               ))}
@@ -137,7 +137,7 @@ function IndexInstanceBrowser({ instanceId }: { instanceId: number }) {
             <NodeDocuments node={leaf} />
           ) : (
             <Tile className="capsule-empty">
-              <p>Select a leaf node to view its documents.</p>
+              <p>Sélectionnez un nœud terminal pour afficher ses documents.</p>
             </Tile>
           )}
         </div>
@@ -160,15 +160,15 @@ export default function IndexesPage() {
 
   return (
     <div className="capsule-page">
-      <h2 className="capsule-page__title">Indexes</h2>
+      <h2 className="capsule-page__title">Index</h2>
       {isLoading ? (
         <DataTableSkeleton columnCount={3} rowCount={4} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load indexes: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement des index : {(error as Error)?.message}</Tile>
       ) : instances.length === 0 ? (
         <Tile className="capsule-empty">
-          <h4>No index instances</h4>
-          <p>Indexes are built server-side from index templates.</p>
+          <h4>Aucune instance d'index</h4>
+          <p>Les index sont générés côté serveur à partir de modèles d'index.</p>
         </Tile>
       ) : (
         <TableContainer>
@@ -176,7 +176,7 @@ export default function IndexesPage() {
             <TableHead>
               <TableRow>
                 <TableHeader>Index</TableHeader>
-                <TableHeader>Top-level nodes</TableHeader>
+                <TableHeader>Nœuds de premier niveau</TableHeader>
                 <TableHeader> </TableHeader>
               </TableRow>
             </TableHead>
@@ -198,7 +198,7 @@ export default function IndexesPage() {
                   <TableCell>{inst.node_count}</TableCell>
                   <TableCell>
                     <Button kind="ghost" size="sm">
-                      Browse
+                      Parcourir
                     </Button>
                   </TableCell>
                 </TableRow>

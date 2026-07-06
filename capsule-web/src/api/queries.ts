@@ -139,7 +139,7 @@ export function useAddMetadata(docId: number) {
   return useMutation({
     mutationFn: (vars: { metadata_type_id: number; value: string }) =>
       apiPost(`/documents/${docId}/metadata/`, vars),
-    meta: { successMessage: 'Metadata added' },
+    meta: { successMessage: 'Métadonnée ajoutée' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['document_metadata', docId] }),
   })
@@ -152,7 +152,7 @@ export function useUpdateMetadata(docId: number) {
       apiPatch(`/documents/${docId}/metadata/${vars.metadataId}/`, {
         value: vars.value,
       }),
-    meta: { successMessage: 'Metadata updated' },
+    meta: { successMessage: 'Métadonnée mise à jour' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['document_metadata', docId] }),
   })
@@ -163,7 +163,7 @@ export function useDeleteMetadata(docId: number) {
   return useMutation({
     mutationFn: (metadataId: number) =>
       apiDelete(`/documents/${docId}/metadata/${metadataId}/`),
-    meta: { successMessage: 'Metadata removed' },
+    meta: { successMessage: 'Métadonnée retirée' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['document_metadata', docId] }),
   })
@@ -192,7 +192,7 @@ export function useAttachTag(docId: number) {
   return useMutation({
     mutationFn: (tagId: number) =>
       apiPost(`/documents/${docId}/tags/attach/`, { tag: tagId }),
-    meta: { successMessage: 'Tag added' },
+    meta: { successMessage: 'Étiquette ajoutée' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['document_tags', docId] }),
   })
@@ -204,7 +204,7 @@ export function useRemoveTag(docId: number) {
   return useMutation({
     mutationFn: (tagId: number) =>
       apiPost(`/documents/${docId}/tags/remove/`, { tag: tagId }),
-    meta: { successMessage: 'Tag removed' },
+    meta: { successMessage: 'Étiquette retirée' },
     // Optimistically drop the tag so the UI is correct regardless of the
     // backend's read-after-write visibility lag on the document<->tag M2M.
     onMutate: async (tagId: number) => {
@@ -244,7 +244,7 @@ export function useAddComment(docId: number) {
   return useMutation({
     mutationFn: (text: string) =>
       apiPost(`/documents/${docId}/comments/`, { text }),
-    meta: { successMessage: 'Comment added' },
+    meta: { successMessage: 'Commentaire ajouté' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['document_comments', docId] }),
   })
@@ -299,7 +299,7 @@ export function useToggleFavorite() {
         await apiPost(`/documents/favorites/`, { document_id: vars.docId })
       }
     },
-    meta: { successMessage: 'Favorites updated' },
+    meta: { successMessage: 'Favoris mis à jour' },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['favorites'] }),
   })
 }
@@ -321,7 +321,7 @@ export function useTrashDocument() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (docId: number) => apiDelete(`/documents/${docId}/`),
-    meta: { successMessage: 'Document moved to trash' },
+    meta: { successMessage: 'Document déplacé vers la corbeille' },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['documents'] })
       qc.invalidateQueries({ queryKey: ['trashed_documents'] })
@@ -335,7 +335,7 @@ export function useRestoreDocument() {
   return useMutation({
     mutationFn: (docId: number) =>
       apiPost(`/trashed_documents/${docId}/restore/`),
-    meta: { successMessage: 'Document restored' },
+    meta: { successMessage: 'Document restauré' },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['documents'] })
       qc.invalidateQueries({ queryKey: ['trashed_documents'] })
@@ -349,7 +349,7 @@ export function useDeleteTrashed() {
   return useMutation({
     mutationFn: (docId: number) =>
       apiDelete(`/trashed_documents/${docId}/`),
-    meta: { successMessage: 'Document permanently deleted' },
+    meta: { successMessage: 'Document supprimé définitivement' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['trashed_documents'] }),
   })
@@ -1123,7 +1123,7 @@ export function useCreateFirm() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (vars: { name: string }) => apiPost<Firm>(`/capsule/firms/`, vars),
-    meta: { successMessage: 'Firm created' },
+    meta: { successMessage: 'Cabinet créé' },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['capsule_firms'] }),
   })
 }
@@ -1142,7 +1142,7 @@ export function useUpdateFirm(id: number) {
   return useMutation({
     mutationFn: (vars: { name?: string; contact_email?: string; logo?: string }) =>
       apiPatch<Firm>(`/capsule/firms/${id}/`, vars),
-    meta: { successMessage: 'Firm updated' },
+    meta: { successMessage: 'Cabinet mis à jour' },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['capsule_firm', id] })
       qc.invalidateQueries({ queryKey: ['capsule_firms'] })
@@ -1155,7 +1155,7 @@ export function useSetFirmActive(id: number) {
   return useMutation({
     mutationFn: (active: boolean) =>
       apiPost(`/capsule/firms/${id}/active/`, { active }),
-    meta: { successMessage: 'Firm updated' },
+    meta: { successMessage: 'Cabinet mis à jour' },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['capsule_firm', id] })
       qc.invalidateQueries({ queryKey: ['capsule_firms'] })
@@ -1167,7 +1167,7 @@ export function useDeleteFirm() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => apiDelete(`/capsule/firms/${id}/`),
-    meta: { successMessage: 'Firm deleted' },
+    meta: { successMessage: 'Cabinet supprimé' },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['capsule_firms'] }),
   })
 }
@@ -1194,7 +1194,7 @@ export function useUpdateAccountant(firmId: number) {
       const { userId, ...body } = vars
       return apiPatch(`/capsule/firms/${firmId}/accountants/${userId}/`, body)
     },
-    meta: { successMessage: 'Accountant updated' },
+    meta: { successMessage: 'Comptable mis à jour' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['capsule_firm_accountants', firmId] }),
   })
@@ -1205,7 +1205,7 @@ export function useDeleteAccountant(firmId: number) {
   return useMutation({
     mutationFn: (userId: number) =>
       apiDelete(`/capsule/firms/${firmId}/accountants/${userId}/`),
-    meta: { successMessage: 'Accountant removed' },
+    meta: { successMessage: 'Comptable retiré' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['capsule_firm_accountants', firmId] }),
   })
@@ -1217,7 +1217,7 @@ export function useResetAccountantPassword(firmId: number) {
       apiPost(`/capsule/firms/${firmId}/accountants/${vars.userId}/reset-password/`, {
         password: vars.password,
       }),
-    meta: { successMessage: 'Password reset' },
+    meta: { successMessage: 'Mot de passe réinitialisé' },
   })
 }
 
@@ -1228,7 +1228,7 @@ export function useUpdateClient(id: number) {
   return useMutation({
     mutationFn: (vars: Partial<CapsuleClient>) =>
       apiPatch<CapsuleClient>(`/capsule/clients/${id}/`, vars),
-    meta: { successMessage: 'Client updated' },
+    meta: { successMessage: 'Client mis à jour' },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['capsule_client', id] })
       qc.invalidateQueries({ queryKey: ['capsule_clients'] })
@@ -1250,7 +1250,7 @@ export function useSetClientActive(id: number) {
   return useMutation({
     mutationFn: (active: boolean) =>
       apiPost(`/capsule/clients/${id}/active/`, { active }),
-    meta: { successMessage: 'Client updated' },
+    meta: { successMessage: 'Client mis à jour' },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['capsule_client', id] })
       qc.invalidateQueries({ queryKey: ['capsule_clients'] })
@@ -1262,7 +1262,7 @@ export function useDeleteClient() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => apiDelete(`/capsule/clients/${id}/`),
-    meta: { successMessage: 'Client deleted' },
+    meta: { successMessage: 'Client supprimé' },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['capsule_clients'] }),
   })
 }
@@ -1282,7 +1282,7 @@ export function useAddClientUser(clientId: number) {
   return useMutation({
     mutationFn: (vars: { full_name?: string; username?: string }) =>
       apiPost<InviteResult>(`/capsule/clients/${clientId}/users/`, vars),
-    meta: { successMessage: 'Employee login added' },
+    meta: { successMessage: 'Compte employé ajouté' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['capsule_client_users', clientId] }),
   })
@@ -1300,7 +1300,7 @@ export function useUpdateClientUser(clientId: number) {
       const { userId, ...body } = vars
       return apiPatch(`/capsule/clients/${clientId}/users/${userId}/`, body)
     },
-    meta: { successMessage: 'Login updated' },
+    meta: { successMessage: 'Compte mis à jour' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['capsule_client_users', clientId] }),
   })
@@ -1311,7 +1311,7 @@ export function useDeleteClientUser(clientId: number) {
   return useMutation({
     mutationFn: (userId: number) =>
       apiDelete(`/capsule/clients/${clientId}/users/${userId}/`),
-    meta: { successMessage: 'Login removed' },
+    meta: { successMessage: 'Compte retiré' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['capsule_client_users', clientId] }),
   })
@@ -1325,7 +1325,7 @@ export function useResetClientLoginPassword(clientId: number) {
         `/capsule/clients/${clientId}/users/${vars.userId}/reset-password/`,
         { mode: vars.mode, password: vars.password },
       ),
-    meta: { successMessage: 'Password reset' },
+    meta: { successMessage: 'Mot de passe réinitialisé' },
   })
 }
 
@@ -1343,7 +1343,7 @@ export function useAttachClientDocument(clientId: number) {
         `/capsule/clients/${clientId}/documents/attach/`,
         vars,
       ),
-    meta: { successMessage: 'Document uploaded for client' },
+    meta: { successMessage: 'Document importé pour le client' },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['cabinet_documents'] })
       qc.invalidateQueries({ queryKey: ['capsule_client_uploaders', clientId] })
@@ -1380,7 +1380,7 @@ export function useCreateAccountant() {
           full_name: vars.full_name ?? '',
         },
       ),
-    meta: { successMessage: 'Accountant created' },
+    meta: { successMessage: 'Comptable créé' },
   })
 }
 
@@ -1407,7 +1407,7 @@ export function useProvisionClient() {
   return useMutation({
     mutationFn: (vars: { firm_id: number; display_name: string }) =>
       apiPost<ProvisionClientResult>(`/capsule/clients/`, vars),
-    meta: { successMessage: 'Client created' },
+    meta: { successMessage: 'Client créé' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['capsule_clients'] }),
   })
@@ -1434,7 +1434,7 @@ export function useUpdateFirmSettings(firmId: number | null) {
   return useMutation({
     mutationFn: (vars: Partial<FirmSettings>) =>
       apiPatch<FirmSettings>(`/capsule/firms/${firmId}/settings/`, vars),
-    meta: { successMessage: 'Settings saved' },
+    meta: { successMessage: 'Paramètres enregistrés' },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['firm_settings', firmId] })
       qc.invalidateQueries({ queryKey: ['whoami'] })
@@ -1447,7 +1447,7 @@ export function usePasswordChange() {
   const setMustChangePassword = useAppStore((s) => s.setMustChangePassword)
   return useMutation({
     mutationFn: (newPassword: string) => changePassword(newPassword),
-    meta: { successMessage: 'Password changed' },
+    meta: { successMessage: 'Mot de passe modifié' },
     onSuccess: () => {
       setMustChangePassword(false)
       qc.invalidateQueries({ queryKey: ['whoami'] })
@@ -1484,7 +1484,7 @@ export function useCreateRequest(clientId: number | null) {
         `/capsule/clients/${clientId}/requests/`,
         vars,
       ),
-    meta: { successMessage: 'Document requested' },
+    meta: { successMessage: 'Document demandé' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['capsule_requests', clientId] }),
   })
@@ -1498,7 +1498,7 @@ export function useUpdateRequest(clientId: number | null) {
       apiPatch<CapsuleDocumentRequest>(`/capsule/requests/${vars.id}/`, {
         status: vars.status,
       }),
-    meta: { successMessage: 'Request updated' },
+    meta: { successMessage: 'Demande mise à jour' },
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['capsule_requests', clientId] }),
   })

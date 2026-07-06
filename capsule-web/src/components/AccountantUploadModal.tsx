@@ -19,7 +19,7 @@ import { useAppStore } from '../store/useAppStore'
 import { requiredLabel } from '../lib/forms'
 
 const ACCEPTED = ['.pdf', '.png', '.jpg', '.jpeg', '.gif', '.tiff', '.tif', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.odt', '.ods']
-const ACCEPTED_LABEL = 'PDF, images, or Office documents'
+const ACCEPTED_LABEL = 'PDF, images ou documents Office'
 const isAccepted = (name: string) => ACCEPTED.some((e) => name.toLowerCase().endsWith(e))
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
@@ -68,7 +68,7 @@ export default function AccountantUploadModal({
     setError(null)
     if (!file) return
     if (sourceId == null || documentTypeId == null) {
-      setError('Upload is not configured for this firm. Please contact support.')
+      setError('L’import n’est pas configuré pour ce cabinet. Veuillez contacter le support.')
       return
     }
     setBusy(true)
@@ -91,14 +91,14 @@ export default function AccountantUploadModal({
         }
       }
       if (!attached) {
-        setError('The document was uploaded but could not be filed to the client yet. It should appear shortly.')
+        setError('Le document a été importé mais n’a pas encore pu être classé chez le client. Il devrait apparaître sous peu.')
         setBusy(false)
         return
       }
       onUploaded()
       reset()
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Upload failed. Please try again.')
+      setError(e instanceof Error ? e.message : 'L’import a échoué. Veuillez réessayer.')
       setBusy(false)
     }
   }
@@ -111,13 +111,13 @@ export default function AccountantUploadModal({
         onClick={() => setOpen(true)}
         data-testid="accountant-upload"
       >
-        Upload document
+        Importer un document
       </Button>
       <Modal
         open={open}
-        modalHeading="Upload a document for this client"
-        primaryButtonText={busy ? 'Uploading…' : 'Upload'}
-        secondaryButtonText="Cancel"
+        modalHeading="Importer un document pour ce client"
+        primaryButtonText={busy ? 'Import en cours…' : 'Importer'}
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={busy}
         onRequestClose={reset}
         onRequestSubmit={handleSubmit}
@@ -128,22 +128,22 @@ export default function AccountantUploadModal({
           {error && (
             <InlineNotification
               kind="error"
-              title="Could not upload"
+              title="Impossible d’importer"
               subtitle={error}
               lowContrast
               hideCloseButton
             />
           )}
           <div>
-            <p className="cds--label">{requiredLabel('File')}</p>
+            <p className="cds--label">{requiredLabel('Fichier')}</p>
             <FileUploaderDropContainer
-              labelText={`Drag and drop a file here or click to upload (${ACCEPTED_LABEL})`}
+              labelText={`Glissez-déposez un fichier ici ou cliquez pour importer (${ACCEPTED_LABEL})`}
               accept={ACCEPTED}
               multiple={false}
               onAddFiles={(_e, { addedFiles }) => {
                 const f = addedFiles?.[0] ?? null
                 if (f && !isAccepted(f.name)) {
-                  setError(`Please upload a ${ACCEPTED_LABEL}.`)
+                  setError(`Veuillez importer un fichier de type ${ACCEPTED_LABEL}.`)
                   return
                 }
                 setError(null)
@@ -159,18 +159,18 @@ export default function AccountantUploadModal({
             )}
             {fileInvalid && (
               <p className="cds--form-requirement" style={{ color: '#da1e28' }}>
-                A file is required.
+                Un fichier est obligatoire.
               </p>
             )}
           </div>
           {categories.length > 0 && (
             <Select
               id="acct-upload-category"
-              labelText="Category"
+              labelText="Catégorie"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
-              <SelectItem value="" text="— None —" />
+              <SelectItem value="" text="— Aucune —" />
               {categories.map((c) => (
                 <SelectItem key={c} value={c} text={c} />
               ))}
@@ -178,6 +178,7 @@ export default function AccountantUploadModal({
           )}
           <DatePicker
             datePickerType="single"
+            locale="fr"
             dateFormat="Y-m-d"
             value={documentDate}
             onChange={(dates: Date[]) => {
@@ -187,14 +188,14 @@ export default function AccountantUploadModal({
           >
             <DatePickerInput
               id="acct-upload-date"
-              labelText="Document date (optional)"
-              placeholder="yyyy-mm-dd"
+              labelText="Date du document (facultatif)"
+              placeholder="aaaa-mm-jj"
             />
           </DatePicker>
           <TextInput
             id="acct-upload-label"
-            labelText="Label (optional)"
-            placeholder="Defaults to the file name"
+            labelText="Libellé (facultatif)"
+            placeholder="Par défaut, le nom du fichier"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
           />

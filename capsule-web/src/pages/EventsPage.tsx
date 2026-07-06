@@ -30,10 +30,10 @@ function pick(v: unknown, keys: string[]): string {
 }
 
 const headers = [
-  { key: 'verb', header: 'Event' },
-  { key: 'actor', header: 'Actor' },
-  { key: 'target', header: 'Target' },
-  { key: 'timestamp', header: 'When' },
+  { key: 'verb', header: 'Événement' },
+  { key: 'actor', header: 'Acteur' },
+  { key: 'target', header: 'Cible' },
+  { key: 'timestamp', header: 'Date' },
 ]
 
 export default function EventsPage() {
@@ -43,11 +43,11 @@ export default function EventsPage() {
 
   return (
     <div className="capsule-page">
-      <h2 className="capsule-page__title">Events</h2>
+      <h2 className="capsule-page__title">Événements</h2>
       {isLoading ? (
         <DataTableSkeleton columnCount={4} rowCount={10} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load events.</Tile>
+        <Tile>Échec du chargement des événements.</Tile>
       ) : (
         <>
           <DataTable
@@ -56,7 +56,7 @@ export default function EventsPage() {
               verb: pick(e.verb, ['label', 'id']).replace(/[._]/g, ' '),
               actor: pick(e.actor, ['label', 'username', 'email']),
               target: pick(e.target, ['label']),
-              timestamp: e.timestamp ? new Date(e.timestamp).toLocaleString() : '—',
+              timestamp: e.timestamp ? new Date(e.timestamp).toLocaleString('fr-FR') : '—',
             }))}
             headers={headers}
           >

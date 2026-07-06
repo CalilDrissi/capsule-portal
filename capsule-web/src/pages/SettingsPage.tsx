@@ -3,14 +3,14 @@ import { InlineNotification, Tile } from '@carbon/react'
 export default function SettingsPage() {
   return (
     <div className="capsule-page">
-      <h2 className="capsule-page__title">Settings</h2>
+      <h2 className="capsule-page__title">Paramètres</h2>
       <Tile>
         <InlineNotification
           kind="info"
           lowContrast
           hideCloseButton
-          title="Settings are not exposed over the REST API"
-          subtitle="Mayan's smart-settings are configured via environment variables / config files on the server (there is no /api/v4/settings/ endpoint — it returns 404). System settings therefore can't be edited from this client. Document types, metadata types, smart links and web links are managed under their own Administration pages."
+          title="Les paramètres ne sont pas exposés via l'API REST"
+          subtitle="Les paramètres avancés de Mayan sont configurés au moyen de variables d'environnement / fichiers de configuration sur le serveur (il n'existe pas de point de terminaison /api/v4/settings/ — il renvoie une erreur 404). Les paramètres système ne peuvent donc pas être modifiés depuis ce client. Les types de document, types de métadonnée, liens intelligents et liens web sont gérés depuis leurs propres pages d'administration."
         />
       </Tile>
     </div>

@@ -27,7 +27,7 @@ export default function LogoUpload({
     try {
       onChange(await fileToLogoDataUrl(file))
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not use that image.')
+      setError(e instanceof Error ? e.message : "Impossible d'utiliser cette image.")
     }
   }
 
@@ -49,7 +49,7 @@ export default function LogoUpload({
           renderIcon={ImageIcon}
           onClick={() => inputRef.current?.click()}
         >
-          {value ? 'Replace logo' : 'Upload logo'}
+          {value ? 'Remplacer le logo' : 'Importer un logo'}
         </Button>
         {value && (
           <Button
@@ -58,14 +58,14 @@ export default function LogoUpload({
             renderIcon={TrashCan}
             onClick={() => onChange('')}
           >
-            Remove
+            Retirer
           </Button>
         )}
       </div>
       {error && (
         <InlineNotification
           kind="error"
-          title="Could not use that image"
+          title="Impossible d'utiliser cette image"
           subtitle={error}
           lowContrast
           hideCloseButton

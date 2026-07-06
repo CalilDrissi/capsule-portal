@@ -49,13 +49,13 @@ export default function ClientWorkspaceSelfPage() {
           alignItems: 'center',
         }}
       >
-        <h2 className="capsule-page__title">My documents</h2>
+        <h2 className="capsule-page__title">Mes documents</h2>
         <Button
           renderIcon={Upload}
           onClick={() => navigate('/workspace/upload')}
           data-testid="workspace-upload"
         >
-          Upload
+          Importer
         </Button>
       </div>
 
@@ -64,9 +64,9 @@ export default function ClientWorkspaceSelfPage() {
       {isError && (
         <ActionableNotification
           kind="error"
-          title="Couldn't load your documents"
-          subtitle="There was a problem reaching the server."
-          actionButtonLabel="Retry"
+          title="Impossible de charger vos documents"
+          subtitle="Un problème est survenu lors de la connexion au serveur."
+          actionButtonLabel="Réessayer"
           onActionButtonClick={retry}
           lowContrast
           hideCloseButton
@@ -75,10 +75,10 @@ export default function ClientWorkspaceSelfPage() {
       )}
 
       <Tabs>
-        <TabList aria-label="My documents" contained>
-          <Tab>All</Tab>
-          <Tab>By period</Tab>
-          <Tab>Timeline</Tab>
+        <TabList aria-label="Mes documents" contained>
+          <Tab>Tous</Tab>
+          <Tab>Par période</Tab>
+          <Tab>Chronologie</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -88,8 +88,8 @@ export default function ClientWorkspaceSelfPage() {
               </Tile>
             ) : isError ? null : documents.length === 0 ? (
               <Tile className="capsule-empty" data-testid="workspace-empty">
-                <h4>No documents yet</h4>
-                <p>Upload your first document to get started.</p>
+                <h4>Aucun document pour l'instant</h4>
+                <p>Importez votre premier document pour commencer.</p>
               </Tile>
             ) : (
               <DocumentsTable

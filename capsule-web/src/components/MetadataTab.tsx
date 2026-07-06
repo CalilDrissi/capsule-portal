@@ -58,7 +58,7 @@ export default function MetadataTab({
     )
   }
 
-  if (isLoading) return <InlineLoading description="Loading metadata…" />
+  if (isLoading) return <InlineLoading description="Chargement des métadonnées…" />
 
   const existing = data?.results ?? []
   const usedTypeIds = new Set(existing.map((m) => m.metadata_type.id))
@@ -69,7 +69,7 @@ export default function MetadataTab({
   return (
     <Stack gap={5}>
       {existing.length === 0 && (
-        <Tile>No metadata values set for this document.</Tile>
+        <Tile>Aucune valeur de métadonnée définie pour ce document.</Tile>
       )}
       {existing.map((m) => (
         <Tile key={m.id} className="capsule-meta-row" data-testid={`meta-${m.id}`}>
@@ -94,10 +94,10 @@ export default function MetadataTab({
                   )
                 }
               >
-                Save
+                Enregistrer
               </Button>
               <Button size="sm" kind="ghost" onClick={() => setEditing(null)}>
-                Cancel
+                Annuler
               </Button>
             </div>
           ) : (
@@ -107,7 +107,7 @@ export default function MetadataTab({
                 size="sm"
                 kind="ghost"
                 hasIconOnly
-                iconDescription="Edit"
+                iconDescription="Modifier"
                 renderIcon={Edit}
                 data-testid={`meta-edit-btn-${m.id}`}
                 onClick={() => {
@@ -119,7 +119,7 @@ export default function MetadataTab({
                 size="sm"
                 kind="ghost"
                 hasIconOnly
-                iconDescription="Remove"
+                iconDescription="Retirer"
                 renderIcon={TrashCan}
                 onClick={() => deleteMeta.mutate(m.id)}
               />
@@ -131,25 +131,25 @@ export default function MetadataTab({
       {addable.length > 0 && (
         <Tile>
           <Stack gap={4}>
-            <strong>Add metadata</strong>
+            <strong>Ajouter une métadonnée</strong>
             <Dropdown
               id="meta-add-type"
               titleText={requiredLabel('Type')}
-              label="Choose a metadata type"
+              label="Choisir un type de métadonnée"
               items={addable}
               selectedItem={newType}
               itemToString={(i) => (i ? i.metadata_type.label : '')}
               onChange={({ selectedItem }) => setNewType(selectedItem ?? null)}
               invalid={newTypeInvalid}
-              invalidText="Type is required."
+              invalidText="Le type est obligatoire."
             />
             <TextInput
               id="meta-add-value"
-              labelText={requiredLabel('Value')}
+              labelText={requiredLabel('Valeur')}
               value={newValue}
               onChange={(e) => setNewValue(e.target.value)}
               invalid={newValueInvalid}
-              invalidText="Value is required."
+              invalidText="La valeur est obligatoire."
             />
             <Button
               renderIcon={Add}
@@ -157,7 +157,7 @@ export default function MetadataTab({
               data-testid="meta-add-btn"
               onClick={handleAdd}
             >
-              Add metadata
+              Ajouter une métadonnée
             </Button>
           </Stack>
         </Tile>

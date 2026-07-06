@@ -25,9 +25,9 @@ import {
 } from '../api/queries'
 
 const headers = [
-  { key: 'label', header: 'Label' },
+  { key: 'label', header: 'Libellé' },
   { key: 'type', header: 'Type' },
-  { key: 'trashed', header: 'Trashed' },
+  { key: 'trashed', header: 'Mis à la corbeille' },
   { key: 'actions', header: 'Actions' },
 ]
 
@@ -42,21 +42,21 @@ export default function TrashPage() {
     label: d.label,
     type: d.document_type?.label ?? '—',
     trashed: d.trashed_date_time
-      ? new Date(d.trashed_date_time).toLocaleString()
+      ? new Date(d.trashed_date_time).toLocaleString('fr-FR')
       : '—',
     actions: '',
   }))
 
   return (
     <div className="capsule-page">
-      <h2 className="capsule-page__title">Trash</h2>
+      <h2 className="capsule-page__title">Corbeille</h2>
       {isLoading ? (
         <DataTableSkeleton columnCount={4} rowCount={5} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load trash: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement de la corbeille : {(error as Error)?.message}</Tile>
       ) : items.length === 0 ? (
         <Tile className="capsule-empty">
-          <h4>Trash is empty</h4>
+          <h4>La corbeille est vide</h4>
         </Tile>
       ) : (
         <DataTable rows={rows} headers={headers}>
@@ -84,7 +84,7 @@ export default function TrashPage() {
                         batch.onCancel()
                       }}
                     >
-                      Restore
+                      Restaurer
                     </TableBatchAction>
                     <TableBatchAction
                       renderIcon={TrashCan}
@@ -95,7 +95,7 @@ export default function TrashPage() {
                         batch.onCancel()
                       }}
                     >
-                      Delete forever
+                      Supprimer définitivement
                     </TableBatchAction>
                   </TableBatchActions>
                   <TableToolbarContent />
@@ -130,7 +130,7 @@ export default function TrashPage() {
                                   data-testid={`restore-${row.id}`}
                                   onClick={() => restore.mutate(Number(row.id))}
                                 >
-                                  Restore
+                                  Restaurer
                                 </Button>
                                 <Button
                                   kind="danger--ghost"
@@ -139,7 +139,7 @@ export default function TrashPage() {
                                   data-testid={`delete-${row.id}`}
                                   onClick={() => remove.mutate(Number(row.id))}
                                 >
-                                  Delete
+                                  Supprimer
                                 </Button>
                               </TableCell>
                             ) : (

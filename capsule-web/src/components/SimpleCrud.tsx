@@ -115,16 +115,16 @@ export default function SimpleCrud<T extends { id: number }>({
       <div className="capsule-page__header">
         <h2 className="capsule-page__title">{title}</h2>
         <Button renderIcon={Add} onClick={openCreate}>
-          New
+          Nouveau
         </Button>
       </div>
 
       {isLoading ? (
         <DataTableSkeleton columnCount={columns.length + 1} rowCount={6} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load.</Tile>
+        <Tile>Échec du chargement.</Tile>
       ) : items.length === 0 ? (
-        <Tile>Nothing here yet.</Tile>
+        <Tile>Aucun élément pour le moment.</Tile>
       ) : (
         <DataTable rows={items.map((i) => ({ id: String(i.id) }))} headers={headers}>
           {({ getTableProps, getHeaderProps }) => (
@@ -152,10 +152,10 @@ export default function SimpleCrud<T extends { id: number }>({
                         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                           {extraRowActions?.(item)}
                           <OverflowMenu aria-label="Actions" flipped>
-                            <OverflowMenuItem itemText="Edit" onClick={() => openEdit(item)} />
+                            <OverflowMenuItem itemText="Modifier" onClick={() => openEdit(item)} />
                             <OverflowMenuItem
                               isDelete
-                              itemText="Delete"
+                              itemText="Supprimer"
                               onClick={() => setDeleteId(item.id)}
                             />
                           </OverflowMenu>
@@ -173,9 +173,9 @@ export default function SimpleCrud<T extends { id: number }>({
       {open && (
         <Modal
           open={open}
-          modalHeading={editing ? `Edit ${title}` : `New ${title}`}
-          primaryButtonText={busy ? 'Saving…' : 'Save'}
-          secondaryButtonText="Cancel"
+          modalHeading={editing ? `Modifier ${title}` : `Nouveau ${title}`}
+          primaryButtonText={busy ? 'Enregistrement…' : 'Enregistrer'}
+          secondaryButtonText="Annuler"
           primaryButtonDisabled={busy}
           onRequestClose={closeModal}
           onRequestSubmit={submit}
@@ -202,7 +202,7 @@ export default function SimpleCrud<T extends { id: number }>({
                     setValues((v) => ({ ...v, [f.name]: e.target.value }))
                   }
                   invalid={isFieldInvalid(f)}
-                  invalidText={`${f.label} is required.`}
+                  invalidText={`${f.label} est requis.`}
                 />
               ),
             )}
@@ -215,16 +215,16 @@ export default function SimpleCrud<T extends { id: number }>({
           open
           danger
           size="sm"
-          modalHeading={`Delete this ${title.replace(/s$/, '').toLowerCase()}?`}
-          primaryButtonText="Delete"
-          secondaryButtonText="Cancel"
+          modalHeading={`Supprimer ${title.replace(/s$/, '').toLowerCase()} ?`}
+          primaryButtonText="Supprimer"
+          secondaryButtonText="Annuler"
           onRequestClose={() => setDeleteId(null)}
           onRequestSubmit={() => {
             onDelete(deleteId)
             setDeleteId(null)
           }}
         >
-          <p>This action cannot be undone.</p>
+          <p>Cette action est irréversible.</p>
         </Modal>
       )}
     </div>

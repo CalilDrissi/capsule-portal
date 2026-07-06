@@ -79,14 +79,14 @@ export default function ClientsGridPage() {
           onClick={openModal}
           data-testid="new-client"
         >
-          New client
+          Nouveau client
         </Button>
       </div>
 
       {isError && (
         <InlineNotification
           kind="error"
-          title="Could not load clients"
+          title="Impossible de charger les clients"
           lowContrast
           hideCloseButton
         />
@@ -95,8 +95,8 @@ export default function ClientsGridPage() {
       {!isLoading && (clients?.length ?? 0) > 0 && (
         <Search
           size="lg"
-          labelText="Search clients"
-          placeholder="Search clients by name or company"
+          labelText="Rechercher des clients"
+          placeholder="Rechercher un client par nom ou société"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onClear={() => setQuery('')}
@@ -111,12 +111,12 @@ export default function ClientsGridPage() {
         </Tile>
       ) : (clients?.length ?? 0) === 0 ? (
         <Tile className="capsule-empty" data-testid="clients-empty">
-          <h4>No clients yet</h4>
-          <p>Create your first client to get started.</p>
+          <h4>Aucun client pour l'instant</h4>
+          <p>Créez votre premier client pour commencer.</p>
         </Tile>
       ) : filtered.length === 0 ? (
         <Tile className="capsule-empty">
-          <p>No clients match “{query}”.</p>
+          <p>Aucun client ne correspond à « {query} ».</p>
         </Tile>
       ) : (
         <div className="capsule-stats" data-testid="clients-grid">
@@ -138,10 +138,10 @@ export default function ClientsGridPage() {
               )}
               <div className="capsule-stat__label">
                 {c.is_active === false
-                  ? 'Inactive'
+                  ? 'Inactif'
                   : c.must_change_password
-                    ? 'Pending first login'
-                    : 'Active'}
+                    ? 'Première connexion en attente'
+                    : 'Actif'}
               </div>
             </ClickableTile>
           ))}
@@ -150,9 +150,9 @@ export default function ClientsGridPage() {
 
       <Modal
         open={modalOpen}
-        modalHeading={created ? 'Client created' : 'New client'}
-        primaryButtonText={created ? 'Done' : 'Create'}
-        secondaryButtonText={created ? undefined : 'Cancel'}
+        modalHeading={created ? 'Client créé' : 'Nouveau client'}
+        primaryButtonText={created ? 'Terminé' : 'Créer'}
+        secondaryButtonText={created ? undefined : 'Annuler'}
         primaryButtonDisabled={!created && provision.isPending}
         onRequestClose={resetModal}
         onRequestSubmit={created ? resetModal : handleCreate}
@@ -163,13 +163,13 @@ export default function ClientsGridPage() {
           <Stack gap={5}>
             <InlineNotification
               kind="success"
-              title="Client created — send them this invite link"
-              subtitle="They open the link, set their own password, and are taken straight to their workspace. The link can only be used once."
+              title="Client créé — envoyez-lui ce lien d'invitation"
+              subtitle="Il ouvre le lien, définit son propre mot de passe et accède directement à son espace de travail. Le lien ne peut être utilisé qu'une seule fois."
               lowContrast
               hideCloseButton
             />
             <div>
-              <p className="cds--label">Invite link</p>
+              <p className="cds--label">Lien d'invitation</p>
               <CodeSnippet type="multi" data-testid="invite-link">
                 {created.invite_path
                   ? `${window.location.origin}${created.invite_path}`
@@ -178,15 +178,15 @@ export default function ClientsGridPage() {
             </div>
             <details>
               <summary className="capsule-hint">
-                Or share temporary credentials instead
+                Ou partagez plutôt des identifiants temporaires
               </summary>
               <div style={{ marginTop: '0.75rem' }}>
-                <p className="cds--label">Temporary username</p>
+                <p className="cds--label">Nom d'utilisateur temporaire</p>
                 <CodeSnippet type="single" data-testid="temp-username">
                   {created.temp_username}
                 </CodeSnippet>
                 <p className="cds--label" style={{ marginTop: '0.5rem' }}>
-                  Temporary password
+                  Mot de passe temporaire
                 </p>
                 <CodeSnippet type="single" data-testid="temp-password">
                   {created.temp_password}
@@ -198,12 +198,12 @@ export default function ClientsGridPage() {
           <Stack gap={5}>
             <TextInput
               id="client-display-name"
-              labelText={requiredLabel('Display name')}
-              placeholder="e.g. Acme Corp"
+              labelText={requiredLabel("Nom d'affichage")}
+              placeholder="ex. Acme Corp"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               invalid={displayNameInvalid}
-              invalidText="Display name is required."
+              invalidText="Le nom d'affichage est obligatoire."
             />
           </Stack>
         )}

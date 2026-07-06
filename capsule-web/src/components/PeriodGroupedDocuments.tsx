@@ -5,8 +5,8 @@ import type { DocumentMetadata, DocumentSummary, Paginated } from '../api/types'
 import DocumentsTable from './DocumentsTable'
 
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June', 'July',
-  'August', 'September', 'October', 'November', 'December',
+  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet',
+  'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
 ]
 
 /**
@@ -70,7 +70,7 @@ export default function PeriodGroupedDocuments({
 
   // Build a Year → Month tree.
   const root = new Map<string, PeriodNode>()
-  const undated = emptyNode('undated', 'Undated')
+  const undated = emptyNode('undated', 'Sans date')
 
   documents.forEach((doc, i) => {
     const metadata = metaQueries[i]?.data?.results
@@ -111,8 +111,8 @@ export default function PeriodGroupedDocuments({
   if (documents.length === 0) {
     return (
       <Tile className="capsule-empty" data-testid={emptyTestId}>
-        <h4>No documents yet</h4>
-        <p>Documents will appear here grouped by period.</p>
+        <h4>Aucun document pour le moment</h4>
+        <p>Les documents apparaîtront ici, regroupés par période.</p>
       </Tile>
     )
   }

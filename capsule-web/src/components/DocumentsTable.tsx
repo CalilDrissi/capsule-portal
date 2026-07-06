@@ -22,13 +22,13 @@ import type {
 } from '../api/types'
 
 const baseHeaders = [
-  { key: 'label', header: 'Label' },
+  { key: 'label', header: 'Libellé' },
   { key: 'type', header: 'Type' },
-  { key: 'created', header: 'Created' },
+  { key: 'created', header: 'Créé le' },
 ]
 
-const statusHeader = { key: 'status', header: 'Status' }
-const uploaderHeader = { key: 'uploader', header: 'Uploaded by' }
+const statusHeader = { key: 'status', header: 'Statut' }
+const uploaderHeader = { key: 'uploader', header: 'Importé par' }
 
 /** Carbon tag colour per Capsule status state. */
 function statusTagType(state: string): 'gray' | 'blue' | 'magenta' | 'green' {
@@ -99,7 +99,7 @@ export default function DocumentsTable({
     label: d.label,
     type: d.document_type?.label ?? '—',
     created: d.datetime_created
-      ? new Date(d.datetime_created).toLocaleString()
+      ? new Date(d.datetime_created).toLocaleString('fr-FR')
       : '—',
     status: statusById[d.id] ?? '—',
     uploader: uploaders?.[String(d.id)]?.display ?? '—',

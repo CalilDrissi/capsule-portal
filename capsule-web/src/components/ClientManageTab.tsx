@@ -129,7 +129,7 @@ export default function ClientManageTab({ clientId }: { clientId: number }) {
     <Stack gap={7}>
       {/* Details */}
       <section>
-        <h4 style={{ marginBottom: '1rem' }}>Details</h4>
+        <h4 style={{ marginBottom: '1rem' }}>Détails</h4>
         <Stack gap={5}>
           <LogoUpload
             name={form.display_name}
@@ -138,46 +138,46 @@ export default function ClientManageTab({ clientId }: { clientId: number }) {
           />
           <TextInput
             id="client-display-name"
-            labelText={requiredLabel('Display name')}
+            labelText={requiredLabel('Nom d’affichage')}
             value={form.display_name}
             onChange={(e) => set('display_name', e.target.value)}
             invalid={displayNameInvalid}
-            invalidText="Display name is required."
+            invalidText="Le nom d’affichage est obligatoire."
           />
           <TextInput
             id="client-company-name"
-            labelText="Company legal name"
+            labelText="Raison sociale"
             value={form.company_name}
             onChange={(e) => set('company_name', e.target.value)}
           />
           <TextInput
             id="client-contact-name"
-            labelText="Contact person"
+            labelText="Personne à contacter"
             value={form.contact_name}
             onChange={(e) => set('contact_name', e.target.value)}
           />
           <TextInput
             id="client-contact-email"
-            labelText="Contact email"
+            labelText="E-mail de contact"
             value={form.contact_email}
             onChange={(e) => set('contact_email', e.target.value)}
           />
           <TextInput
             id="client-contact-phone"
-            labelText="Contact phone"
+            labelText="Téléphone"
             value={form.contact_phone}
             onChange={(e) => set('contact_phone', e.target.value)}
           />
           <TextArea
             id="client-address"
-            labelText="Address"
+            labelText="Adresse"
             rows={2}
             value={form.address}
             onChange={(e) => set('address', e.target.value)}
           />
           <TextInput
             id="client-tax-id"
-            labelText="Tax / registration ID"
+            labelText="Numéro fiscal / SIRET"
             value={form.tax_id}
             onChange={(e) => set('tax_id', e.target.value)}
           />
@@ -191,7 +191,7 @@ export default function ClientManageTab({ clientId }: { clientId: number }) {
           {updateClient.isError && (
             <InlineNotification
               kind="error"
-              title="Could not save changes"
+              title="Impossible d’enregistrer les modifications"
               subtitle={(updateClient.error as Error)?.message}
               lowContrast
               hideCloseButton
@@ -199,7 +199,7 @@ export default function ClientManageTab({ clientId }: { clientId: number }) {
           )}
           <div>
             <Button onClick={handleSave} disabled={updateClient.isPending}>
-              Save
+              Enregistrer
             </Button>
           </div>
         </Stack>
@@ -212,11 +212,11 @@ export default function ClientManageTab({ clientId }: { clientId: number }) {
 
       {/* Danger zone */}
       <section>
-        <h4 style={{ marginBottom: '0.25rem' }}>Danger zone</h4>
+        <h4 style={{ marginBottom: '0.25rem' }}>Zone de danger</h4>
         <p className="capsule-hint" style={{ marginBottom: '1rem' }}>
           {active
-            ? 'Deactivating blocks all of this client’s logins. Deleting is permanent.'
-            : 'This client is deactivated — their logins are blocked. Reactivate to restore access.'}
+            ? 'La désactivation bloque tous les comptes de ce client. La suppression est définitive.'
+            : 'Ce client est désactivé — ses comptes sont bloqués. Réactivez-le pour rétablir l’accès.'}
         </p>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <Button
@@ -225,7 +225,7 @@ export default function ClientManageTab({ clientId }: { clientId: number }) {
             onClick={() => setActive.mutate(active ? false : true)}
             data-testid="toggle-client-active"
           >
-            {active ? 'Deactivate client' : 'Activate client'}
+            {active ? 'Désactiver le client' : 'Activer le client'}
           </Button>
           <Button
             kind="danger--tertiary"
@@ -233,7 +233,7 @@ export default function ClientManageTab({ clientId }: { clientId: number }) {
             onClick={() => setConfirmDelete(true)}
             data-testid="delete-client"
           >
-            Delete client
+            Supprimer le client
           </Button>
         </div>
       </section>
@@ -241,9 +241,9 @@ export default function ClientManageTab({ clientId }: { clientId: number }) {
       <Modal
         open={confirmDelete}
         danger
-        modalHeading="Delete this client?"
-        primaryButtonText="Delete permanently"
-        secondaryButtonText="Cancel"
+        modalHeading="Supprimer ce client ?"
+        primaryButtonText="Supprimer définitivement"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={deleteClient.isPending}
         onRequestClose={() => setConfirmDelete(false)}
         onRequestSubmit={handleDelete}
@@ -251,8 +251,8 @@ export default function ClientManageTab({ clientId }: { clientId: number }) {
         data-testid="delete-client-modal"
       >
         <p>
-          This permanently removes the client, their logins, and access to
-          their documents. This cannot be undone.
+          Cette action supprime définitivement le client, ses comptes et
+          l’accès à ses documents. Elle est irréversible.
         </p>
       </Modal>
     </Stack>

@@ -60,7 +60,7 @@ export default function LoginPage() {
         // whoami failed: never fail OPEN to platform/admin. Clear the
         // half-established session and ask the user to retry.
         useAppStore.getState().logout()
-        setError("Couldn't load your account, please try again.")
+        setError('Impossible de charger votre compte, veuillez réessayer.')
         return
       }
 
@@ -74,7 +74,7 @@ export default function LoginPage() {
         navigate('/documents', { replace: true })
       }
     } catch {
-      setError('Invalid username or password. Please try again.')
+      setError("Nom d'utilisateur ou mot de passe invalide. Veuillez réessayer.")
     } finally {
       setLoading(false)
     }
@@ -87,13 +87,13 @@ export default function LoginPage() {
           <div>
             <h1 className="capsule-login-title">Capsule</h1>
             <p className="capsule-login-subtitle">
-              Sign in to your document workspace
+              Connectez-vous à votre espace de documents
             </p>
           </div>
           {error && (
             <InlineNotification
               kind="error"
-              title="Sign in failed"
+              title="Échec de la connexion"
               subtitle={error}
               lowContrast
               hideCloseButton
@@ -104,22 +104,22 @@ export default function LoginPage() {
             <Stack gap={5}>
               <TextInput
                 id="username"
-                labelText={requiredLabel('Username')}
+                labelText={requiredLabel("Nom d'utilisateur")}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 invalid={usernameInvalid}
-                invalidText="Username is required."
+                invalidText="Le nom d'utilisateur est requis."
               />
               <PasswordInput
                 id="password"
-                labelText={requiredLabel('Password')}
+                labelText={requiredLabel('Mot de passe')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 invalid={passwordInvalid}
-                invalidText="Password is required."
+                invalidText="Le mot de passe est requis."
               />
               <Button type="submit" disabled={loading} renderIcon={ArrowRight}>
-                {loading ? 'Signing in…' : 'Sign in'}
+                {loading ? 'Connexion…' : 'Se connecter'}
               </Button>
             </Stack>
           </Form>

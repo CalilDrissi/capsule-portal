@@ -17,7 +17,7 @@ function handleUnauthorized(): void {
   const store = useAppStore.getState()
   if (!store.token) return
   store.logout()
-  notify.error('Your session expired', 'Please sign in again.')
+  notify.error('Votre session a expiré', 'Veuillez vous reconnecter.')
   if (window.location.pathname !== '/login') {
     window.location.assign('/login')
   }
@@ -67,7 +67,7 @@ export async function apiGet<T>(path: string): Promise<T> {
   if (!res.ok) {
     if (res.status === 401) handleUnauthorized()
     const body = await safeBody(res)
-    throw new ApiError(res.status, `GET ${path} failed (${res.status})`, body)
+    throw new ApiError(res.status, `Échec de la requête GET ${path} (${res.status})`, body)
   }
   return (await res.json()) as T
 }
@@ -105,7 +105,7 @@ async function apiSend<T>(
     const errBody = await safeBody(res)
     throw new ApiError(
       res.status,
-      `${method} ${path} failed (${res.status})`,
+      `Échec de la requête ${method} ${path} (${res.status})`,
       errBody,
     )
   }
@@ -129,7 +129,7 @@ export async function downloadFile(
 ): Promise<void> {
   const res = await fetch(downloadUrl, { headers: authHeaders() })
   if (!res.ok) {
-    throw new ApiError(res.status, `Download failed (${res.status})`, null)
+    throw new ApiError(res.status, `Échec du téléchargement (${res.status})`, null)
   }
   const blob = await res.blob()
   const objUrl = URL.createObjectURL(blob)
@@ -161,7 +161,7 @@ export async function downloadFilePost(
   })
   if (!res.ok) {
     const errBody = await safeBody(res)
-    throw new ApiError(res.status, `Download failed (${res.status})`, errBody)
+    throw new ApiError(res.status, `Échec du téléchargement (${res.status})`, errBody)
   }
   const blob = await res.blob()
   const objUrl = URL.createObjectURL(blob)
@@ -186,7 +186,7 @@ export async function obtainToken(
   })
   if (!res.ok) {
     const body = await safeBody(res)
-    throw new ApiError(res.status, 'Invalid username or password', body)
+    throw new ApiError(res.status, "Nom d'utilisateur ou mot de passe invalide", body)
   }
   const data = (await res.json()) as { token: string }
   return data.token
@@ -237,7 +237,7 @@ export async function uploadDocument(
   )
   if (!res.ok) {
     const body = await safeBody(res)
-    throw new ApiError(res.status, `Upload failed (${res.status})`, body)
+    throw new ApiError(res.status, `Échec de l'importation (${res.status})`, body)
   }
   return safeBody(res)
 }
@@ -306,7 +306,7 @@ export async function applyUploadMetadata(opts: {
 export async function fetchImageObjectUrl(imageUrl: string): Promise<string> {
   const res = await fetch(imageUrl, { headers: authHeaders() })
   if (!res.ok) {
-    throw new ApiError(res.status, `Image fetch failed (${res.status})`, null)
+    throw new ApiError(res.status, `Échec du chargement de l'image (${res.status})`, null)
   }
   const blob = await res.blob()
   return URL.createObjectURL(blob)

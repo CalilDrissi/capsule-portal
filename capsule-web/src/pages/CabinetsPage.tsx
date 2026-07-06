@@ -28,9 +28,9 @@ import { requiredLabel } from '../lib/forms'
 import type { Cabinet } from '../api/types'
 
 const headers = [
-  { key: 'label', header: 'Label' },
-  { key: 'path', header: 'Full path' },
-  { key: 'children', header: 'Sub-cabinets' },
+  { key: 'label', header: 'Libellé' },
+  { key: 'path', header: 'Chemin complet' },
+  { key: 'children', header: 'Sous-classeurs' },
   { key: 'actions', header: '' },
 ]
 
@@ -102,26 +102,26 @@ export default function CabinetsPage() {
   return (
     <div className="capsule-page">
       <div className="capsule-page__header">
-        <h2 className="capsule-page__title">Cabinets</h2>
+        <h2 className="capsule-page__title">Classeurs</h2>
         <Button
           renderIcon={Add}
           onClick={openCreate}
           data-testid="new-cabinet"
         >
-          New cabinet
+          Nouveau classeur
         </Button>
       </div>
 
       {isLoading ? (
         <DataTableSkeleton columnCount={4} rowCount={5} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load cabinets: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement des classeurs : {(error as Error)?.message}</Tile>
       ) : cabinets.length === 0 ? (
         <Tile className="capsule-empty">
-          <h4>No cabinets yet</h4>
-          <p>Create a cabinet to start organizing your documents.</p>
+          <h4>Aucun classeur pour le moment</h4>
+          <p>Créez un classeur pour commencer à organiser vos documents.</p>
           <Button renderIcon={Add} onClick={openCreate}>
-            New cabinet
+            Nouveau classeur
           </Button>
         </Tile>
       ) : (
@@ -150,20 +150,20 @@ export default function CabinetsPage() {
                           cell.info.header === 'actions' ? (
                             <TableCell key={cell.id}>
                               <OverflowMenu
-                                aria-label="Cabinet actions"
+                                aria-label="Actions du classeur"
                                 flipped
                                 onClick={(e: React.MouseEvent) =>
                                   e.stopPropagation()
                                 }
                               >
                                 <OverflowMenuItem
-                                  itemText="Open"
+                                  itemText="Ouvrir"
                                   onClick={() =>
                                     navigate(`/cabinets/${row.id}`)
                                   }
                                 />
                                 <OverflowMenuItem
-                                  itemText="Rename"
+                                  itemText="Renommer"
                                   onClick={() => {
                                     if (cab) openEdit(cab)
                                   }}
@@ -171,7 +171,7 @@ export default function CabinetsPage() {
                                 <OverflowMenuItem
                                   hasDivider
                                   isDelete
-                                  itemText="Delete"
+                                  itemText="Supprimer"
                                   onClick={() => deleteCabinet.mutate(Number(row.id))}
                                 />
                               </OverflowMenu>
@@ -198,9 +198,9 @@ export default function CabinetsPage() {
 
       <Modal
         open={createOpen}
-        modalHeading="New cabinet"
-        primaryButtonText="Create"
-        secondaryButtonText="Cancel"
+        modalHeading="Nouveau classeur"
+        primaryButtonText="Créer"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={createCabinet.isPending}
         onRequestClose={() => setCreateOpen(false)}
         onRequestSubmit={submitCreate}
@@ -208,11 +208,11 @@ export default function CabinetsPage() {
         <TextInput
           id="new-cabinet-label"
           data-testid="cabinet-label-input"
-          labelText={requiredLabel('Label')}
+          labelText={requiredLabel('Libellé')}
           value={newLabel}
           onChange={(e) => setNewLabel(e.target.value)}
           invalid={createLabelInvalid}
-          invalidText="Label is required."
+          invalidText="Le libellé est obligatoire."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitCreate()
           }}
@@ -226,20 +226,20 @@ export default function CabinetsPage() {
 
       <Modal
         open={!!editCabinet}
-        modalHeading="Rename cabinet"
-        primaryButtonText="Save"
-        secondaryButtonText="Cancel"
+        modalHeading="Renommer le classeur"
+        primaryButtonText="Enregistrer"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={updateCabinet.isPending}
         onRequestClose={() => setEditCabinet(null)}
         onRequestSubmit={submitEdit}
       >
         <TextInput
           id="edit-cabinet-label"
-          labelText={requiredLabel('Label')}
+          labelText={requiredLabel('Libellé')}
           value={editLabel}
           onChange={(e) => setEditLabel(e.target.value)}
           invalid={editLabelInvalid}
-          invalidText="Label is required."
+          invalidText="Le libellé est obligatoire."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitEdit()
           }}

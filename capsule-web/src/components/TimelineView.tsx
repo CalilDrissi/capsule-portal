@@ -65,8 +65,8 @@ export default function TimelineView({
   if (documents.length === 0) {
     return (
       <Tile className="capsule-empty" data-testid={emptyTestId}>
-        <h4>No activity yet</h4>
-        <p>Uploads will appear here as a timeline.</p>
+        <h4>Aucune activité pour le moment</h4>
+        <p>Les documents importés apparaîtront ici sous forme de chronologie.</p>
       </Tile>
     )
   }
@@ -75,11 +75,11 @@ export default function TimelineView({
   const groups: { label: string; items: typeof entries }[] = []
   for (const entry of entries) {
     const label = entry.date
-      ? entry.date.toLocaleDateString(undefined, {
+      ? entry.date.toLocaleDateString('fr-FR', {
           month: 'long',
           year: 'numeric',
         })
-      : 'Undated'
+      : 'Sans date'
     let group = groups[groups.length - 1]
     if (!group || group.label !== label) {
       group = { label, items: [] }
@@ -123,7 +123,7 @@ export default function TimelineView({
                       color: 'var(--cds-text-secondary, #6f6f6f)',
                     }}
                   >
-                    {date ? date.toLocaleDateString() : 'No date'}
+                    {date ? date.toLocaleDateString('fr-FR') : 'Sans date'}
                   </div>
                 </div>
                 {category && <Tag type="blue">{category}</Tag>}

@@ -31,7 +31,7 @@ function SignatureList({
 }) {
   const { data, isLoading } = useFileSignatures(docId, fileId, kind)
   if (isLoading)
-    return <InlineLoading description={`Loading ${kind} signatures…`} />
+    return <InlineLoading description="Chargement des signatures…" />
 
   const sigs = data?.results ?? []
   return (
@@ -39,16 +39,16 @@ function SignatureList({
       <h4 className="capsule-section-title">{title}</h4>
       {sigs.length === 0 ? (
         <Tile data-testid={`signatures-${kind}-empty`}>
-          No {kind} signatures found for this file.
+          Aucune signature {kind} trouvée pour ce fichier.
         </Tile>
       ) : (
         <StructuredListWrapper isCondensed>
           <StructuredListHead>
             <StructuredListRow head>
-              <StructuredListCell head>Signer / Key ID</StructuredListCell>
+              <StructuredListCell head>Signataire / ID de clé</StructuredListCell>
               <StructuredListCell head>Date</StructuredListCell>
-              <StructuredListCell head>Fingerprint</StructuredListCell>
-              <StructuredListCell head>Status</StructuredListCell>
+              <StructuredListCell head>Empreinte</StructuredListCell>
+              <StructuredListCell head>Statut</StructuredListCell>
             </StructuredListRow>
           </StructuredListHead>
           <StructuredListBody>
@@ -60,14 +60,14 @@ function SignatureList({
                 <StructuredListCell>
                   {(() => {
                     const d = pick(sig, ['date_time', 'date'])
-                    return d !== '—' ? new Date(d).toLocaleString() : '—'
+                    return d !== '—' ? new Date(d).toLocaleString('fr-FR') : '—'
                   })()}
                 </StructuredListCell>
                 <StructuredListCell>
                   {pick(sig, ['public_key_fingerprint', 'key_id'])}
                 </StructuredListCell>
                 <StructuredListCell>
-                  {sig.signature_id_url || sig.key_id ? 'Key present' : 'Unverified'}
+                  {sig.signature_id_url || sig.key_id ? 'Clé présente' : 'Non vérifiée'}
                 </StructuredListCell>
               </StructuredListRow>
             ))}
@@ -87,28 +87,28 @@ function SignatureList({
  */
 export default function SignaturesTab({ doc }: { doc: DocumentDetail }) {
   const { data: files, isLoading } = useDocumentFiles(doc.id)
-  if (isLoading) return <InlineLoading description="Loading file…" />
+  if (isLoading) return <InlineLoading description="Chargement du fichier…" />
 
   const latestFile = files?.results[0] ?? doc.file_latest ?? undefined
   if (!latestFile)
-    return <Tile data-testid="signatures-tab">No file to inspect.</Tile>
+    return <Tile data-testid="signatures-tab">Aucun fichier à inspecter.</Tile>
 
   return (
     <div data-testid="signatures-tab">
       <p className="capsule-hint">
-        Digital signatures are read-only here; signing requires server-side keys.
+        Les signatures numériques sont en lecture seule ici ; la signature nécessite des clés côté serveur.
       </p>
       <SignatureList
         docId={doc.id}
         fileId={latestFile.id}
         kind="embedded"
-        title="Embedded signatures"
+        title="Signatures intégrées"
       />
       <SignatureList
         docId={doc.id}
         fileId={latestFile.id}
         kind="detached"
-        title="Detached signatures"
+        title="Signatures détachées"
       />
     </div>
   )

@@ -53,10 +53,10 @@ export default function ClientWorkspacePage() {
   if (!client) {
     return (
       <div className="capsule-page">
-        <PageBreadcrumb items={[{ label: 'Clients', to: '/clients' }, { label: 'Not found' }]} />
+        <PageBreadcrumb items={[{ label: 'Clients', to: '/clients' }, { label: 'Introuvable' }]} />
         <InlineNotification
           kind="error"
-          title="Client not found"
+          title="Client introuvable"
           lowContrast
           hideCloseButton
         />
@@ -79,11 +79,11 @@ export default function ClientWorkspacePage() {
       <h2 className="capsule-page__title">{client.display_name}</h2>
 
       <Tabs>
-        <TabList aria-label="Client workspace" contained>
+        <TabList aria-label="Espace de travail du client" contained>
           <Tab>Documents</Tab>
-          <Tab>By period</Tab>
-          <Tab>Timeline</Tab>
-          <Tab>Requests</Tab>
+          <Tab>Par période</Tab>
+          <Tab>Chronologie</Tab>
+          <Tab>Demandes</Tab>
           <Tab>Client</Tab>
         </TabList>
         <TabPanels>
@@ -109,10 +109,10 @@ export default function ClientWorkspacePage() {
               </Tile>
             ) : documents.length === 0 ? (
               <Tile className="capsule-empty" data-testid="client-docs-empty">
-                <h4>No documents yet</h4>
+                <h4>Aucun document pour l'instant</h4>
                 <p>
-                  This client has not uploaded any documents. You can upload one
-                  for them with the button above.
+                  Ce client n'a importé aucun document. Vous pouvez en importer
+                  un pour lui à l'aide du bouton ci-dessus.
                 </p>
               </Tile>
             ) : (

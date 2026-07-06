@@ -83,8 +83,8 @@ export default function DocumentDetailPage() {
   if (isError || !doc)
     return (
       <div className="capsule-page">
-        <PageBreadcrumb items={[{ label: 'Documents', to: '/documents' }, { label: 'Not found' }]} />
-        <Tile>Document not found.</Tile>
+        <PageBreadcrumb items={[{ label: 'Documents', to: '/documents' }, { label: 'Introuvable' }]} />
+        <Tile>Document introuvable.</Tile>
       </div>
     )
 
@@ -114,7 +114,7 @@ export default function DocumentDetailPage() {
               })
             }
           >
-            {isFavorite ? 'Favorited' : 'Favorite'}
+            {isFavorite ? 'En favori' : 'Favori'}
           </Button>
           <CheckoutButton docId={doc.id} />
           {latestFile && (
@@ -126,7 +126,7 @@ export default function DocumentDetailPage() {
                 downloadFile(`${latestFile.url}download/`, latestFile.filename)
               }
             >
-              Download
+              Télécharger
             </Button>
           )}
           <Button
@@ -140,7 +140,7 @@ export default function DocumentDetailPage() {
               })
             }
           >
-            Send to trash
+            Mettre à la corbeille
           </Button>
         </div>
       </div>
@@ -153,25 +153,25 @@ export default function DocumentDetailPage() {
           {imgUrl ? (
             <img className="capsule-viewer__img" src={imgUrl} alt={`Page ${pageIndex + 1}`} />
           ) : (
-            !imgLoading && <Tile>No preview available.</Tile>
+            !imgLoading && <Tile>Aucun aperçu disponible.</Tile>
           )}
           {pages.length > 1 && (
             <div className="capsule-viewer__nav">
               <Button
                 hasIconOnly
                 kind="ghost"
-                iconDescription="Previous page"
+                iconDescription="Page précédente"
                 renderIcon={ChevronLeft}
                 disabled={pageIndex === 0}
                 onClick={() => setPageIndex((i) => Math.max(0, i - 1))}
               />
               <span>
-                Page {pageIndex + 1} of {pages.length}
+                Page {pageIndex + 1} sur {pages.length}
               </span>
               <Button
                 hasIconOnly
                 kind="ghost"
-                iconDescription="Next page"
+                iconDescription="Page suivante"
                 renderIcon={ChevronRight}
                 disabled={pageIndex >= pages.length - 1}
                 onClick={() => setPageIndex((i) => Math.min(pages.length - 1, i + 1))}
@@ -184,13 +184,13 @@ export default function DocumentDetailPage() {
           <StructuredListWrapper isCondensed>
             <StructuredListBody>
               {[
-                ['Label', doc.label],
+                ['Libellé', doc.label],
                 ['Type', doc.document_type?.label],
-                ['Language', doc.language],
+                ['Langue', doc.language],
                 ['UUID', doc.uuid],
-                ['Created', doc.datetime_created ? new Date(doc.datetime_created).toLocaleString() : '—'],
-                ['File', doc.file_latest?.filename],
-                ['Size', doc.file_latest?.size ? `${(doc.file_latest.size / 1024).toFixed(1)} KB` : '—'],
+                ['Créé le', doc.datetime_created ? new Date(doc.datetime_created).toLocaleString('fr-FR') : '—'],
+                ['Fichier', doc.file_latest?.filename],
+                ['Taille', doc.file_latest?.size ? `${(doc.file_latest.size / 1024).toFixed(1)} Ko` : '—'],
               ].map(([k, v]) => (
                 <StructuredListRow key={k as string}>
                   <StructuredListCell head>{k}</StructuredListCell>
@@ -204,18 +204,18 @@ export default function DocumentDetailPage() {
 
       <div className="capsule-tabs" data-testid="detail-tabs">
         <Tabs>
-          <TabList aria-label="Document details" contained>
-            <Tab>Metadata</Tab>
-            <Tab>Tags</Tab>
-            <Tab>Comments</Tab>
+          <TabList aria-label="Détails du document" contained>
+            <Tab>Métadonnées</Tab>
+            <Tab>Étiquettes</Tab>
+            <Tab>Commentaires</Tab>
             <Tab>OCR</Tab>
-            <Tab>Content</Tab>
-            <Tab>Workflows</Tab>
+            <Tab>Contenu</Tab>
+            <Tab>Flux de travail</Tab>
             <Tab>Signatures</Tab>
             <Tab>Versions</Tab>
-            <Tab>Files</Tab>
-            <Tab>Cabinets</Tab>
-            <Tab>Access control</Tab>
+            <Tab>Fichiers</Tab>
+            <Tab>Classeurs</Tab>
+            <Tab>Contrôle d'accès</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>

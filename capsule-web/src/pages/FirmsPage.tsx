@@ -113,7 +113,7 @@ export default function FirmsPage() {
         throw accountantError
       }
     } catch (e) {
-      setError(apiErrorMessage(e, 'Could not create the firm. Please try again.'))
+      setError(apiErrorMessage(e, 'Impossible de créer le cabinet. Veuillez réessayer.'))
     }
   }
 
@@ -126,22 +126,22 @@ export default function FirmsPage() {
           alignItems: 'center',
         }}
       >
-        <h2 className="capsule-page__title">Firms</h2>
+        <h2 className="capsule-page__title">Cabinets</h2>
         <Button renderIcon={Add} onClick={openModal} data-testid="new-firm">
-          New firm
+          Nouveau cabinet
         </Button>
       </div>
 
       <p className="capsule-hint" style={{ marginTop: '0.25rem' }}>
-        Each firm is an isolated accounting practice with its own accountants and
-        clients. Create a firm and its first accountant here, then sign in as that
-        accountant to add clients.
+        Chaque cabinet est une structure comptable isolée avec ses propres
+        comptables et clients. Créez ici un cabinet et son premier comptable, puis
+        connectez-vous en tant que ce comptable pour ajouter des clients.
       </p>
 
       {isError && (
         <InlineNotification
           kind="error"
-          title="Could not load firms"
+          title="Impossible de charger les cabinets"
           lowContrast
           hideCloseButton
         />
@@ -150,8 +150,8 @@ export default function FirmsPage() {
       {!isLoading && (firms?.length ?? 0) > 0 && (
         <Search
           size="lg"
-          labelText="Search firms"
-          placeholder="Search firms by name"
+          labelText="Rechercher des cabinets"
+          placeholder="Rechercher un cabinet par nom"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onClear={() => setQuery('')}
@@ -166,12 +166,12 @@ export default function FirmsPage() {
         </Tile>
       ) : (firms?.length ?? 0) === 0 ? (
         <Tile className="capsule-empty" data-testid="firms-empty">
-          <h4>No firms yet</h4>
-          <p>Create your first firm to get started.</p>
+          <h4>Aucun cabinet pour le moment</h4>
+          <p>Créez votre premier cabinet pour commencer.</p>
         </Tile>
       ) : filtered.length === 0 ? (
         <Tile className="capsule-empty">
-          <p>No firms match “{query}”.</p>
+          <p>Aucun cabinet ne correspond à «&nbsp;{query}&nbsp;».</p>
         </Tile>
       ) : (
         <div className="capsule-stats" data-testid="firms-grid">
@@ -191,7 +191,7 @@ export default function FirmsPage() {
               <div className="capsule-stat__label">{f.slug}</div>
               <div style={{ marginTop: '0.5rem' }}>
                 <Tag type={f.is_active === false ? 'gray' : 'green'} size="sm">
-                  {f.is_active === false ? 'Inactive' : 'Active'}
+                  {f.is_active === false ? 'Inactif' : 'Actif'}
                 </Tag>
               </div>
             </ClickableTile>
@@ -201,9 +201,9 @@ export default function FirmsPage() {
 
       <Modal
         open={open}
-        modalHeading={created ? 'Firm created' : 'New firm'}
-        primaryButtonText={created ? 'Done' : 'Create firm'}
-        secondaryButtonText={created ? undefined : 'Cancel'}
+        modalHeading={created ? 'Cabinet créé' : 'Nouveau cabinet'}
+        primaryButtonText={created ? 'Terminé' : 'Créer le cabinet'}
+        secondaryButtonText={created ? undefined : 'Annuler'}
         primaryButtonDisabled={!created && busy}
         onRequestClose={() => setOpen(false)}
         onRequestSubmit={created ? () => setOpen(false) : handleCreate}
@@ -214,22 +214,22 @@ export default function FirmsPage() {
           <Stack gap={5}>
             <InlineNotification
               kind="success"
-              title={`${created.firm.name} is ready`}
-              subtitle="Sign in with the accountant login below to add clients. Change the password after first sign-in."
+              title={`${created.firm.name} est prêt`}
+              subtitle="Connectez-vous avec le compte comptable ci-dessous pour ajouter des clients. Modifiez le mot de passe après la première connexion."
               lowContrast
               hideCloseButton
             />
             <div>
-              <p className="cds--label">Sign-in URL</p>
+              <p className="cds--label">URL de connexion</p>
               <CodeSnippet type="single">{window.location.origin}</CodeSnippet>
               <p className="cds--label" style={{ marginTop: '0.5rem' }}>
-                Accountant username
+                Nom d'utilisateur du comptable
               </p>
               <CodeSnippet type="single" data-testid="acct-username">
                 {created.username}
               </CodeSnippet>
               <p className="cds--label" style={{ marginTop: '0.5rem' }}>
-                Accountant password
+                Mot de passe du comptable
               </p>
               <CodeSnippet type="single" data-testid="acct-password">
                 {created.password}
@@ -241,7 +241,7 @@ export default function FirmsPage() {
             {error && (
               <InlineNotification
                 kind="error"
-                title="Could not create firm"
+                title="Impossible de créer le cabinet"
                 subtitle={error}
                 lowContrast
                 hideCloseButton
@@ -249,38 +249,38 @@ export default function FirmsPage() {
             )}
             <TextInput
               id="firm-name"
-              labelText={requiredLabel('Firm name')}
-              placeholder="e.g. Kiloctet Accounting"
+              labelText={requiredLabel('Nom du cabinet')}
+              placeholder="ex. Kiloctet Comptabilité"
               value={firmName}
               onChange={(e) => setFirmName(e.target.value)}
               invalid={firmNameInvalid}
-              invalidText="Firm name is required."
+              invalidText="Le nom du cabinet est obligatoire."
             />
             <TextInput
               id="acct-name"
-              labelText={requiredLabel('Accountant full name')}
-              placeholder="e.g. Sam Rivera"
+              labelText={requiredLabel('Nom complet du comptable')}
+              placeholder="ex. Sam Rivera"
               value={acctName}
               onChange={(e) => setAcctName(e.target.value)}
               invalid={acctNameInvalid}
-              invalidText="Accountant full name is required."
+              invalidText="Le nom complet du comptable est obligatoire."
             />
             <TextInput
               id="acct-user"
-              labelText="Accountant username (optional)"
-              helperText="Used to sign in. Leave blank to auto-generate from the firm name."
+              labelText="Nom d'utilisateur du comptable (facultatif)"
+              helperText="Utilisé pour se connecter. Laissez vide pour le générer automatiquement à partir du nom du cabinet."
               placeholder={firmName ? `${slug(firmName)}_admin` : 'auto'}
               value={acctUser}
               onChange={(e) => setAcctUser(e.target.value)}
             />
             <TextInput
               id="acct-pass"
-              labelText={requiredLabel('Accountant password')}
-              helperText="Auto-generated — you can edit it. At least 10 characters."
+              labelText={requiredLabel('Mot de passe du comptable')}
+              helperText="Généré automatiquement — vous pouvez le modifier. Au moins 10 caractères."
               value={acctPass}
               onChange={(e) => setAcctPass(e.target.value)}
               invalid={passInvalid}
-              invalidText="Password must be at least 10 characters."
+              invalidText="Le mot de passe doit comporter au moins 10 caractères."
             />
           </Stack>
         )}

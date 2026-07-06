@@ -28,7 +28,7 @@ import { requiredLabel } from '../lib/forms'
 import type { Group } from '../api/types'
 
 const headers = [
-  { key: 'name', header: 'Name' },
+  { key: 'name', header: 'Nom' },
   { key: 'actions', header: '' },
 ]
 
@@ -88,22 +88,22 @@ export default function GroupsPage() {
   return (
     <div className="capsule-page">
       <div className="capsule-page__header">
-        <h2 className="capsule-page__title">Groups</h2>
+        <h2 className="capsule-page__title">Groupes</h2>
         <Button renderIcon={Add} onClick={openCreate} data-testid="new-group">
-          New group
+          Nouveau groupe
         </Button>
       </div>
 
       {isLoading ? (
         <DataTableSkeleton columnCount={2} rowCount={5} showHeader={false} />
       ) : isError ? (
-        <Tile>Failed to load groups: {(error as Error)?.message}</Tile>
+        <Tile>Échec du chargement des groupes : {(error as Error)?.message}</Tile>
       ) : groups.length === 0 ? (
         <Tile className="capsule-empty">
-          <h4>No groups yet</h4>
-          <p>Create a group to organize users.</p>
+          <h4>Aucun groupe pour le moment</h4>
+          <p>Créez un groupe pour organiser les utilisateurs.</p>
           <Button renderIcon={Add} onClick={openCreate}>
-            New group
+            Nouveau groupe
           </Button>
         </Tile>
       ) : (
@@ -132,16 +132,16 @@ export default function GroupsPage() {
                           cell.info.header === 'actions' ? (
                             <TableCell key={cell.id}>
                               <OverflowMenu
-                                aria-label="Group actions"
+                                aria-label="Actions sur le groupe"
                                 flipped
                                 onClick={(e: React.MouseEvent) => e.stopPropagation()}
                               >
                                 <OverflowMenuItem
-                                  itemText="Open"
+                                  itemText="Ouvrir"
                                   onClick={() => navigate(`/admin/groups/${row.id}`)}
                                 />
                                 <OverflowMenuItem
-                                  itemText="Rename"
+                                  itemText="Renommer"
                                   onClick={() => {
                                     if (grp) {
                                       setEditGroup(grp)
@@ -153,7 +153,7 @@ export default function GroupsPage() {
                                 <OverflowMenuItem
                                   hasDivider
                                   isDelete
-                                  itemText="Delete"
+                                  itemText="Supprimer"
                                   onClick={() => deleteGroup.mutate(Number(row.id))}
                                 />
                               </OverflowMenu>
@@ -180,9 +180,9 @@ export default function GroupsPage() {
 
       <Modal
         open={createOpen}
-        modalHeading="New group"
-        primaryButtonText="Create"
-        secondaryButtonText="Cancel"
+        modalHeading="Nouveau groupe"
+        primaryButtonText="Créer"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={createGroup.isPending}
         onRequestClose={() => setCreateOpen(false)}
         onRequestSubmit={submitCreate}
@@ -190,11 +190,11 @@ export default function GroupsPage() {
         <TextInput
           id="new-group-name"
           data-testid="group-name-input"
-          labelText={requiredLabel('Name')}
+          labelText={requiredLabel('Nom')}
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           invalid={newNameInvalid}
-          invalidText="Name is required."
+          invalidText="Le nom est obligatoire."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitCreate()
           }}
@@ -206,20 +206,20 @@ export default function GroupsPage() {
 
       <Modal
         open={!!editGroup}
-        modalHeading="Rename group"
-        primaryButtonText="Save"
-        secondaryButtonText="Cancel"
+        modalHeading="Renommer le groupe"
+        primaryButtonText="Enregistrer"
+        secondaryButtonText="Annuler"
         primaryButtonDisabled={updateGroup.isPending}
         onRequestClose={() => setEditGroup(null)}
         onRequestSubmit={submitEdit}
       >
         <TextInput
           id="edit-group-name"
-          labelText={requiredLabel('Name')}
+          labelText={requiredLabel('Nom')}
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
           invalid={editNameInvalid}
-          invalidText="Name is required."
+          invalidText="Le nom est obligatoire."
           onKeyDown={(e) => {
             if (e.key === 'Enter') submitEdit()
           }}
