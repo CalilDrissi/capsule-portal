@@ -34,6 +34,7 @@ import WebLinksPage from './pages/WebLinksPage'
 import SettingsPage from './pages/SettingsPage'
 import FirmsPage from './pages/FirmsPage'
 import FirmDetailPage from './pages/FirmDetailPage'
+import InstallPrompt from './components/InstallPrompt'
 import ClientsGridPage from './pages/ClientsGridPage'
 import ClientWorkspacePage from './pages/ClientWorkspacePage'
 import ClientWorkspaceSelfPage from './pages/ClientWorkspaceSelfPage'
@@ -405,6 +406,7 @@ export default function App() {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <InstallPrompt />
     </GlobalTheme>
   )
 }

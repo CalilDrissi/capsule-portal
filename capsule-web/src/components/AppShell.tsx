@@ -62,6 +62,13 @@ export default function AppShell() {
     <Theme theme={theme} className="capsule-shell">
       <Header aria-label="Capsule">
         <HeaderName href="#" prefix="" onClick={(e) => e.preventDefault()}>
+          <img
+            src="/logo.svg"
+            alt=""
+            width={22}
+            height={22}
+            style={{ verticalAlign: 'middle', marginRight: 8, borderRadius: 5 }}
+          />
           {firm?.name ? `Capsule — ${firm.name}` : 'Capsule'}
         </HeaderName>
         <HeaderGlobalBar>

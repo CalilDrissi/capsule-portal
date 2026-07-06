@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Capsule">
+  <rect width="512" height="512" rx="116" fill="#0f62fe"/>
+  <g transform="rotate(-45 256 256)">
+    <rect x="141" y="191" width="230" height="130" rx="65" fill="#ffffff"/>
+    <rect x="251" y="191" width="10" height="130" fill="#0f62fe"/>
+  </g>
+</svg>
