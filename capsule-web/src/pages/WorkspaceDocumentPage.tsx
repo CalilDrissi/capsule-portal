@@ -10,6 +10,7 @@ import {
   Tile,
 } from '@carbon/react'
 import PageBreadcrumb from '../components/PageBreadcrumb'
+import DocumentViewer from '../components/DocumentViewer'
 import CommentsTab from '../components/CommentsTab'
 import WorkflowsTab from '../components/WorkflowsTab'
 import { useDocument } from '../api/queries'
@@ -69,10 +70,14 @@ export default function WorkspaceDocumentPage() {
 
       <Tabs>
         <TabList aria-label="Document" contained>
+          <Tab>Document</Tab>
           <Tab>Status</Tab>
           <Tab>Comments</Tab>
         </TabList>
         <TabPanels>
+          <TabPanel>
+            <DocumentViewer doc={doc} />
+          </TabPanel>
           <TabPanel>
             <div data-testid="workspace-doc-status">
               <WorkflowsTab docId={doc.id} canTransition={role !== 'client'} />

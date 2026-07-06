@@ -63,7 +63,8 @@ def _grant_document_acls(client, document, user):
     )
 
     from mayan.apps.documents.permissions import (
-        permission_document_edit, permission_document_view
+        permission_document_edit, permission_document_file_view,
+        permission_document_version_view, permission_document_view
     )
     from mayan.apps.document_comments.permissions import (
         permission_document_comment_create,
@@ -80,6 +81,9 @@ def _grant_document_acls(client, document, user):
 
     permissions = (
         permission_document_view, permission_document_edit,
+        # File + version view so the client/accountant can open the page-image
+        # preview and download the file they uploaded/are reviewing.
+        permission_document_file_view, permission_document_version_view,
         permission_document_comment_create,
         permission_document_comment_view,
         permission_workflow_instance_transition,

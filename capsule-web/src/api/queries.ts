@@ -1329,6 +1329,28 @@ export function useResetClientLoginPassword(clientId: number) {
   })
 }
 
+/**
+ * Attach the accountant's just-uploaded document to a client (files it into the
+ * client cabinet, grants ACLs, records attribution, applies metadata). The
+ * upload is processed asynchronously, so the caller may need to retry until the
+ * document exists (the endpoint 404s until then).
+ */
+export function useAttachClientDocument(clientId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (vars: { category?: string; document_date?: string }) =>
+      apiPost<{ document_id: number; label: string }>(
+        `/capsule/clients/${clientId}/documents/attach/`,
+        vars,
+      ),
+    meta: { successMessage: 'Document uploaded for client' },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['cabinet_documents'] })
+      qc.invalidateQueries({ queryKey: ['capsule_client_uploaders', clientId] })
+    },
+  })
+}
+
 /** Map of document id -> uploader, for a client's documents. */
 export function useClientDocumentUploaders(clientId: number | null) {
   return useQuery({

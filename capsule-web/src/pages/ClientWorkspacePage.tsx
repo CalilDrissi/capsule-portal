@@ -17,6 +17,7 @@ import PeriodGroupedDocuments from '../components/PeriodGroupedDocuments'
 import TimelineView from '../components/TimelineView'
 import ExportPeriodButton from '../components/ExportPeriodButton'
 import ClientManageTab from '../components/ClientManageTab'
+import AccountantUploadModal from '../components/AccountantUploadModal'
 import { AccountantRequestsPanel } from '../components/RequestsPanel'
 import {
   useCabinetDocuments,
@@ -87,6 +88,21 @@ export default function ClientWorkspacePage() {
         </TabList>
         <TabPanels>
           <TabPanel>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginBottom: '1rem',
+              }}
+            >
+              <AccountantUploadModal
+                clientId={client.id}
+                onUploaded={() => {
+                  docs.refetch()
+                  uploaders.refetch()
+                }}
+              />
+            </div>
             {docs.isLoading ? (
               <Tile>
                 <SkeletonText paragraph lineCount={3} />
@@ -94,7 +110,10 @@ export default function ClientWorkspacePage() {
             ) : documents.length === 0 ? (
               <Tile className="capsule-empty" data-testid="client-docs-empty">
                 <h4>No documents yet</h4>
-                <p>This client has not uploaded any documents.</p>
+                <p>
+                  This client has not uploaded any documents. You can upload one
+                  for them with the button above.
+                </p>
               </Tile>
             ) : (
               <DocumentsTable

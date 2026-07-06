@@ -952,6 +952,74 @@ class APIClientDocumentUploadersView(APIView):
         return Response(data=data)
 
 
+class APIClientDocumentAttachView(APIView):
+    """
+    post: Attach an accountant-uploaded document to a client. Body
+    {document_id?, category?, document_date?}. Files the document into the
+    client's cabinet, grants the client + accountant roles the document ACLs,
+    records the accountant as the uploader, and applies category/document-date
+    metadata. When document_id is omitted, resolves the newest document of the
+    firm's document type that is not yet attributed to any client (the doc the
+    accountant just uploaded). Accountant of the firm (or platform) only.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, client_id, *args, **kwargs):
+        client = get_object_or_404(
+            queryset=Client.objects.select_related(
+                'firm', 'cabinet', 'client_role', 'firm__accountant_role'
+            ),
+            pk=client_id
+        )
+        if not _can_manage_firm(user=request.user, firm=client.firm):
+            return Response(
+                data={'detail': 'Must be an accountant of this firm.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        data = request.data or {}
+        document = self._resolve_document(
+            client=client, document_id=data.get('document_id')
+        )
+        if document is None:
+            return Response(
+                data={
+                    'detail': 'Could not find the uploaded document to attach.'
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        from .services import uploads
+        uploads.attach_document_to_client(
+            document=document, client=client, user=request.user,
+            category=(data.get('category') or None),
+            document_date=(data.get('document_date') or None)
+        )
+        return Response(
+            data={'document_id': document.pk, 'label': document.label},
+            status=status.HTTP_201_CREATED
+        )
+
+    @staticmethod
+    def _resolve_document(client, document_id):
+        Document = apps.get_model(
+            app_label='documents', model_name='Document'
+        )
+        firm = client.firm
+        if document_id:
+            return Document.valid.filter(
+                pk=document_id, document_type_id=firm.document_type_id
+            ).first()
+        # Newest document of the firm's type not yet attributed to any client
+        # (i.e. the orphaned doc the accountant just uploaded).
+        attributed = apps.get_model(
+            app_label='capsule_org', model_name='CapsuleDocumentUpload'
+        ).objects.values_list('document_id', flat=True)
+        return Document.valid.filter(
+            document_type_id=firm.document_type_id
+        ).exclude(pk__in=attributed).order_by('-datetime_created').first()
+
+
 class APIFirmDetailView(APIView):
     """
     get: Return a firm's detail (platform only).

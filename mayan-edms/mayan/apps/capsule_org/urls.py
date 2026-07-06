@@ -3,7 +3,8 @@ from django.urls import re_path
 from .api_views import (
     APIAccountantDetailView, APIAccountantResetPasswordView,
     APIClientActiveView, APIClientDetailView,
-    APIClientDocumentUploadersView, APIClientInviteView,
+    APIClientDocumentAttachView, APIClientDocumentUploadersView,
+    APIClientInviteView,
     APIClientListCreateView, APIClientRequestListCreateView,
     APIClientUserDetailView, APIClientUserListCreateView,
     APIClientUserResetPasswordView, APIDocumentRequestUpdateView,
@@ -107,6 +108,11 @@ api_urls = [
         ),
         name='capsule-client-document-uploaders',
         view=APIClientDocumentUploadersView.as_view()
+    ),
+    re_path(
+        route=r'^capsule/clients/(?P<client_id>[0-9]+)/documents/attach/$',
+        name='capsule-client-document-attach',
+        view=APIClientDocumentAttachView.as_view()
     ),
     re_path(
         route=r'^capsule/clients/(?P<client_id>[0-9]+)/$',
