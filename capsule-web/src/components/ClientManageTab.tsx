@@ -19,6 +19,7 @@ import {
 } from '../api/queries'
 import { requiredLabel } from '../lib/forms'
 import ClientLoginsTable from './ClientLoginsTable'
+import LogoUpload from './LogoUpload'
 import type { CapsuleClient } from '../api/types'
 
 /** The editable string fields of a client, in one form-state shape. */
@@ -31,6 +32,7 @@ type DetailsForm = {
   address: string
   tax_id: string
   notes: string
+  logo: string
 }
 
 const EMPTY: DetailsForm = {
@@ -42,6 +44,7 @@ const EMPTY: DetailsForm = {
   address: '',
   tax_id: '',
   notes: '',
+  logo: '',
 }
 
 function toForm(c: CapsuleClient): DetailsForm {
@@ -54,6 +57,7 @@ function toForm(c: CapsuleClient): DetailsForm {
     address: c.address ?? '',
     tax_id: c.tax_id ?? '',
     notes: c.notes ?? '',
+    logo: c.logo ?? '',
   }
 }
 
@@ -127,6 +131,11 @@ export default function ClientManageTab({ clientId }: { clientId: number }) {
       <section>
         <h4 style={{ marginBottom: '1rem' }}>Details</h4>
         <Stack gap={5}>
+          <LogoUpload
+            name={form.display_name}
+            value={form.logo}
+            onChange={(dataUrl) => set('logo', dataUrl)}
+          />
           <TextInput
             id="client-display-name"
             labelText={requiredLabel('Display name')}

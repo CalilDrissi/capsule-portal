@@ -6,15 +6,17 @@ import {
   CodeSnippet,
   InlineNotification,
   Modal,
+  Search,
   SkeletonText,
   Stack,
   TextInput,
   Tile,
 } from '@carbon/react'
-import { Add, User } from '@carbon/icons-react'
+import { Add } from '@carbon/icons-react'
 import { useClients, useProvisionClient } from '../api/queries'
 import { useAppStore } from '../store/useAppStore'
 import { requiredLabel } from '../lib/forms'
+import EntityAvatar from '../components/EntityAvatar'
 import type { ProvisionClientResult } from '../api/types'
 
 export default function ClientsGridPage() {
@@ -27,8 +29,17 @@ export default function ClientsGridPage() {
   const [displayName, setDisplayName] = useState('')
   const [created, setCreated] = useState<ProvisionClientResult | null>(null)
   const [attempted, setAttempted] = useState(false)
+  const [query, setQuery] = useState('')
 
   const displayNameInvalid = attempted && !displayName.trim()
+
+  const q = query.trim().toLowerCase()
+  const filtered = (clients ?? []).filter(
+    (c) =>
+      !q ||
+      c.display_name.toLowerCase().includes(q) ||
+      (c.company_name ?? '').toLowerCase().includes(q),
+  )
 
   function openModal() {
     setDisplayName('')
@@ -81,6 +92,19 @@ export default function ClientsGridPage() {
         />
       )}
 
+      {!isLoading && (clients?.length ?? 0) > 0 && (
+        <Search
+          size="lg"
+          labelText="Search clients"
+          placeholder="Search clients by name or company"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onClear={() => setQuery('')}
+          data-testid="clients-search"
+          style={{ marginBottom: '1rem' }}
+        />
+      )}
+
       {isLoading ? (
         <Tile>
           <SkeletonText paragraph lineCount={3} />
@@ -90,9 +114,13 @@ export default function ClientsGridPage() {
           <h4>No clients yet</h4>
           <p>Create your first client to get started.</p>
         </Tile>
+      ) : filtered.length === 0 ? (
+        <Tile className="capsule-empty">
+          <p>No clients match “{query}”.</p>
+        </Tile>
       ) : (
         <div className="capsule-stats" data-testid="clients-grid">
-          {clients!.map((c) => (
+          {filtered.map((c) => (
             <ClickableTile
               key={c.id}
               className="capsule-stat"
@@ -100,11 +128,14 @@ export default function ClientsGridPage() {
               data-testid={`client-card-${c.id}`}
             >
               <div className="capsule-stat__icon">
-                <User size={24} />
+                <EntityAvatar name={c.display_name} logo={c.logo} size={48} />
               </div>
               <div className="capsule-stat__value" style={{ fontSize: '1.25rem' }}>
                 {c.display_name}
               </div>
+              {c.company_name && (
+                <div className="capsule-stat__label">{c.company_name}</div>
+              )}
               <div className="capsule-stat__label">
                 {c.is_active === false
                   ? 'Inactive'

@@ -369,6 +369,7 @@ export interface CapsuleClient {
   tax_id?: string
   notes?: string
   is_active?: boolean
+  logo?: string
   cabinet_id: number
   client_role_id: number
   client_group_id: number
@@ -422,6 +423,7 @@ export interface Firm {
   slug: string
   contact_email?: string
   is_active?: boolean
+  logo?: string
   accountant_group_id: number | null
   accountant_role_id: number | null
   document_type_id: number | null

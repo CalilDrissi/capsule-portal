@@ -25,6 +25,7 @@ import {
 } from '@carbon/react'
 import { Add } from '@carbon/icons-react'
 import PageBreadcrumb from '../components/PageBreadcrumb'
+import LogoUpload from '../components/LogoUpload'
 import {
   useCreateAccountant,
   useDeleteAccountant,
@@ -81,6 +82,7 @@ export default function FirmDetailPage() {
   /* ----------------------------- Firm details ---------------------------- */
   const [name, setName] = useState('')
   const [contactEmail, setContactEmail] = useState('')
+  const [logo, setLogo] = useState('')
   const [detailsAttempted, setDetailsAttempted] = useState(false)
 
   // Seed the edit form once the firm loads (and whenever it changes).
@@ -88,6 +90,7 @@ export default function FirmDetailPage() {
     if (firm) {
       setName(firm.name)
       setContactEmail(firm.contact_email ?? '')
+      setLogo(firm.logo ?? '')
     }
   }, [firm])
 
@@ -96,7 +99,11 @@ export default function FirmDetailPage() {
   function saveDetails() {
     setDetailsAttempted(true)
     if (!name.trim()) return
-    updateFirm.mutate({ name: name.trim(), contact_email: contactEmail.trim() })
+    updateFirm.mutate({
+      name: name.trim(),
+      contact_email: contactEmail.trim(),
+      logo,
+    })
   }
 
   /* ------------------------- Add accountant modal ------------------------ */
@@ -229,6 +236,7 @@ export default function FirmDetailPage() {
               hideCloseButton
             />
           )}
+          <LogoUpload name={name} value={logo} onChange={setLogo} />
           <TextInput
             id="firm-detail-name"
             labelText={requiredLabel('Firm name')}

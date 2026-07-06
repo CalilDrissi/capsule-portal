@@ -28,6 +28,9 @@ class Client(models.Model):
         blank=True, max_length=255,
         verbose_name=_(message='Company legal name')
     )
+    # Optional logo, stored as a small resized data: URI (kept compact
+    # client-side). Empty -> the UI shows a generated initials monogram.
+    logo = models.TextField(blank=True, verbose_name=_(message='Logo'))
     contact_name = models.CharField(
         blank=True, max_length=255, verbose_name=_(message='Contact person')
     )

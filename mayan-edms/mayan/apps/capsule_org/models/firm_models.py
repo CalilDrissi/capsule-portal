@@ -82,6 +82,9 @@ class Firm(models.Model):
     contact_email = models.EmailField(
         blank=True, verbose_name=_(message='Contact email')
     )
+    # Optional logo, stored as a small resized data: URI. Empty -> the UI shows
+    # a generated initials monogram.
+    logo = models.TextField(blank=True, verbose_name=_(message='Logo'))
     # Deactivating a firm disables its logins (users set is_active=False) while
     # keeping all documents/history intact. Reversible.
     is_active = models.BooleanField(

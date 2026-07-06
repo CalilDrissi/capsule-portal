@@ -1140,7 +1140,7 @@ export function useFirm(id: number | null) {
 export function useUpdateFirm(id: number) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (vars: { name?: string; contact_email?: string }) =>
+    mutationFn: (vars: { name?: string; contact_email?: string; logo?: string }) =>
       apiPatch<Firm>(`/capsule/firms/${id}/`, vars),
     meta: { successMessage: 'Firm updated' },
     onSuccess: () => {

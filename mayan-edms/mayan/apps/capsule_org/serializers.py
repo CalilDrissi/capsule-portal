@@ -38,7 +38,8 @@ class FirmSerializer(serializers.ModelSerializer):
             'id', 'name', 'slug', 'accountant_group_id',
             'accountant_role_id', 'document_type_id',
             'document_date_metadata_type_id', 'category_metadata_type_id',
-            'index_template_id', 'workflow_id', 'contact_email', 'is_active'
+            'index_template_id', 'workflow_id', 'contact_email', 'is_active',
+            'logo'
         )
         model = Firm
         read_only_fields = fields
@@ -57,6 +58,8 @@ class FirmUpdateSerializer(serializers.Serializer):
     contact_email = serializers.EmailField(
         allow_blank=True, required=False
     )
+    # Data: URI (resized client-side); allow empty to clear the logo.
+    logo = serializers.CharField(allow_blank=True, required=False)
 
     def validate_name(self, value):
         queryset = Firm.objects.filter(name=value)
@@ -93,7 +96,7 @@ class ClientSerializer(serializers.ModelSerializer):
             'id', 'firm_id', 'user_id', 'display_name', 'cabinet_id',
             'client_role_id', 'client_group_id', 'must_change_password',
             'company_name', 'contact_name', 'contact_email', 'contact_phone',
-            'address', 'tax_id', 'notes', 'is_active'
+            'address', 'tax_id', 'notes', 'is_active', 'logo'
         )
         model = Client
         read_only_fields = fields
@@ -127,6 +130,8 @@ class ClientUpdateSerializer(serializers.Serializer):
         allow_blank=True, max_length=128, required=False
     )
     notes = serializers.CharField(allow_blank=True, required=False)
+    # Data: URI (resized client-side); allow empty to clear the logo.
+    logo = serializers.CharField(allow_blank=True, required=False)
 
 
 class ClientUserSerializer(serializers.Serializer):

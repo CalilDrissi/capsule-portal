@@ -6,15 +6,17 @@ import {
   CodeSnippet,
   InlineNotification,
   Modal,
+  Search,
   SkeletonText,
   Stack,
   Tag,
   TextInput,
   Tile,
 } from '@carbon/react'
-import { Add, Enterprise } from '@carbon/icons-react'
+import { Add } from '@carbon/icons-react'
 import { useCreateAccountant, useCreateFirm, useFirms } from '../api/queries'
 import { requiredLabel } from '../lib/forms'
+import EntityAvatar from '../components/EntityAvatar'
 import type { Firm } from '../api/types'
 
 /** A readable, policy-passing password (>=10 chars, mixed case + digits). */
@@ -50,6 +52,12 @@ export default function FirmsPage() {
   const [created, setCreated] = useState<Created | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [attempted, setAttempted] = useState(false)
+  const [query, setQuery] = useState('')
+
+  const q = query.trim().toLowerCase()
+  const filtered = (firms ?? []).filter(
+    (f) => !q || f.name.toLowerCase().includes(q) || f.slug.toLowerCase().includes(q),
+  )
 
   const busy = createFirm.isPending || createAccountant.isPending
 
@@ -123,6 +131,19 @@ export default function FirmsPage() {
         />
       )}
 
+      {!isLoading && (firms?.length ?? 0) > 0 && (
+        <Search
+          size="lg"
+          labelText="Search firms"
+          placeholder="Search firms by name"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onClear={() => setQuery('')}
+          data-testid="firms-search"
+          style={{ marginBottom: '1rem' }}
+        />
+      )}
+
       {isLoading ? (
         <Tile>
           <SkeletonText paragraph lineCount={3} />
@@ -132,9 +153,13 @@ export default function FirmsPage() {
           <h4>No firms yet</h4>
           <p>Create your first firm to get started.</p>
         </Tile>
+      ) : filtered.length === 0 ? (
+        <Tile className="capsule-empty">
+          <p>No firms match “{query}”.</p>
+        </Tile>
       ) : (
         <div className="capsule-stats" data-testid="firms-grid">
-          {firms!.map((f) => (
+          {filtered.map((f) => (
             <ClickableTile
               key={f.id}
               className="capsule-stat"
@@ -142,7 +167,7 @@ export default function FirmsPage() {
               onClick={() => navigate(`/firms/${f.id}`)}
             >
               <div className="capsule-stat__icon">
-                <Enterprise size={24} />
+                <EntityAvatar name={f.name} logo={f.logo} size={48} />
               </div>
               <div className="capsule-stat__value" style={{ fontSize: '1.25rem' }}>
                 {f.name}
