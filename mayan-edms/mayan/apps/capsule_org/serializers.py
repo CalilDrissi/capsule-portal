@@ -71,7 +71,11 @@ class FirmUpdateSerializer(serializers.Serializer):
 
 
 class AccountantCreateSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150)
+    # Optional: blank -> the provisioning service auto-generates a unique
+    # username from the accountant's name (matches client provisioning).
+    username = serializers.CharField(
+        allow_blank=True, default='', max_length=150, required=False
+    )
     password = serializers.CharField(
         max_length=255, style={'input_type': 'password'}
     )

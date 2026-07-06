@@ -1,11 +1,14 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Button,
+  ClickableTile,
   CodeSnippet,
   InlineNotification,
   Modal,
   SkeletonText,
   Stack,
+  Tag,
   TextInput,
   Tile,
 } from '@carbon/react'
@@ -34,6 +37,7 @@ interface Created {
 }
 
 export default function FirmsPage() {
+  const navigate = useNavigate()
   const { data: firms, isLoading, isError } = useFirms()
   const createFirm = useCreateFirm()
   const createAccountant = useCreateAccountant()
@@ -131,7 +135,12 @@ export default function FirmsPage() {
       ) : (
         <div className="capsule-stats" data-testid="firms-grid">
           {firms!.map((f) => (
-            <Tile key={f.id} className="capsule-stat" data-testid={`firm-${f.id}`}>
+            <ClickableTile
+              key={f.id}
+              className="capsule-stat"
+              data-testid={`firm-${f.id}`}
+              onClick={() => navigate(`/firms/${f.id}`)}
+            >
               <div className="capsule-stat__icon">
                 <Enterprise size={24} />
               </div>
@@ -139,7 +148,12 @@ export default function FirmsPage() {
                 {f.name}
               </div>
               <div className="capsule-stat__label">{f.slug}</div>
-            </Tile>
+              <div style={{ marginTop: '0.5rem' }}>
+                <Tag type={f.is_active === false ? 'gray' : 'green'} size="sm">
+                  {f.is_active === false ? 'Inactive' : 'Active'}
+                </Tag>
+              </div>
+            </ClickableTile>
           ))}
         </div>
       )}

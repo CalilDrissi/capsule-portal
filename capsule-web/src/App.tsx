@@ -33,6 +33,7 @@ import SmartLinksPage from './pages/SmartLinksPage'
 import WebLinksPage from './pages/WebLinksPage'
 import SettingsPage from './pages/SettingsPage'
 import FirmsPage from './pages/FirmsPage'
+import FirmDetailPage from './pages/FirmDetailPage'
 import ClientsGridPage from './pages/ClientsGridPage'
 import ClientWorkspacePage from './pages/ClientWorkspacePage'
 import ClientWorkspaceSelfPage from './pages/ClientWorkspaceSelfPage'
@@ -118,6 +119,14 @@ export default function App() {
             element={
               <RequireRole allow={[]}>
                 <FirmsPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="firms/:id"
+            element={
+              <RequireRole allow={[]}>
+                <FirmDetailPage />
               </RequireRole>
             }
           />

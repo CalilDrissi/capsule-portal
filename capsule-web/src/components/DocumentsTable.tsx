@@ -14,7 +14,12 @@ import {
   Tag,
 } from '@carbon/react'
 import { apiGet } from '../api/client'
-import type { DocumentSummary, Paginated, WorkflowInstance } from '../api/types'
+import type {
+  DocumentSummary,
+  DocumentUploaders,
+  Paginated,
+  WorkflowInstance,
+} from '../api/types'
 
 const baseHeaders = [
   { key: 'label', header: 'Label' },
@@ -23,6 +28,7 @@ const baseHeaders = [
 ]
 
 const statusHeader = { key: 'status', header: 'Status' }
+const uploaderHeader = { key: 'uploader', header: 'Uploaded by' }
 
 /** Carbon tag colour per Capsule status state. */
 function statusTagType(state: string): 'gray' | 'blue' | 'magenta' | 'green' {
@@ -46,11 +52,15 @@ export default function DocumentsTable({
   documents,
   linkBase = '/documents',
   showStatus = false,
+  uploaders,
 }: {
   documents: DocumentSummary[]
   linkBase?: string
   showStatus?: boolean
+  /** When provided, adds an "Uploaded by" column (doc id -> uploader). */
+  uploaders?: DocumentUploaders
 }) {
+  const showUploader = !!uploaders
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
@@ -78,7 +88,11 @@ export default function DocumentsTable({
     })
   }
 
-  const headers = showStatus ? [...baseHeaders, statusHeader] : baseHeaders
+  const headers = [
+    ...baseHeaders,
+    ...(showStatus ? [statusHeader] : []),
+    ...(showUploader ? [uploaderHeader] : []),
+  ]
 
   const rows = documents.map((d) => ({
     id: String(d.id),
@@ -88,6 +102,7 @@ export default function DocumentsTable({
       ? new Date(d.datetime_created).toLocaleString()
       : '—',
     status: statusById[d.id] ?? '—',
+    uploader: uploaders?.[String(d.id)]?.display ?? '—',
   }))
 
   return (

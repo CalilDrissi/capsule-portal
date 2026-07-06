@@ -102,7 +102,7 @@ def create_accountant(firm, username, password, full_name='', actor=None):
     Creates a NON-STAFF, NON-SUPERUSER accountant user, adds them to the
     firm's accountant group, and records a FirmMembership(accountant).
     """
-    username = _unique_username(base=username)
+    username = _unique_username(base=username or full_name or 'accountant')
 
     user = User(
         username=username, is_staff=False, is_superuser=False,

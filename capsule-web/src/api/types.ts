@@ -361,10 +361,50 @@ export interface CapsuleClient {
   firm_id: number
   user_id: number
   display_name: string
+  company_name?: string
+  contact_name?: string
+  contact_email?: string
+  contact_phone?: string
+  address?: string
+  tax_id?: string
+  notes?: string
+  is_active?: boolean
   cabinet_id: number
   client_role_id: number
   client_group_id: number
   must_change_password: boolean
+}
+
+/** One login belonging to a client company (primary owner or an employee). */
+export interface ClientUser {
+  id: number
+  user_id: number
+  username: string
+  first_name: string
+  is_active: boolean
+  is_primary: boolean
+  has_invite: boolean
+}
+
+/** An accountant login of a firm. */
+export interface AccountantSummary {
+  user_id: number
+  username: string
+  first_name: string
+  is_active: boolean
+}
+
+/** Map of document id -> who uploaded it (GET /capsule/clients/<id>/document-uploaders/). */
+export type DocumentUploaders = Record<
+  string,
+  { username: string; display: string }
+>
+
+/** Result of adding an employee login / regenerating an invite. */
+export interface InviteResult {
+  username?: string
+  invite_token?: string
+  invite_path?: string | null
 }
 
 export interface ProvisionClientResult {
@@ -380,6 +420,8 @@ export interface Firm {
   id: number
   name: string
   slug: string
+  contact_email?: string
+  is_active?: boolean
   accountant_group_id: number | null
   accountant_role_id: number | null
   document_type_id: number | null

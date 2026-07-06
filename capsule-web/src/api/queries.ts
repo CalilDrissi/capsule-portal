@@ -6,12 +6,16 @@ import {
 import { apiDelete, apiGet, apiPatch, apiPost, changePassword } from './client'
 import type {
   AccountantCreateResult,
+  AccountantSummary,
   CapsuleClient,
   CapsuleDocumentRequest,
   CapsuleNotification,
   CapsuleNotificationList,
+  ClientUser,
+  DocumentUploaders,
   Firm,
   FirmSettings,
+  InviteResult,
   ProvisionClientResult,
   Whoami,
 } from './types'
@@ -1121,6 +1125,219 @@ export function useCreateFirm() {
     mutationFn: (vars: { name: string }) => apiPost<Firm>(`/capsule/firms/`, vars),
     meta: { successMessage: 'Firm created' },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['capsule_firms'] }),
+  })
+}
+
+/** Firm detail (platform admin). */
+export function useFirm(id: number | null) {
+  return useQuery({
+    queryKey: ['capsule_firm', id] as const,
+    queryFn: () => apiGet<Firm>(`/capsule/firms/${id}/`),
+    enabled: id != null,
+  })
+}
+
+export function useUpdateFirm(id: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (vars: { name?: string; contact_email?: string }) =>
+      apiPatch<Firm>(`/capsule/firms/${id}/`, vars),
+    meta: { successMessage: 'Firm updated' },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['capsule_firm', id] })
+      qc.invalidateQueries({ queryKey: ['capsule_firms'] })
+    },
+  })
+}
+
+export function useSetFirmActive(id: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (active: boolean) =>
+      apiPost(`/capsule/firms/${id}/active/`, { active }),
+    meta: { successMessage: 'Firm updated' },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['capsule_firm', id] })
+      qc.invalidateQueries({ queryKey: ['capsule_firms'] })
+    },
+  })
+}
+
+export function useDeleteFirm() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => apiDelete(`/capsule/firms/${id}/`),
+    meta: { successMessage: 'Firm deleted' },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['capsule_firms'] }),
+  })
+}
+
+/** A firm's accountant logins. */
+export function useFirmAccountants(firmId: number | null) {
+  return useQuery({
+    queryKey: ['capsule_firm_accountants', firmId] as const,
+    queryFn: () =>
+      apiGet<AccountantSummary[]>(`/capsule/firms/${firmId}/accountant-list/`),
+    enabled: firmId != null,
+  })
+}
+
+export function useUpdateAccountant(firmId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (vars: {
+      userId: number
+      first_name?: string
+      email?: string
+      active?: boolean
+    }) => {
+      const { userId, ...body } = vars
+      return apiPatch(`/capsule/firms/${firmId}/accountants/${userId}/`, body)
+    },
+    meta: { successMessage: 'Accountant updated' },
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: ['capsule_firm_accountants', firmId] }),
+  })
+}
+
+export function useDeleteAccountant(firmId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (userId: number) =>
+      apiDelete(`/capsule/firms/${firmId}/accountants/${userId}/`),
+    meta: { successMessage: 'Accountant removed' },
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: ['capsule_firm_accountants', firmId] }),
+  })
+}
+
+export function useResetAccountantPassword(firmId: number) {
+  return useMutation({
+    mutationFn: (vars: { userId: number; password: string }) =>
+      apiPost(`/capsule/firms/${firmId}/accountants/${vars.userId}/reset-password/`, {
+        password: vars.password,
+      }),
+    meta: { successMessage: 'Password reset' },
+  })
+}
+
+/* ------------------------- Client management ------------------------- */
+
+export function useUpdateClient(id: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (vars: Partial<CapsuleClient>) =>
+      apiPatch<CapsuleClient>(`/capsule/clients/${id}/`, vars),
+    meta: { successMessage: 'Client updated' },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['capsule_client', id] })
+      qc.invalidateQueries({ queryKey: ['capsule_clients'] })
+    },
+  })
+}
+
+/** Client detail (fresh copy incl. company/contact fields). */
+export function useClientDetail(id: number | null) {
+  return useQuery({
+    queryKey: ['capsule_client', id] as const,
+    queryFn: () => apiGet<CapsuleClient>(`/capsule/clients/${id}/`),
+    enabled: id != null,
+  })
+}
+
+export function useSetClientActive(id: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (active: boolean) =>
+      apiPost(`/capsule/clients/${id}/active/`, { active }),
+    meta: { successMessage: 'Client updated' },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['capsule_client', id] })
+      qc.invalidateQueries({ queryKey: ['capsule_clients'] })
+    },
+  })
+}
+
+export function useDeleteClient() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => apiDelete(`/capsule/clients/${id}/`),
+    meta: { successMessage: 'Client deleted' },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['capsule_clients'] }),
+  })
+}
+
+/** A client's logins (primary + employees). */
+export function useClientUsers(clientId: number | null) {
+  return useQuery({
+    queryKey: ['capsule_client_users', clientId] as const,
+    queryFn: () =>
+      apiGet<ClientUser[]>(`/capsule/clients/${clientId}/users/`),
+    enabled: clientId != null,
+  })
+}
+
+export function useAddClientUser(clientId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (vars: { full_name?: string; username?: string }) =>
+      apiPost<InviteResult>(`/capsule/clients/${clientId}/users/`, vars),
+    meta: { successMessage: 'Employee login added' },
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: ['capsule_client_users', clientId] }),
+  })
+}
+
+export function useUpdateClientUser(clientId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (vars: {
+      userId: number
+      first_name?: string
+      email?: string
+      active?: boolean
+    }) => {
+      const { userId, ...body } = vars
+      return apiPatch(`/capsule/clients/${clientId}/users/${userId}/`, body)
+    },
+    meta: { successMessage: 'Login updated' },
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: ['capsule_client_users', clientId] }),
+  })
+}
+
+export function useDeleteClientUser(clientId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (userId: number) =>
+      apiDelete(`/capsule/clients/${clientId}/users/${userId}/`),
+    meta: { successMessage: 'Login removed' },
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: ['capsule_client_users', clientId] }),
+  })
+}
+
+/** Reset a client login's password: mode 'password' (set directly) or 'link' (invite). */
+export function useResetClientLoginPassword(clientId: number) {
+  return useMutation({
+    mutationFn: (vars: { userId: number; mode: 'password' | 'link'; password?: string }) =>
+      apiPost<InviteResult & { ok?: boolean }>(
+        `/capsule/clients/${clientId}/users/${vars.userId}/reset-password/`,
+        { mode: vars.mode, password: vars.password },
+      ),
+    meta: { successMessage: 'Password reset' },
+  })
+}
+
+/** Map of document id -> uploader, for a client's documents. */
+export function useClientDocumentUploaders(clientId: number | null) {
+  return useQuery({
+    queryKey: ['capsule_client_uploaders', clientId] as const,
+    queryFn: () =>
+      apiGet<DocumentUploaders>(
+        `/capsule/clients/${clientId}/document-uploaders/`,
+      ),
+    enabled: clientId != null,
   })
 }
 

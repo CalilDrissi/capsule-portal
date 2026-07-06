@@ -106,7 +106,11 @@ export default function ClientsGridPage() {
                 {c.display_name}
               </div>
               <div className="capsule-stat__label">
-                {c.must_change_password ? 'Pending first login' : 'Active'}
+                {c.is_active === false
+                  ? 'Inactive'
+                  : c.must_change_password
+                    ? 'Pending first login'
+                    : 'Active'}
               </div>
             </ClickableTile>
           ))}

@@ -16,8 +16,13 @@ import DocumentsTable from '../components/DocumentsTable'
 import PeriodGroupedDocuments from '../components/PeriodGroupedDocuments'
 import TimelineView from '../components/TimelineView'
 import ExportPeriodButton from '../components/ExportPeriodButton'
+import ClientManageTab from '../components/ClientManageTab'
 import { AccountantRequestsPanel } from '../components/RequestsPanel'
-import { useCabinetDocuments, useClient } from '../api/queries'
+import {
+  useCabinetDocuments,
+  useClient,
+  useClientDocumentUploaders,
+} from '../api/queries'
 import { useAppStore } from '../store/useAppStore'
 
 /** Accountant's view of one client: their documents + status/requests/export. */
@@ -27,6 +32,7 @@ export default function ClientWorkspacePage() {
   const setActiveClientId = useAppStore((s) => s.setActiveClientId)
   const { client, isLoading: clientLoading } = useClient(clientId)
   const docs = useCabinetDocuments(client?.cabinet_id ?? null)
+  const uploaders = useClientDocumentUploaders(clientId)
 
   useEffect(() => {
     setActiveClientId(clientId)
@@ -77,6 +83,7 @@ export default function ClientWorkspacePage() {
           <Tab>By period</Tab>
           <Tab>Timeline</Tab>
           <Tab>Requests</Tab>
+          <Tab>Client</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -94,6 +101,7 @@ export default function ClientWorkspacePage() {
                 documents={documents}
                 linkBase={linkBase}
                 showStatus
+                uploaders={uploaders.data}
               />
             )}
           </TabPanel>
@@ -128,6 +136,9 @@ export default function ClientWorkspacePage() {
           </TabPanel>
           <TabPanel>
             <AccountantRequestsPanel clientId={client.id} />
+          </TabPanel>
+          <TabPanel>
+            <ClientManageTab clientId={client.id} />
           </TabPanel>
         </TabPanels>
       </Tabs>
