@@ -25,6 +25,15 @@ function slug(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 20)
 }
 
+/** A field label with a required-marker asterisk. */
+function required(label: string) {
+  return (
+    <span>
+      {label} <span style={{ color: '#da1e28' }} aria-hidden="true">*</span>
+    </span>
+  )
+}
+
 interface Created {
   firm: Firm
   username: string
@@ -43,8 +52,14 @@ export default function FirmsPage() {
   const [acctPass, setAcctPass] = useState('')
   const [created, setCreated] = useState<Created | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [attempted, setAttempted] = useState(false)
 
   const busy = createFirm.isPending || createAccountant.isPending
+
+  // Field-level validity (only surfaced after a save attempt).
+  const firmNameInvalid = attempted && !firmName.trim()
+  const acctNameInvalid = attempted && !acctName.trim()
+  const passInvalid = attempted && acctPass.trim().length < 10
 
   function openModal() {
     setFirmName('')
@@ -53,14 +68,16 @@ export default function FirmsPage() {
     setAcctPass(generatePassword())
     setCreated(null)
     setError(null)
+    setAttempted(false)
     setOpen(true)
   }
 
   async function handleCreate() {
     setError(null)
+    setAttempted(true)
     const name = firmName.trim()
     const username = acctUser.trim() || `${slug(name)}_admin`
-    if (!name || !acctName.trim()) return
+    if (!name || !acctName.trim() || acctPass.trim().length < 10) return
     try {
       const firm = await createFirm.mutateAsync({ name })
       await createAccountant.mutateAsync({
@@ -139,9 +156,7 @@ export default function FirmsPage() {
         modalHeading={created ? 'Firm created' : 'New firm'}
         primaryButtonText={created ? 'Done' : 'Create firm'}
         secondaryButtonText={created ? undefined : 'Cancel'}
-        primaryButtonDisabled={
-          !created && (!firmName.trim() || !acctName.trim() || busy)
-        }
+        primaryButtonDisabled={!created && busy}
         onRequestClose={() => setOpen(false)}
         onRequestSubmit={created ? () => setOpen(false) : handleCreate}
         onSecondarySubmit={() => setOpen(false)}
@@ -186,21 +201,25 @@ export default function FirmsPage() {
             )}
             <TextInput
               id="firm-name"
-              labelText="Firm name"
+              labelText={required('Firm name')}
               placeholder="e.g. Kiloctet Accounting"
               value={firmName}
               onChange={(e) => setFirmName(e.target.value)}
+              invalid={firmNameInvalid}
+              invalidText="Firm name is required."
             />
             <TextInput
               id="acct-name"
-              labelText="Accountant full name"
+              labelText={required('Accountant full name')}
               placeholder="e.g. Sam Rivera"
               value={acctName}
               onChange={(e) => setAcctName(e.target.value)}
+              invalid={acctNameInvalid}
+              invalidText="Accountant full name is required."
             />
             <TextInput
               id="acct-user"
-              labelText="Accountant username"
+              labelText="Accountant username (optional)"
               helperText="Used to sign in. Leave blank to auto-generate from the firm name."
               placeholder={firmName ? `${slug(firmName)}_admin` : 'auto'}
               value={acctUser}
@@ -208,10 +227,12 @@ export default function FirmsPage() {
             />
             <TextInput
               id="acct-pass"
-              labelText="Accountant password"
+              labelText={required('Accountant password')}
               helperText="Auto-generated — you can edit it. At least 10 characters."
               value={acctPass}
               onChange={(e) => setAcctPass(e.target.value)}
+              invalid={passInvalid}
+              invalidText="Password must be at least 10 characters."
             />
           </Stack>
         )}

@@ -109,8 +109,8 @@
 
     <div class="progress">
       <span>Progress</span>
-      <div class="bar"><span></span></div>
-      <span>1 step</span>
+      <div class="bar"><span style="width:50%"></span></div>
+      <span>2 of ~3 steps</span>
     </div>
 
     <div class="steps">
@@ -134,14 +134,31 @@
         <p class="note"><b>Change this password</b> after your first sign-in, then keep it somewhere safe — it's the master account.</p>
       </article>
 
-      <!-- NEXT STEP PLACEHOLDER -->
-      <article class="step pending">
+      <!-- STEP 2 -->
+      <article class="step">
         <div class="step-head">
           <span class="num">02</span>
           <h2>Create your firm</h2>
+          <span class="tag now">Do this now</span>
+        </div>
+        <ol class="actions">
+          <li>In the left sidebar, click <b>Firms</b> (top icon).</li>
+          <li>Click <b>New firm</b> (top-right).</li>
+          <li>Enter your <b>Firm name</b> and the <b>Accountant full name</b>. Leave username blank to auto-generate; the password is pre-filled (you can edit it).</li>
+          <li>Click <b>Create firm</b>.</li>
+          <li><b>Copy the accountant username and password</b> shown — that's the firm's day-to-day login. It only appears once.</li>
+        </ol>
+        <p class="note">A <b>firm</b> is one accounting practice, fully isolated from every other firm. The <b>accountant</b> login you just created is what you (or the firm) use to add clients and review documents — not the admin login.</p>
+      </article>
+
+      <!-- STEP 3 (pending) -->
+      <article class="step pending">
+        <div class="step-head">
+          <span class="num">03</span>
+          <h2>Sign in as the accountant &amp; add clients</h2>
           <span class="tag wait">Up next</span>
         </div>
-        <p class="note">We'll fill this in together — tell me your firm's name and this step appears here with the exact actions.</p>
+        <p class="note">Once you've created the firm, tell me and I'll add this step: signing out of admin, signing in with the accountant login, and inviting your first client.</p>
       </article>
     </div>
   </main>
