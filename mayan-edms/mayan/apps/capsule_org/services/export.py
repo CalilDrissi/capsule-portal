@@ -5,8 +5,6 @@ import zipfile
 
 from django.apps import apps
 
-from .index_builder import DOCUMENT_DATE_METADATA_NAME
-
 logger = logging.getLogger(name=__name__)
 
 # Read/compress each document file this many bytes at a time so a single
@@ -14,23 +12,24 @@ logger = logging.getLogger(name=__name__)
 COPY_CHUNK_SIZE = 1024 * 1024  # 1 MiB
 
 
-def _effective_period_key(document):
+def _effective_period_key(document, date_type_id=None):
     """
-    Compute a document's period key as "YYYY" / "YYYY-MM" using the firm
+    Compute a document's period key as "YYYY" / "YYYY-MM" using the firm's
     document-date metadata when present, else the creation date. This mirrors
-    the SPA's client-side period grouping so an exported period matches the
-    "By period" view.
+    the SPA's period grouping so an exported period matches the "By period" view.
+
+    `date_type_id` is the firm's document-date MetadataType id — matched by id
+    rather than by name, because the type is named `capsule_<slug>_document_date`
+    (firm-scoped) and a fixed-name substring match would never hit it.
     """
     date = None
 
     value = None
-    for document_metadata in document.metadata.all():
-        metadata_type = document_metadata.metadata_type
-        if metadata_type and DOCUMENT_DATE_METADATA_NAME in (
-            metadata_type.name or ''
-        ):
-            value = document_metadata.value
-            break
+    if date_type_id is not None:
+        for document_metadata in document.metadata.all():
+            if document_metadata.metadata_type_id == date_type_id:
+                value = document_metadata.value
+                break
 
     if value:
         try:
@@ -49,8 +48,8 @@ def _effective_period_key(document):
             'month': '{:04d}-{:02d}'.format(date.year, date.month)}
 
 
-def _period_matches(document, period_key):
-    keys = _effective_period_key(document)
+def _period_matches(document, period_key, date_type_id=None):
+    keys = _effective_period_key(document, date_type_id=date_type_id)
     if not keys:
         return False
     return period_key in (keys['year'], keys['month'])
@@ -79,6 +78,8 @@ def build_period_zip(client, period_key, user):
     if cabinet is None:
         return b'', 0
 
+    date_type_id = getattr(client.firm, 'document_date_metadata_type_id', None)
+
     queryset = Document.valid.filter(cabinets=cabinet).distinct()
 
     # Kill the per-document N+1: `_effective_period_key` walks
@@ -101,7 +102,10 @@ def build_period_zip(client, period_key, user):
         buffer, mode='w', compression=zipfile.ZIP_DEFLATED
     ) as archive:
         for document in queryset:
-            if not _period_matches(document=document, period_key=period_key):
+            if not _period_matches(
+                document=document, period_key=period_key,
+                date_type_id=date_type_id
+            ):
                 continue
 
             document_file = document.file_latest

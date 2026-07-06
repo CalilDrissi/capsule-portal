@@ -14,7 +14,13 @@ import {
   Tile,
 } from '@carbon/react'
 import { Add } from '@carbon/icons-react'
-import { useCreateAccountant, useCreateFirm, useFirms } from '../api/queries'
+import {
+  useCreateAccountant,
+  useCreateFirm,
+  useDeleteFirm,
+  useFirms,
+} from '../api/queries'
+import { apiErrorMessage } from '../api/client'
 import { requiredLabel } from '../lib/forms'
 import EntityAvatar from '../components/EntityAvatar'
 import type { Firm } from '../api/types'
@@ -43,6 +49,7 @@ export default function FirmsPage() {
   const { data: firms, isLoading, isError } = useFirms()
   const createFirm = useCreateFirm()
   const createAccountant = useCreateAccountant()
+  const deleteFirm = useDeleteFirm()
 
   const [open, setOpen] = useState(false)
   const [firmName, setFirmName] = useState('')
@@ -81,23 +88,32 @@ export default function FirmsPage() {
     setError(null)
     setAttempted(true)
     const name = firmName.trim()
-    const username = acctUser.trim() || `${slug(name)}_admin`
     if (!name || !acctName.trim() || acctPass.trim().length < 10) return
+    let firm: Firm | null = null
     try {
-      const firm = await createFirm.mutateAsync({ name })
-      await createAccountant.mutateAsync({
-        firmId: firm.id,
-        username,
-        password: acctPass,
-        full_name: acctName.trim(),
-      })
-      setCreated({ firm, username, password: acctPass })
+      firm = await createFirm.mutateAsync({ name })
+      try {
+        const res = await createAccountant.mutateAsync({
+          firmId: firm.id,
+          // Blank -> the backend auto-generates a unique username.
+          username: acctUser.trim(),
+          password: acctPass,
+          full_name: acctName.trim(),
+        })
+        // Show the REAL username the server assigned, not a local guess.
+        setCreated({ firm, username: res.user.username, password: acctPass })
+      } catch (accountantError) {
+        // The firm was created but the accountant failed — roll the firm back
+        // so we don't leave an orphan firm with no login.
+        try {
+          await deleteFirm.mutateAsync(firm.id)
+        } catch {
+          /* best effort */
+        }
+        throw accountantError
+      }
     } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message.replace(/^[A-Z]+ \/[^:]+: \d+: /, '')
-          : 'Could not create the firm. Please try again.',
-      )
+      setError(apiErrorMessage(e, 'Could not create the firm. Please try again.'))
     }
   }
 

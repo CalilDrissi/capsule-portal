@@ -48,6 +48,15 @@ class FirmSerializer(serializers.ModelSerializer):
 class FirmCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
 
+    def validate_name(self, value):
+        # Firm.name is unique; validate here so a duplicate returns HTTP 400
+        # with a clear message instead of an IntegrityError 500.
+        if Firm.objects.filter(name=value).exists():
+            raise serializers.ValidationError(
+                'A firm with this name already exists.'
+            )
+        return value
+
 
 class FirmUpdateSerializer(serializers.Serializer):
     """
