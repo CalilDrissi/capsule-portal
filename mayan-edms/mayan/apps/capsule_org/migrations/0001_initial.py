@@ -10,7 +10,12 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0013_alter_user_first_name_alter_user_last_name'),
+        # NOTE: do NOT pin a specific `auth` migration here. makemigrations may
+        # emit the latest auth node from the machine it ran on (e.g. auth.0013),
+        # which need not exist in the target image's Django (s4.11 tops out at
+        # auth.0012) -> NodeNotFoundError on a fresh migrate. The swappable
+        # dependency below already ties us to the user model's latest migration
+        # portably across Django versions.
         ('cabinets', '0007_alter_cabinet_parent'),
         ('documents', '0092_alter_favoritedocument_unique_together'),
         ('permissions', '0004_auto_20191213_0044'),
