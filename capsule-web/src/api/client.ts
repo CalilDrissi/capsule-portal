@@ -33,6 +33,26 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Extract a human-readable message from a thrown error. DRF returns validation
+ * problems as `{detail: "..."}`, `{detail: ["...", ...]}`, a bare list, or
+ * `{field: ["..."]}`; surface the real reason instead of a generic fallback.
+ */
+export function apiErrorMessage(e: unknown, fallback: string): string {
+  if (e instanceof ApiError) {
+    const b = e.body
+    if (typeof b === 'string' && b.trim()) return b
+    if (Array.isArray(b) && b.length) return String(b[0])
+    if (b && typeof b === 'object') {
+      const rec = b as Record<string, unknown>
+      const cand = rec.detail ?? rec.non_field_errors ?? rec.password ?? Object.values(rec)[0]
+      if (typeof cand === 'string' && cand.trim()) return cand
+      if (Array.isArray(cand) && cand.length) return String(cand[0])
+    }
+  }
+  return fallback
+}
+
 function authHeaders(): Record<string, string> {
   const token = useAppStore.getState().token
   const headers: Record<string, string> = { Accept: 'application/json' }

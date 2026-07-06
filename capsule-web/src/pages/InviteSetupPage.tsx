@@ -11,9 +11,9 @@ import {
   Tile,
 } from '@carbon/react'
 import { ArrowRight } from '@carbon/icons-react'
-import { apiGet, apiPost, obtainToken } from '../api/client'
+import { ApiError, apiErrorMessage, apiGet, apiPost, obtainToken } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
-import { requiredLabel } from '../lib/forms'
+import { MIN_PASSWORD_LENGTH, requiredLabel } from '../lib/forms'
 import type { Whoami } from '../api/types'
 
 interface InviteInfo {
@@ -43,7 +43,7 @@ export default function InviteSetupPage() {
   const [submitting, setSubmitting] = useState(false)
   const [attempted, setAttempted] = useState(false)
 
-  const passwordInvalid = attempted && password.trim().length < 8
+  const passwordInvalid = attempted && password.trim().length < MIN_PASSWORD_LENGTH
   const confirmInvalid = attempted && (!confirm.trim() || password !== confirm)
   const confirmInvalidText = !confirm.trim()
     ? 'Confirm password is required.'
@@ -70,8 +70,8 @@ export default function InviteSetupPage() {
     e.preventDefault()
     setError(null)
     setAttempted(true)
-    if (password.length < 8) {
-      setError('Please choose a password of at least 8 characters.')
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setError(`Please choose a password of at least ${MIN_PASSWORD_LENGTH} characters.`)
       return
     }
     if (password !== confirm) {
@@ -79,9 +79,26 @@ export default function InviteSetupPage() {
       return
     }
     setSubmitting(true)
+    // Step 1: set the password (consumes the token). A 400 here is a password
+    // policy rejection (show the real reason); a 404 means the link is genuinely
+    // bad/already used (show the invalid-link state).
     try {
       await apiPost(`/capsule/invite/${token}/`, { password })
-      // The token is now consumed; log in with the new credentials.
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) {
+        setInvalid(true)
+      } else {
+        setError(
+          apiErrorMessage(err, 'Could not complete setup. Please try again.'),
+        )
+      }
+      setSubmitting(false)
+      return
+    }
+    // Step 2: the account now exists — log in. If auto-login hiccups, the
+    // account is still set up, so send them to the sign-in page rather than
+    // implying the link failed.
+    try {
       const username = info!.username
       const authToken = await obtainToken(username, password)
       setAuth(authToken, username)
@@ -108,7 +125,7 @@ export default function InviteSetupPage() {
       }
       navigate('/workspace', { replace: true })
     } catch {
-      setError('This invite link is no longer valid. Please ask your accountant for a new one.')
+      navigate('/login', { replace: true })
     } finally {
       setSubmitting(false)
     }
@@ -166,7 +183,7 @@ export default function InviteSetupPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   invalid={passwordInvalid}
-                  invalidText="Password must be at least 8 characters."
+                  invalidText={`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`}
                 />
                 <PasswordInput
                   id="invite-confirm"

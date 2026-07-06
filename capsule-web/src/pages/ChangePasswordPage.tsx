@@ -11,7 +11,8 @@ import {
 import { ArrowRight } from '@carbon/icons-react'
 import { usePasswordChange } from '../api/queries'
 import { useAppStore } from '../store/useAppStore'
-import { requiredLabel } from '../lib/forms'
+import { apiErrorMessage } from '../api/client'
+import { MIN_PASSWORD_LENGTH, requiredLabel } from '../lib/forms'
 
 /**
  * First-login password change. Forced by the App-level interceptor when
@@ -27,7 +28,7 @@ export default function ChangePasswordPage() {
   const [error, setError] = useState<string | null>(null)
   const [attempted, setAttempted] = useState(false)
 
-  const pwInvalid = attempted && pw.trim().length < 8
+  const pwInvalid = attempted && pw.trim().length < MIN_PASSWORD_LENGTH
   const confirmInvalid = attempted && (!confirm.trim() || pw !== confirm)
   const confirmInvalidText = !confirm.trim()
     ? 'Confirm new password is required.'
@@ -44,8 +45,8 @@ export default function ChangePasswordPage() {
     e.preventDefault()
     setError(null)
     setAttempted(true)
-    if (pw.length < 8) {
-      setError('Password must be at least 8 characters.')
+    if (pw.length < MIN_PASSWORD_LENGTH) {
+      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`)
       return
     }
     if (pw !== confirm) {
@@ -54,6 +55,10 @@ export default function ChangePasswordPage() {
     }
     change.mutate(pw, {
       onSuccess: () => navigate(landing, { replace: true }),
+      onError: (err) =>
+        setError(
+          apiErrorMessage(err, 'Could not set your password. Please try again.'),
+        ),
     })
   }
 
@@ -85,7 +90,7 @@ export default function ChangePasswordPage() {
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 invalid={pwInvalid}
-                invalidText="New password must be at least 8 characters."
+                invalidText={`New password must be at least ${MIN_PASSWORD_LENGTH} characters.`}
               />
               <PasswordInput
                 id="confirm-password"
