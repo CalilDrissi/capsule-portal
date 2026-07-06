@@ -8,6 +8,7 @@ import {
   Stack,
   Tile,
 } from '@carbon/react'
+import { ArrowRight } from '@carbon/icons-react'
 import { usePasswordChange } from '../api/queries'
 import { useAppStore } from '../store/useAppStore'
 import { requiredLabel } from '../lib/forms'
@@ -94,7 +95,7 @@ export default function ChangePasswordPage() {
                 invalid={confirmInvalid}
                 invalidText={confirmInvalidText}
               />
-              <Button type="submit" disabled={change.isPending}>
+              <Button type="submit" disabled={change.isPending} renderIcon={ArrowRight}>
                 {change.isPending ? 'Saving…' : 'Set password'}
               </Button>
             </Stack>

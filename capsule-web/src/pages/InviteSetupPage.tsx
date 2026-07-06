@@ -10,6 +10,7 @@ import {
   TextInput,
   Tile,
 } from '@carbon/react'
+import { ArrowRight } from '@carbon/icons-react'
 import { apiGet, apiPost, obtainToken } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
 import { requiredLabel } from '../lib/forms'
@@ -175,7 +176,7 @@ export default function InviteSetupPage() {
                   invalid={confirmInvalid}
                   invalidText={confirmInvalidText}
                 />
-                <Button type="submit" disabled={submitting} data-testid="invite-submit">
+                <Button type="submit" disabled={submitting} data-testid="invite-submit" renderIcon={ArrowRight}>
                   {submitting ? 'Setting up…' : 'Create account'}
                 </Button>
               </Stack>

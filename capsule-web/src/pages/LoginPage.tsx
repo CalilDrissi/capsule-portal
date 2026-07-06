@@ -9,6 +9,7 @@ import {
   TextInput,
   Tile,
 } from '@carbon/react'
+import { ArrowRight } from '@carbon/icons-react'
 import { apiGet, obtainToken } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
 import { requiredLabel } from '../lib/forms'
@@ -117,7 +118,7 @@ export default function LoginPage() {
                 invalid={passwordInvalid}
                 invalidText="Password is required."
               />
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading} renderIcon={ArrowRight}>
                 {loading ? 'Signing in…' : 'Sign in'}
               </Button>
             </Stack>
