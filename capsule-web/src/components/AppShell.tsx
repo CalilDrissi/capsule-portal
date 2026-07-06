@@ -65,7 +65,7 @@ export default function AppShell() {
           {firm?.name ? `Capsule — ${firm.name}` : 'Capsule'}
         </HeaderName>
         <HeaderGlobalBar>
-          {!isClient && (
+          {isPlatform && (
             <HeaderGlobalAction
               aria-label="Search"
               tooltipAlignment="end"
@@ -140,7 +140,11 @@ export default function AppShell() {
             </>
           )}
 
-          {(isPlatform || isAccountant) && (
+          {/* Generic Mayan document tools are platform-admin only. Accountants
+              work client-first (Clients -> a client's workspace); the raw
+              firm-wide document/cabinet/index/etc. pages were broken or
+              inappropriate for them (see firm-UI audit). */}
+          {isPlatform && (
             <>
               {isPlatform && (
                 <>

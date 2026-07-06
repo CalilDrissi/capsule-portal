@@ -195,7 +195,7 @@ export default function App() {
           <Route
             path="dashboard"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <DashboardPage />
               </RequireRole>
             }
@@ -203,7 +203,7 @@ export default function App() {
           <Route
             path="documents"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <DocumentsPage />
               </RequireRole>
             }
@@ -211,7 +211,7 @@ export default function App() {
           <Route
             path="documents/:id"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <DocumentDetailPage />
               </RequireRole>
             }
@@ -219,7 +219,7 @@ export default function App() {
           <Route
             path="favorites"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <FavoritesPage />
               </RequireRole>
             }
@@ -227,7 +227,7 @@ export default function App() {
           <Route
             path="recently-created"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <RecentlyCreatedPage />
               </RequireRole>
             }
@@ -235,7 +235,7 @@ export default function App() {
           <Route
             path="trash"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <TrashPage />
               </RequireRole>
             }
@@ -243,7 +243,7 @@ export default function App() {
           <Route
             path="upload"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <UploadPage />
               </RequireRole>
             }
@@ -251,7 +251,7 @@ export default function App() {
           <Route
             path="cabinets"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <CabinetsPage />
               </RequireRole>
             }
@@ -259,7 +259,7 @@ export default function App() {
           <Route
             path="cabinets/:id"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <CabinetDetailPage />
               </RequireRole>
             }
@@ -267,7 +267,7 @@ export default function App() {
           <Route
             path="indexes"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <IndexesPage />
               </RequireRole>
             }
@@ -275,7 +275,7 @@ export default function App() {
           <Route
             path="search"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <SearchPage />
               </RequireRole>
             }
@@ -283,7 +283,7 @@ export default function App() {
           <Route
             path="workflows"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <WorkflowsPage />
               </RequireRole>
             }
@@ -291,7 +291,7 @@ export default function App() {
           <Route
             path="checkouts"
             element={
-              <RequireRole allow={['accountant']}>
+              <RequireRole allow={[]}>
                 <CheckoutsPage />
               </RequireRole>
             }
