@@ -375,6 +375,27 @@ export interface ProvisionClientResult {
   invite_path: string | null
 }
 
+/** A firm (tenant). Returned by GET/POST /capsule/firms/ (platform admin). */
+export interface Firm {
+  id: number
+  name: string
+  slug: string
+  accountant_group_id: number | null
+  accountant_role_id: number | null
+  document_type_id: number | null
+  document_date_metadata_type_id: number | null
+  category_metadata_type_id: number | null
+  index_template_id: number | null
+  workflow_id: number | null
+}
+
+/** Result of POST /capsule/firms/<id>/accountants/. */
+export interface AccountantCreateResult {
+  user: { id: number; username: string }
+  firm_id: number
+  membership_id: number
+}
+
 /** A document request / checklist item (GET /capsule/clients/<id>/requests/). */
 export interface CapsuleDocumentRequest {
   id: number

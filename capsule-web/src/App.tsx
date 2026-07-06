@@ -32,6 +32,7 @@ import EventsPage from './pages/EventsPage'
 import SmartLinksPage from './pages/SmartLinksPage'
 import WebLinksPage from './pages/WebLinksPage'
 import SettingsPage from './pages/SettingsPage'
+import FirmsPage from './pages/FirmsPage'
 import ClientsGridPage from './pages/ClientsGridPage'
 import ClientWorkspacePage from './pages/ClientWorkspacePage'
 import ClientWorkspaceSelfPage from './pages/ClientWorkspaceSelfPage'
@@ -110,6 +111,16 @@ export default function App() {
           }
         >
           <Route index element={<RoleIndexRedirect />} />
+
+          {/* Platform-only: manage firms (tenants) */}
+          <Route
+            path="firms"
+            element={
+              <RequireRole allow={[]}>
+                <FirmsPage />
+              </RequireRole>
+            }
+          />
 
           {/* Accountant tenancy routes */}
           <Route

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Capsule — Platform Admin Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --blue:#0f62fe; --blue-hover:#0353e9;
+    --ink:#161616; --gray90:#262626; --gray70:#525252; --gray50:#8d8d8d;
+    --gray20:#e0e0e0; --gray10:#f4f4f4; --white:#ffffff; --green:#24a148;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    color:var(--ink); background:var(--gray10); font-weight:300; line-height:1.5;
+    font-size:16px;
+  }
+  code,.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+
+  /* Carbon UI-shell header */
+  .shell{
+    position:sticky; top:0; z-index:10;
+    height:48px; background:var(--ink); color:var(--white);
+    display:flex; align-items:center; gap:16px; padding:0 16px;
+    border-bottom:1px solid var(--gray90);
+  }
+  .shell .brand{font-weight:600;font-size:15px;letter-spacing:.01em}
+  .shell .brand span{color:#78a9ff}
+  .shell .divider{width:1px;height:20px;background:var(--gray70)}
+  .shell .ctx{font-size:13px;color:#c6c6c6}
+  .shell .url{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#a8a8a8}
+
+  main{max-width:760px;margin:0 auto;padding:40px 16px 96px}
+
+  .eyebrow{color:var(--blue);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+  h1{font-weight:300;font-size:34px;line-height:1.15;letter-spacing:-.01em;text-wrap:balance;margin-bottom:12px}
+  h1 b{font-weight:600}
+  .lead{color:var(--gray70);font-size:17px;max-width:60ch;margin-bottom:8px}
+  .roles{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+  .chip{font-size:12px;background:var(--white);border:1px solid var(--gray20);padding:6px 12px;color:var(--gray70)}
+  .chip b{color:var(--ink);font-weight:600}
+
+  .progress{margin:36px 0 20px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--gray70)}
+  .bar{flex:1;height:4px;background:var(--gray20);position:relative;overflow:hidden}
+  .bar>span{position:absolute;left:0;top:0;bottom:0;background:var(--blue);width:16%}
+
+  .steps{display:flex;flex-direction:column;gap:16px}
+
+  /* Carbon tile */
+  .step{background:var(--white);border:1px solid var(--gray20);border-left:3px solid var(--blue);padding:24px}
+  .step.done{border-left-color:var(--green)}
+  .step.pending{border-left-color:var(--gray20);opacity:.72}
+  .step-head{display:flex;align-items:baseline;gap:14px;margin-bottom:14px}
+  .num{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;color:var(--blue)}
+  .step.done .num{color:var(--green)}
+  .step.pending .num{color:var(--gray50)}
+  .step h2{font-weight:600;font-size:19px;flex:1}
+  /* Carbon tag */
+  .tag{font-size:12px;font-weight:400;padding:3px 10px;border-radius:12px;white-space:nowrap;line-height:1.4}
+  .tag.now{background:#d0e2ff;color:#0043ce}
+  .tag.ok{background:#a7f0ba;color:#0e6027}
+  .tag.wait{background:var(--gray10);color:var(--gray70);border:1px solid var(--gray20)}
+
+  ol.actions{list-style:none;counter-reset:a;display:flex;flex-direction:column;gap:10px;margin:4px 0 0}
+  ol.actions li{counter-increment:a;position:relative;padding-left:28px;color:var(--gray90)}
+  ol.actions li::before{content:counter(a);position:absolute;left:0;top:1px;width:18px;height:18px;background:var(--gray10);border:1px solid var(--gray20);border-radius:50%;font-size:11px;font-weight:600;color:var(--gray70);display:flex;align-items:center;justify-content:center}
+  .actions b{font-weight:600}
+
+  .cred{margin-top:16px;background:var(--ink);color:#e0e0e0;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:13px;display:flex;flex-direction:column;gap:6px}
+  .cred .row{display:flex;gap:10px}
+  .cred .k{color:#8d8d8d;min-width:96px}
+  .cred .v{color:#78a9ff;font-weight:600;user-select:all}
+
+  .note{margin-top:14px;font-size:14px;color:var(--gray70);border-left:2px solid var(--gray20);padding-left:12px}
+  .note b{color:var(--ink);font-weight:600}
+
+  footer{max-width:760px;margin:0 auto;padding:0 16px 48px;color:var(--gray50);font-size:12px}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+</style>
+</head>
+<body>
+  <header class="shell">
+    <div class="brand">Cap<span>sule</span></div>
+    <div class="divider"></div>
+    <div class="ctx">Platform Admin Guide</div>
+    <div class="url">capsule.kiloctet.com</div>
+  </header>
+
+  <main>
+    <div class="eyebrow">Getting started</div>
+    <h1>Running Capsule as the <b>platform admin</b></h1>
+    <p class="lead">
+      The <b>admin</b> account owns the platform — you use it to set up firms and
+      keep an eye on things. Firms and their accountants do the day-to-day work.
+      Follow these steps in order; we'll add each one here as you go.
+    </p>
+    <div class="roles">
+      <span class="chip"><b>Admin</b> — you, the owner</span>
+      <span class="chip"><b>Accountant</b> — runs a firm</span>
+      <span class="chip"><b>Client</b> — uploads documents</span>
+    </div>
+
+    <div class="progress">
+      <span>Progress</span>
+      <div class="bar"><span></span></div>
+      <span>1 step</span>
+    </div>
+
+    <div class="steps">
+      <!-- STEP 1 -->
+      <article class="step done">
+        <div class="step-head">
+          <span class="num">01</span>
+          <h2>Sign in as the platform admin</h2>
+          <span class="tag ok">Done</span>
+        </div>
+        <ol class="actions">
+          <li>Open <a href="https://capsule.kiloctet.com">capsule.kiloctet.com</a>.</li>
+          <li>Enter the <b>admin</b> username and password below.</li>
+          <li>Click <b>Sign in</b>. You'll land on the admin dashboard.</li>
+        </ol>
+        <div class="cred">
+          <div class="row"><span class="k">URL</span><span class="v">capsule.kiloctet.com</span></div>
+          <div class="row"><span class="k">Username</span><span class="v">admin</span></div>
+          <div class="row"><span class="k">Password</span><span class="v">Capsule-38dce66e6f-Ad9</span></div>
+        </div>
+        <p class="note"><b>Change this password</b> after your first sign-in, then keep it somewhere safe — it's the master account.</p>
+      </article>
+
+      <!-- NEXT STEP PLACEHOLDER -->
+      <article class="step pending">
+        <div class="step-head">
+          <span class="num">02</span>
+          <h2>Create your firm</h2>
+          <span class="tag wait">Up next</span>
+        </div>
+        <p class="note">We'll fill this in together — tell me your firm's name and this step appears here with the exact actions.</p>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    Capsule — a secure document portal for accounting firms. Guide generated for the platform admin.
+  </footer>
+</body>
+</html>

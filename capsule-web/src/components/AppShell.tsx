@@ -17,6 +17,7 @@ import {
   Catalog,
   Dashboard,
   DocumentMultiple_01,
+  Enterprise,
   Favorite,
   FlowConnection,
   Folder,
@@ -142,14 +143,25 @@ export default function AppShell() {
           {(isPlatform || isAccountant) && (
             <>
               {isPlatform && (
-                <SideNavLink
-                  renderIcon={Dashboard}
-                  isActive={isActive('/dashboard')}
-                  onClick={() => navigate('/dashboard')}
-                  href="#"
-                >
-                  Dashboard
-                </SideNavLink>
+                <>
+                  <SideNavLink
+                    renderIcon={Enterprise}
+                    isActive={isActive('/firms')}
+                    onClick={() => navigate('/firms')}
+                    href="#"
+                    data-testid="nav-firms"
+                  >
+                    Firms
+                  </SideNavLink>
+                  <SideNavLink
+                    renderIcon={Dashboard}
+                    isActive={isActive('/dashboard')}
+                    onClick={() => navigate('/dashboard')}
+                    href="#"
+                  >
+                    Dashboard
+                  </SideNavLink>
+                </>
               )}
               <SideNavLink
                 renderIcon={DocumentMultiple_01}

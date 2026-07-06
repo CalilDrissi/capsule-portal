@@ -5,10 +5,12 @@ import {
 } from '@tanstack/react-query'
 import { apiDelete, apiGet, apiPatch, apiPost, changePassword } from './client'
 import type {
+  AccountantCreateResult,
   CapsuleClient,
   CapsuleDocumentRequest,
   CapsuleNotification,
   CapsuleNotificationList,
+  Firm,
   FirmSettings,
   ProvisionClientResult,
   Whoami,
@@ -1097,6 +1099,49 @@ export function useWhoami() {
     queryKey: ['whoami'] as const,
     queryFn: () => apiGet<Whoami>(`/capsule/whoami/`),
     enabled: !!token,
+  })
+}
+
+/* ------------------------------- Firms ------------------------------- */
+
+/** All firms (platform admin only). GET /capsule/firms/ returns a bare array. */
+export function useFirms() {
+  const role = useAppStore((s) => s.role)
+  return useQuery({
+    queryKey: ['capsule_firms'] as const,
+    queryFn: () => apiGet<Firm[]>(`/capsule/firms/`),
+    enabled: role === 'platform' || role == null,
+  })
+}
+
+/** Create a firm (platform admin). Provisions the firm's group/role/settings. */
+export function useCreateFirm() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (vars: { name: string }) => apiPost<Firm>(`/capsule/firms/`, vars),
+    meta: { successMessage: 'Firm created' },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['capsule_firms'] }),
+  })
+}
+
+/** Create an accountant login for a firm (platform admin, or a firm accountant). */
+export function useCreateAccountant() {
+  return useMutation({
+    mutationFn: (vars: {
+      firmId: number
+      username: string
+      password: string
+      full_name?: string
+    }) =>
+      apiPost<AccountantCreateResult>(
+        `/capsule/firms/${vars.firmId}/accountants/`,
+        {
+          username: vars.username,
+          password: vars.password,
+          full_name: vars.full_name ?? '',
+        },
+      ),
+    meta: { successMessage: 'Accountant created' },
   })
 }
 
